@@ -14,6 +14,7 @@
 		5F01EC021F8FD28400E47E6A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5F01EC001F8FD28400E47E6A /* LaunchScreen.storyboard */; };
 		5F01EC0D1F8FD28400E47E6A /* KoelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F01EC0C1F8FD28400E47E6A /* KoelTests.swift */; };
 		5F01EC1A1F8FD2AA00E47E6A /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F01EC191F8FD2AA00E47E6A /* CloudKit.framework */; };
+		5F01EC1D1F8FD8C100E47E6A /* DMKoelModelManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F01EC1C1F8FD8C100E47E6A /* DMKoelModelManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -39,6 +40,7 @@
 		5F01EC0E1F8FD28400E47E6A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5F01EC171F8FD2A600E47E6A /* Koel.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Koel.entitlements; sourceTree = "<group>"; };
 		5F01EC191F8FD2AA00E47E6A /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
+		5F01EC1C1F8FD8C100E47E6A /* DMKoelModelManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMKoelModelManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -82,6 +84,7 @@
 		5F01EBF61F8FD28400E47E6A /* Koel */ = {
 			isa = PBXGroup;
 			children = (
+				5F01EC1B1F8FD89600E47E6A /* Model */,
 				5F01EC171F8FD2A600E47E6A /* Koel.entitlements */,
 				5F01EBF71F8FD28400E47E6A /* AppDelegate.swift */,
 				5F01EBF91F8FD28400E47E6A /* ViewController.swift */,
@@ -108,6 +111,14 @@
 				5F01EC191F8FD2AA00E47E6A /* CloudKit.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		5F01EC1B1F8FD89600E47E6A /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				5F01EC1C1F8FD8C100E47E6A /* DMKoelModelManager.swift */,
+			);
+			path = Model;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -221,6 +232,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5F01EC1D1F8FD8C100E47E6A /* DMKoelModelManager.swift in Sources */,
 				5F01EBFA1F8FD28400E47E6A /* ViewController.swift in Sources */,
 				5F01EBF81F8FD28400E47E6A /* AppDelegate.swift in Sources */,
 			);
