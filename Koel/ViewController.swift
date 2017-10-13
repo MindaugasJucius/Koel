@@ -10,15 +10,19 @@ import UIKit
 
 class ViewController: UIViewController {
 
-    let modelManager = DMKoelModelManager()
+    let modelManager = DMEventManager()
     
     let urlSession = URLSession(configuration: .default)
     var dataTask: URLSessionDataTask?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        //modelManager.saveEvent()
+        modelManager.createEvent()
         
+        getWeatherData()
+    }
+    
+    func getWeatherData() {
         //key - https://home.openweathermap.org/api_keys
         //api call - https://openweathermap.org/current
         //where to use api key - https://openweathermap.org/appid
@@ -28,8 +32,6 @@ class ViewController: UIViewController {
         guard let url = vilniusWeatherUrl else {
             return
         }
-
-        //urlSession.dataTask(with: <#T##URL#>, completionHandler: <#T##(Data?, URLResponse?, Error?) -> Void#>)
         
         dataTask = urlSession.dataTask(
             with: url,
@@ -45,12 +47,6 @@ class ViewController: UIViewController {
                     response.statusCode == 200 {
                     print(data)
                     
-//                    do {
-//                        y = try someThrowingFunction()
-//                    } catch {
-//                        y = nil
-//                    }
-                    
                     let anyJson = try? JSONSerialization.jsonObject(with: data, options: .allowFragments)
                     guard let jsonDict = anyJson as? Dictionary<String, Any> else {
                         return
@@ -61,14 +57,5 @@ class ViewController: UIViewController {
         )
         
         dataTask?.resume()
-
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-
-
 }
-
