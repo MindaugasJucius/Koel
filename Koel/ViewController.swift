@@ -7,55 +7,84 @@
 //
 
 import UIKit
+import CloudKit
+
+private let CellID = "CellID"
 
 class ViewController: UIViewController {
 
-    let modelManager = DMEventManager()
+    @IBOutlet private weak var tableView: UITableView!
+    
+    let eventManager = DMEventManager(withUserManager: DMUserManager())
     
     let urlSession = URLSession(configuration: .default)
     var dataTask: URLSessionDataTask?
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        modelManager.createEvent()
-        
-        getWeatherData()
+    fileprivate var records: [CKRecord] = [] {
+        didSet {
+            tableView.reloadData()
+        }
     }
     
-    func getWeatherData() {
-        //key - https://home.openweathermap.org/api_keys
-        //api call - https://openweathermap.org/current
-        //where to use api key - https://openweathermap.org/appid
-        let vilniusWeatherUrl = URL(string: "https://api.openweathermap.org/data/2.5/weather?q=vilnius&APPID=5a153f9ba6a63b4b39ec55c3e19af847")
-        
-        
-        guard let url = vilniusWeatherUrl else {
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        NotificationCenter.default.addObserver(self, selector: #selector(updateSongs), name: SongsUpdateNotificationName, object: nil)
+        self.tableView.dataSource = self
+        self.tableView.register(UITableViewCell.self, forCellReuseIdentifier: CellID)
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    @objc func updateSongs() {
+        guard let currentEvent = DMUserDefaultsHelper.CurrentEventRecord else {
             return
         }
-        
-        dataTask = urlSession.dataTask(
-            with: url,
-            completionHandler: { data, response, error in
-                
-                if let error = error {
-                    print(error.localizedDescription)
-                    return
+        eventManager.fetchSongs(
+            forEventID: currentEvent.recordID,
+            completion: { [weak self] songRecords in
+                DispatchQueue.main.async {
+                    self?.records = songRecords
                 }
-                
-                if let data = data,
-                    let response = response as? HTTPURLResponse,
-                    response.statusCode == 200 {
-                    print(data)
-                    
-                    let anyJson = try? JSONSerialization.jsonObject(with: data, options: .allowFragments)
-                    guard let jsonDict = anyJson as? Dictionary<String, Any> else {
-                        return
-                    }
-                    print(jsonDict.description)
-                }
+                print(songRecords)
+            },
+            failure: { error in
+                print(error.localizedDescription)
             }
         )
-        
-        dataTask?.resume()
     }
+    
+    @IBAction func updateSongList(_ sender: UIButton) {
+        updateSongs()
+    }
+    
+    @IBAction func createEvent(_ sender: UIButton) {
+        eventManager.createEvent()
+    }
+    
+    @IBAction func addSong(_ sender: UIButton) {
+        guard let currentEvent = DMUserDefaultsHelper.CurrentEventRecord else { return }
+        let song = DMSong(hasBeenPlayed: false, eventID: currentEvent.recordID, spotifySongID: "dankid")
+        eventManager.save(aSong: song) {
+            print("lul")
+        }
+    }
+    
+}
+
+extension ViewController: UITableViewDataSource {
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return records.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: CellID, for: indexPath)
+        let songRecord = self.records[indexPath.row]
+        let cellTitle = "A song created at \(String(describing: songRecord.creationDate!.description))"
+        cell.textLabel?.text = cellTitle
+        return cell
+    }
+    
 }

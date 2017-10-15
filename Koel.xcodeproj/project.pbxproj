@@ -15,6 +15,9 @@
 		5F01EC0D1F8FD28400E47E6A /* KoelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F01EC0C1F8FD28400E47E6A /* KoelTests.swift */; };
 		5F01EC1A1F8FD2AA00E47E6A /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F01EC191F8FD2AA00E47E6A /* CloudKit.framework */; };
 		5F01EC1D1F8FD8C100E47E6A /* DMEventManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F01EC1C1F8FD8C100E47E6A /* DMEventManager.swift */; };
+		5F01EC201F92570500E47E6A /* DMSong.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F01EC1F1F92570500E47E6A /* DMSong.swift */; };
+		5F01EC231F925EB200E47E6A /* DMCKRecordExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F01EC221F925EB200E47E6A /* DMCKRecordExtensions.swift */; };
+		5F01EC251F925F8C00E47E6A /* DMUserManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F01EC241F925F8C00E47E6A /* DMUserManager.swift */; };
 		5FB28BE11F90EA3900B670E6 /* DMEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB28BE01F90EA3900B670E6 /* DMEvent.swift */; };
 		5FB28BE31F90ECEA00B670E6 /* DMUserDefaultsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB28BE21F90ECEA00B670E6 /* DMUserDefaultsHelper.swift */; };
 /* End PBXBuildFile section */
@@ -43,6 +46,9 @@
 		5F01EC171F8FD2A600E47E6A /* Koel.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Koel.entitlements; sourceTree = "<group>"; };
 		5F01EC191F8FD2AA00E47E6A /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		5F01EC1C1F8FD8C100E47E6A /* DMEventManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventManager.swift; sourceTree = "<group>"; };
+		5F01EC1F1F92570500E47E6A /* DMSong.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMSong.swift; sourceTree = "<group>"; };
+		5F01EC221F925EB200E47E6A /* DMCKRecordExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMCKRecordExtensions.swift; sourceTree = "<group>"; };
+		5F01EC241F925F8C00E47E6A /* DMUserManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMUserManager.swift; sourceTree = "<group>"; };
 		5FB28BE01F90EA3900B670E6 /* DMEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEvent.swift; sourceTree = "<group>"; };
 		5FB28BE21F90ECEA00B670E6 /* DMUserDefaultsHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMUserDefaultsHelper.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -88,6 +94,8 @@
 		5F01EBF61F8FD28400E47E6A /* Koel */ = {
 			isa = PBXGroup;
 			children = (
+				5F01EC211F925E9700E47E6A /* Helpers */,
+				5F01EC1E1F9256CB00E47E6A /* Services */,
 				5F01EC1B1F8FD89600E47E6A /* Model */,
 				5F01EC171F8FD2A600E47E6A /* Koel.entitlements */,
 				5F01EBF71F8FD28400E47E6A /* AppDelegate.swift */,
@@ -120,11 +128,28 @@
 		5F01EC1B1F8FD89600E47E6A /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				5F01EC1C1F8FD8C100E47E6A /* DMEventManager.swift */,
 				5FB28BE01F90EA3900B670E6 /* DMEvent.swift */,
-				5FB28BE21F90ECEA00B670E6 /* DMUserDefaultsHelper.swift */,
+				5F01EC1F1F92570500E47E6A /* DMSong.swift */,
 			);
 			path = Model;
+			sourceTree = "<group>";
+		};
+		5F01EC1E1F9256CB00E47E6A /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				5F01EC1C1F8FD8C100E47E6A /* DMEventManager.swift */,
+				5F01EC241F925F8C00E47E6A /* DMUserManager.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		5F01EC211F925E9700E47E6A /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				5F01EC221F925EB200E47E6A /* DMCKRecordExtensions.swift */,
+				5FB28BE21F90ECEA00B670E6 /* DMUserDefaultsHelper.swift */,
+			);
+			path = Helpers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -179,6 +204,9 @@
 						CreatedOnToolsVersion = 9.0;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
 							com.apple.Push = {
 								enabled = 1;
 							};
@@ -239,10 +267,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				5F01EC1D1F8FD8C100E47E6A /* DMEventManager.swift in Sources */,
+				5F01EC251F925F8C00E47E6A /* DMUserManager.swift in Sources */,
+				5F01EC231F925EB200E47E6A /* DMCKRecordExtensions.swift in Sources */,
 				5F01EBFA1F8FD28400E47E6A /* ViewController.swift in Sources */,
 				5FB28BE31F90ECEA00B670E6 /* DMUserDefaultsHelper.swift in Sources */,
 				5F01EBF81F8FD28400E47E6A /* AppDelegate.swift in Sources */,
 				5FB28BE11F90EA3900B670E6 /* DMEvent.swift in Sources */,
+				5F01EC201F92570500E47E6A /* DMSong.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

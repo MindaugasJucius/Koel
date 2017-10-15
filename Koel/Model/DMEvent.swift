@@ -8,40 +8,29 @@
 
 import CloudKit
 
+protocol CKRecordModel {
+    func asCKRecord() -> CKRecord
+}
+
 enum EventKey: String {
-    case creatorId
     case code
     case name
-    case queue
+    case eventHasFinished
 }
 
 struct DMEvent: CKRecordModel {
-
-    let creatorId: String
+    
     let code: String
     var name: String
-    var queue: [String]
+    var eventHasFinished: Bool
     
     func asCKRecord() -> CKRecord {
         let record = CKRecord(recordType: String(describing: DMEvent.self))
-        record[.creatorId] = creatorId
-        record[.code] = code
-        record[.name] = name
-        record[.queue] = queue
-        return record
-    }
-    
-}
+        record[EventKey.code] = code
+        record[EventKey.name] = name
+        record[EventKey.eventHasFinished] = eventHasFinished
 
-extension CKRecord {
-    
-    subscript(key: EventKey) -> Any? {
-        get {
-            return self[key.rawValue]
-        }
-        set {
-            self[key.rawValue] = newValue as? CKRecordValue
-        }
+        return record
     }
     
 }
