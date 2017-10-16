@@ -8,7 +8,6 @@
 
 import CloudKit
 
-
 enum SongKey: String {
     case hasBeenPlayed
     case parentEvent
@@ -16,6 +15,9 @@ enum SongKey: String {
 }
 
 struct DMSong: CKRecordModel {
+
+    static let notificationSongIDKey = "songID"
+    static let notificationReasonSongKey = "songIDNotificationReason"
     
     let hasBeenPlayed: Bool
     let eventID: CKRecordID
