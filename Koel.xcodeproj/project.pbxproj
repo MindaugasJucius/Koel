@@ -20,6 +20,7 @@
 		5F01EC251F925F8C00E47E6A /* DMUserManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F01EC241F925F8C00E47E6A /* DMUserManager.swift */; };
 		5FB28BE11F90EA3900B670E6 /* DMEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB28BE01F90EA3900B670E6 /* DMEvent.swift */; };
 		5FB28BE31F90ECEA00B670E6 /* DMUserDefaultsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB28BE21F90ECEA00B670E6 /* DMUserDefaultsHelper.swift */; };
+		5FF67D4B1F9795F7001E66FA /* DMSongManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FF67D4A1F9795F7001E66FA /* DMSongManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +52,7 @@
 		5F01EC241F925F8C00E47E6A /* DMUserManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMUserManager.swift; sourceTree = "<group>"; };
 		5FB28BE01F90EA3900B670E6 /* DMEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEvent.swift; sourceTree = "<group>"; };
 		5FB28BE21F90ECEA00B670E6 /* DMUserDefaultsHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMUserDefaultsHelper.swift; sourceTree = "<group>"; };
+		5FF67D4A1F9795F7001E66FA /* DMSongManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMSongManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -139,6 +141,7 @@
 			children = (
 				5F01EC1C1F8FD8C100E47E6A /* DMEventManager.swift */,
 				5F01EC241F925F8C00E47E6A /* DMUserManager.swift */,
+				5FF67D4A1F9795F7001E66FA /* DMSongManager.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -269,6 +272,7 @@
 				5F01EC1D1F8FD8C100E47E6A /* DMEventManager.swift in Sources */,
 				5F01EC251F925F8C00E47E6A /* DMUserManager.swift in Sources */,
 				5F01EC231F925EB200E47E6A /* DMCKRecordExtensions.swift in Sources */,
+				5FF67D4B1F9795F7001E66FA /* DMSongManager.swift in Sources */,
 				5F01EBFA1F8FD28400E47E6A /* ViewController.swift in Sources */,
 				5FB28BE31F90ECEA00B670E6 /* DMUserDefaultsHelper.swift in Sources */,
 				5F01EBF81F8FD28400E47E6A /* AppDelegate.swift in Sources */,

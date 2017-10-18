@@ -10,8 +10,8 @@ import UIKit
 import CloudKit
 import UserNotifications
 
-let SongsNotification = Notification(name: SongsUpdateNotificationName)
 let SongsUpdateNotificationName = Notification.Name("songs updated notification")
+let SongsNotification = Notification(name: SongsUpdateNotificationName)
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
@@ -22,25 +22,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
-            if let error = error {
-                print("D'oh: \(error.localizedDescription)")
-            } else {
-                DispatchQueue.main.async {
-                    application.registerForRemoteNotifications()
-                }
-            }
-        }
+        application.registerForRemoteNotifications()
         
         //if DMUserDefaultsHelper.CurrentEventRecord != nil {
             eventManager.saveSongCreationSubscription()
         //}
         
         return true
-    }
-    
-    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        completionHandler([.alert, .sound, .badge])
     }
  
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
