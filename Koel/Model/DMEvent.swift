@@ -21,6 +21,7 @@ enum EventKey: String {
 struct DMEvent: CKRecordModel {
     
     let code: String
+    var id: String?
     var name: String
     var eventHasFinished: Bool
     

@@ -11,16 +11,24 @@ import CloudKit
 
 private let CellID = "CellID"
 
-class ViewController: UIViewController {
+class DMSongQueueViewController: UIViewController {
 
     @IBOutlet private weak var tableView: UITableView!
     
-    let eventManager = DMEventManager(withUserManager: DMUserManager())
-    
-    let urlSession = URLSession(configuration: .default)
-    var dataTask: URLSessionDataTask?
+    let songManager: DMSongManager
+    let event: CKRecord
     
     fileprivate var records: [CKRecord] = []
+    
+    init(withEvent event: CKRecord) {
+        self.event = event
+        self.songManager = DMSongManager(withEvent: event)
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -40,7 +48,7 @@ class ViewController: UIViewController {
             return
         }
         print(songNotificationReason)
-        eventManager.fetchASong(
+        songManager.fetchASong(
             withSongRecordID: songIDRecord,
             completion: { [unowned self] songRecord in
                 self.handle(songRecord: songRecord, withNotificationReason: songNotificationReason)
@@ -81,11 +89,9 @@ class ViewController: UIViewController {
     }
     
     func fetchAllSongs() {
-        guard let currentEvent = DMUserDefaultsHelper.CurrentEventRecord else {
-            return
-        }
-        eventManager.fetchSongs(
-            forEventID: currentEvent.recordID,
+
+        songManager.fetchSongs(
+            forEventID: event.recordID,
             completion: { [weak self] songRecords in
                 DispatchQueue.main.async {
                     self?.records = songRecords
@@ -99,21 +105,16 @@ class ViewController: UIViewController {
         )
     }
     
-    @IBAction func createEvent(_ sender: UIButton) {
-        eventManager.createEvent()
-    }
-    
     @IBAction func addSong(_ sender: UIButton) {
-        guard let currentEvent = DMUserDefaultsHelper.CurrentEventRecord else { return }
-        let song = DMSong(hasBeenPlayed: false, eventID: currentEvent.recordID, spotifySongID: "dankid")
-        eventManager.save(aSong: song) {
+        let song = DMSong(hasBeenPlayed: false, eventID: event.recordID, spotifySongID: "dankid")
+        songManager.save(aSong: song) { song in
             print("lul")
         }
     }
     
 }
 
-extension ViewController: UITableViewDataSource {
+extension DMSongQueueViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return records.count

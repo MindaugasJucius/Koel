@@ -10,7 +10,7 @@ import UIKit
 import CloudKit
 
 class DMSongManager: NSObject, DMManager {
-
+    
     let event: CKRecord
     
     init(withEvent event: CKRecord) {
@@ -45,36 +45,7 @@ class DMSongManager: NSObject, DMManager {
         
         cloudKitContainer.publicCloudDatabase.add(queryOperation)
     }
-    
-    func saveSongCreationSubscription(forEvent eventWithoutSubscription: CKRecord? = nil) {
-        let eventRecord = eventWithoutSubscription ?? event
         
-        guard !DMUserDefaultsHelper.SongCreationSubsriptionExists else {
-            return
-        }
-        
-        let predicate = NSPredicate(format: "parentEvent = %@", CKReference(recordID: eventRecord.recordID, action: .deleteSelf))
-        let subscription = CKQuerySubscription(
-            recordType: String(describing: DMSong.self),
-            predicate: predicate,
-            subscriptionID: DMEventManager.SongCreationSubscriptionID,
-            options: [.firesOnRecordCreation, .firesOnRecordUpdate]
-        )
-        
-        let notificationInfo = CKNotificationInfo()
-        notificationInfo.shouldSendContentAvailable = true
-        subscription.notificationInfo = notificationInfo
-        
-        cloudKitContainer.publicCloudDatabase.save(subscription) { subscription, error in
-            if let error = error {
-                print("error while saving subscription \(error.localizedDescription)")
-                return
-            }
-            print("SAVED SONG CREATION SUBSCRIPTION.")
-            UserDefaults.standard.set(true, forKey: DMUserDefaultsHelper.SongCreationSubsriptionExistsKey)
-        }
-    }
-    
     func save(aSong song: DMSong, completion: @escaping FetchSuccessSingleRecord) {
         cloudKitContainer.publicCloudDatabase.save(
             song.asCKRecord(),

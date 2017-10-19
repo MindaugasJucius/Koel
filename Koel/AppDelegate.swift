@@ -16,18 +16,52 @@ let SongsNotification = Notification(name: SongsUpdateNotificationName)
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
 
-    var window: UIWindow?
-
-    private let eventManager = DMEventManager()
+    private let userManager = DMUserManager()
     
+    var window: UIWindow? = UIWindow(frame: UIScreen.main.bounds)
+
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         
         application.registerForRemoteNotifications()
         
-        //if DMUserDefaultsHelper.CurrentEventRecord != nil {
-            eventManager.saveSongCreationSubscription()
-        //}
+        window?.makeKeyAndVisible()
+
+        let updateRootViewController = {
+            let rootViewController: UIViewController
+            if let currentEvent = DMUserDefaultsHelper.CurrentEventRecord {
+                rootViewController = DMSongQueueViewController(withEvent: currentEvent)
+            } else {
+                rootViewController = DMEventCreationViewController()
+            }
+            self.window?.rootViewController = rootViewController
+        }
         
+        guard DMUserDefaultsHelper.CloudKitUserRecord == nil else {
+            updateRootViewController()
+            return true
+        }
+        
+        self.window?.rootViewController = DMInitialLoadingViewController()
+        
+        let initialSetupGroup = DispatchGroup()
+        
+        initialSetupGroup.enter()
+        
+        userManager.fetchFullCurrentUserRecord(
+            success: { user in
+                print(user)
+                print(DMUserDefaultsHelper.CloudKitUserRecord)
+                initialSetupGroup.leave()
+            },
+            failure: { error in
+                initialSetupGroup.leave()
+            }
+        )
+        
+        initialSetupGroup.notify(queue: DispatchQueue.main) {
+            updateRootViewController()
+        }
+
         return true
     }
  

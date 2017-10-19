@@ -11,7 +11,7 @@ import CloudKit
 
 class DMUserDefaultsHelper: NSObject {
 
-    static let CloudKitUserIDKey = "CloudKitUserID"
+    static let CloudKitUserKey = "CloudKitUser"
     static let CurrentEventRecordKey = "CurrentEventRecord"
     static let SongCreationSubsriptionExistsKey = "SongCreationSubsriptionExists"
     
@@ -19,8 +19,8 @@ class DMUserDefaultsHelper: NSObject {
         UserDefaults.standard.set(value, forKey: key)
     }
     
-    static func set(CKRecord record: CKRecord, forKey key: String) {
-        let recordData = NSKeyedArchiver.archivedData(withRootObject: record)
+    static func set(anyEntity entity: Any, forKey key: String) {
+        let recordData = NSKeyedArchiver.archivedData(withRootObject: entity)
         DMUserDefaultsHelper.set(value: recordData, forKey: key)
     }
     
@@ -32,8 +32,17 @@ class DMUserDefaultsHelper: NSObject {
         return NSKeyedUnarchiver.unarchiveObject(with: recordData) as? CKRecord
     }
     
-    static var CloudKitUserID: String? {
-        return UserDefaults.standard.string(forKey: CloudKitUserIDKey)
+    private static func getArchivedEntity(withKey key: String) -> Any? {
+        guard let entityData = UserDefaults.standard.object(forKey: key) as? Data else {
+            return nil
+        }
+
+        return NSKeyedUnarchiver.unarchiveObject(with: entityData)
+    }
+    
+    static var CloudKitUserRecord: DMUser? {
+        let data = DMUserDefaultsHelper.getArchivedEntity(withKey: CloudKitUserKey)
+        return data as? DMUser
     }
     
     static var CurrentEventRecord: CKRecord? {
