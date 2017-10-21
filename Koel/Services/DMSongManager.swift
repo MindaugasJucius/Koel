@@ -59,9 +59,7 @@ class DMSongManager: NSObject, DMManager {
             song.asCKRecord(),
             completionHandler: { songRecord, error in
                 if let savedSongRecord = songRecord {
-                    var persistedSong = song
-                    persistedSong.id = savedSongRecord.recordID
-                    completion(persistedSong)
+                    completion(DMSong.from(CKRecord: savedSongRecord))
                     print("INSERTED A SONG. ID: \(savedSongRecord.recordID.recordName)")
                 }
             }

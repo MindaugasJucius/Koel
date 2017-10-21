@@ -52,7 +52,9 @@ class DMEventCreationViewController: UIViewController {
             event: event, joined: { [unowned self] joinedUser in
                 print("User joined an event. ID \(event.id?.recordName ?? "no id")")
                 let songQueue = DMSongQueueViewController(withEvent: event)
-                self.present(songQueue, animated: true, completion: nil)
+                DispatchQueue.main.async {
+                    self.present(songQueue, animated: true, completion: nil)
+                }
             },
             failure: { error in
                 print("An error occurred while joining an event \(error.localizedDescription)")
@@ -71,7 +73,7 @@ extension DMEventCreationViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: CellID, for: indexPath)
         let event = self.events[indexPath.row]
-        let cellTitle = "\(event.name) created at \(String(describing: event.id?.recordName))"
+        let cellTitle = "Event: \(event.name) with id \(event.id?.recordName ?? "no id")"
         cell.textLabel?.text = cellTitle
         return cell
     }
