@@ -34,4 +34,20 @@ struct DMSong: CKRecordModel {
         return record
     }
     
+    static func from(CKRecord record: CKRecord) -> DMSong {
+        
+        guard let alreadyPlayed = record[SongKey.hasBeenPlayed] as? Bool,
+            let id = record[SongKey.recordName] as? CKRecordID,
+            let eventID = record[SongKey.parentEvent] as? CKRecordID,
+            let spotifySongID = record[SongKey.spotifySongID] as? String else {
+                fatalError("Failed to unpack DMSong from CKRecord")
+        }
+        
+        return DMSong(
+            hasBeenPlayed: alreadyPlayed,
+            id: id,
+            eventID: eventID,
+            spotifySongID: spotifySongID
+        )
+    }
 }

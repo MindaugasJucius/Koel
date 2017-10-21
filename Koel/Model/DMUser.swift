@@ -15,7 +15,7 @@ enum UserKey: String {
     case pastEvents
 }
 
-class DMUser: NSObject, CKRecordModel, NSCoding {
+final class DMUser: NSObject, CKRecordModel, NSCoding {
 
     let currentJoinedEvent: DMEvent?
     let fullName: String?
@@ -61,5 +61,5 @@ class DMUser: NSObject, CKRecordModel, NSCoding {
         let id = record.recordID
         return DMUser(currentJoinedEvent: nil, fullName: fullName, id: id, pastEvents: nil)
     }
-    
+
 }

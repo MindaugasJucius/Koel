@@ -49,7 +49,7 @@ class DMEventManager: NSObject, DMManager {
         )
     }
     
-    func fetchAllEvents(success: @escaping FetchSuccessMultipleRecords, failure: @escaping FetchFailure) {
+    func fetchAllEvents(success: @escaping ([DMEvent]) -> (), failure: @escaping FetchFailure) {
         let eventQuery = CKQuery(recordType: String(describing: DMEvent.self), predicate: NSPredicate(value: true))
         
         cloudKitContainer.publicCloudDatabase.perform(
@@ -59,7 +59,7 @@ class DMEventManager: NSObject, DMManager {
                 if let error = error {
                     failure(error)
                 } else if let events = events {
-                    success(events)
+                    success(events.map { DMEvent.from(CKRecord: $0) })
                 }
             }
         )

@@ -15,9 +15,10 @@ class DMEventCreationViewController: UIViewController {
 
     @IBOutlet private weak var tableView: UITableView!
     
-    private let eventManager = DMEventManager()
+    fileprivate let eventManager = DMEventManager()
+    private let userManager = DMUserManager()
     
-    fileprivate var records: [CKRecord] = []
+    fileprivate var events: [DMEvent] = []
     
     init() {
         super.init(nibName: nil, bundle: nil)
@@ -35,7 +36,7 @@ class DMEventCreationViewController: UIViewController {
         eventManager.fetchAllEvents(
             success: { [unowned self] events in
                 DispatchQueue.main.async {
-                    self.records = events
+                    self.events = events
                     self.tableView.reloadData()
                 }
             },
@@ -50,16 +51,24 @@ class DMEventCreationViewController: UIViewController {
 extension DMEventCreationViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return records.count
+        return events.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: CellID, for: indexPath)
-        let eventRecord = self.records[indexPath.row]
-        let eventName = eventRecord[EventKey.name] ?? "Event"
-        let cellTitle = "\(eventName) created at \(String(describing: eventRecord.creationDate!.description))"
+        let event = self.events[indexPath.row]
+        let cellTitle = "\(event.name) created at \(String(describing: event.id?.recordName))"
         cell.textLabel?.text = cellTitle
         return cell
+    }
+    
+}
+
+extension DMEventCreationViewController: UITableViewDelegate {
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let eventToJoin = self.events[indexPath.row]
+        userManager.join(event: eventToJoin)
     }
     
 }

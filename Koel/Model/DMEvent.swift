@@ -10,6 +10,7 @@ import CloudKit
 
 protocol CKRecordModel {
     func asCKRecord() -> CKRecord
+    static func from(CKRecord: CKRecord) -> Self
 }
 
 enum EventKey: String {
@@ -34,6 +35,24 @@ struct DMEvent: CKRecordModel {
         record[EventKey.eventHasFinished] = eventHasFinished
 
         return record
+    }
+    
+    static func from(CKRecord record: CKRecord) -> DMEvent {
+        
+        guard let code = record[EventKey.code] as? String,
+            let id = record[EventKey.recordName] as? CKRecordID,
+            let name = record[EventKey.name] as? String,
+            let finished = record[EventKey.eventHasFinished] as? Bool else
+        {
+            fatalError("Couldn't unpack DMEvent from CKRecord")
+        }
+        
+        return DMEvent(
+            code: code,
+            id: id,
+            name: name,
+            eventHasFinished: finished
+        )
     }
     
 }
