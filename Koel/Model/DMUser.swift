@@ -11,7 +11,7 @@ import CloudKit
 enum UserKey: String {
     case currentJoinedEvent
     case fullName
-    case id
+    case recordName
     case pastEvents
 }
 
@@ -31,7 +31,7 @@ class DMUser: NSObject, CKRecordModel, NSCoding {
     }
     
     required convenience init?(coder aDecoder: NSCoder) {
-        guard let id = aDecoder.decodeObject(forKey: UserKey.id.rawValue) as? CKRecordID else {
+        guard let id = aDecoder.decodeObject(forKey: UserKey.recordName.rawValue) as? CKRecordID else {
             return nil
         }
         let fullName = aDecoder.decodeObject(forKey: UserKey.fullName.rawValue) as? String
@@ -40,17 +40,17 @@ class DMUser: NSObject, CKRecordModel, NSCoding {
 
     func encode(with aCoder: NSCoder) {
         aCoder.encode(fullName, forKey: UserKey.fullName.rawValue)
-        aCoder.encode(id, forKey: UserKey.id.rawValue)
+        aCoder.encode(id, forKey: UserKey.recordName.rawValue)
     }
     
     func asCKRecord() -> CKRecord {
         //because User is a default record type, and it's name can't be changed
         let userRecord = CKRecord(recordType: "User")
         userRecord[UserKey.fullName] = fullName
+        userRecord[UserKey.recordName] = id
         
         if let joinedEventID = currentJoinedEvent?.id {
-            let joinedEventRecordID = CKRecordID(recordName: joinedEventID)
-            userRecord[UserKey.currentJoinedEvent] = CKReference(recordID: joinedEventRecordID, action: .none)
+            userRecord[UserKey.currentJoinedEvent] = CKReference(recordID: joinedEventID, action: .none)
         }
         
         return userRecord

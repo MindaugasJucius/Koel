@@ -14,7 +14,8 @@ class DMUserManager: NSObject, DMManager {
     /// Joins a specified event.
     /// Currently a user can only join one event at a time.
     /// Event joining is accomplished by setting User record field currentJoinedEvent as a reference
-    /// to passed in DMEvent's id. DMEvent should previously be saved to CloudKit.
+    /// to passed in DMEvent's id. DMEvent should previously be saved to CloudKit (otherwise event entity won't have an ID).
+    ///
     /// - Parameter event: an Event to join
     func join(event: DMEvent) {
         // Ask user for full name and update user model if access is gained
@@ -45,7 +46,7 @@ class DMUserManager: NSObject, DMManager {
     ///
     /// - Parameters:
     ///   - success: success closure is passed a User record
-    ///   - failure: an error if one exists
+    ///   - failure: error handling closure
     func fetchFullCurrentUserRecord(success: @escaping (DMUser) -> (), failure: @escaping FetchFailure) {
         
         let fetchFullUserRecord = { (userRecordID: CKRecordID) in

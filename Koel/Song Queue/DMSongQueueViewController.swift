@@ -106,9 +106,10 @@ class DMSongQueueViewController: UIViewController {
     }
     
     @IBAction func addSong(_ sender: UIButton) {
-        let song = DMSong(hasBeenPlayed: false, eventID: event.recordID, spotifySongID: "dankid")
+        let song = DMSong(hasBeenPlayed: false, id: nil, eventID: event.recordID, spotifySongID: "dankid")
         songManager.save(aSong: song) { song in
             print("lul")
+            
         }
     }
     

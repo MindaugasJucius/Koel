@@ -15,13 +15,14 @@ protocol CKRecordModel {
 enum EventKey: String {
     case code
     case name
+    case recordName
     case eventHasFinished
 }
 
 struct DMEvent: CKRecordModel {
     
     let code: String
-    var id: String?
+    var id: CKRecordID?
     var name: String
     var eventHasFinished: Bool
     
@@ -29,6 +30,7 @@ struct DMEvent: CKRecordModel {
         let record = CKRecord(recordType: String(describing: DMEvent.self))
         record[EventKey.code] = code
         record[EventKey.name] = name
+        record[EventKey.recordName] = id
         record[EventKey.eventHasFinished] = eventHasFinished
 
         return record

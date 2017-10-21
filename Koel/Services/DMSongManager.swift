@@ -9,6 +9,8 @@
 import UIKit
 import CloudKit
 
+typealias FetchSuccessSong = (DMSong) -> ()
+
 class DMSongManager: NSObject, DMManager {
     
     let event: CKRecord
@@ -46,14 +48,17 @@ class DMSongManager: NSObject, DMManager {
         cloudKitContainer.publicCloudDatabase.add(queryOperation)
     }
         
-    func save(aSong song: DMSong, completion: @escaping FetchSuccessSingleRecord) {
+    func save(aSong song: DMSong, completion: @escaping FetchSuccessSong) {
         cloudKitContainer.publicCloudDatabase.save(
             song.asCKRecord(),
             completionHandler: { songRecord, error in
-                if let song = songRecord {
-                    print("INSERTED A SONG. ID: \(song.recordID.recordName)")
+                if let savedSongRecord = songRecord {
+                    var persistedSong = song
+                    persistedSong.id = savedSongRecord.recordID
+                    completion(persistedSong)
+                    print("INSERTED A SONG. ID: \(savedSongRecord.recordID.recordName)")
                 }
-        }
+            }
         )
     }
     

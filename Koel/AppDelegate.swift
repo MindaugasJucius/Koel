@@ -10,7 +10,7 @@ import UIKit
 import CloudKit
 import UserNotifications
 
-let SongsUpdateNotificationName = Notification.Name("songs updated notification")
+let SongsUpdateNotificationName = Notification.Name("Songs-Updated-Notification")
 let SongsNotification = Notification(name: SongsUpdateNotificationName)
 
 @UIApplicationMain
@@ -28,6 +28,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
         let updateRootViewController = {
             let rootViewController: UIViewController
+            // Show Queue controller if an event exists (means it has been joined, if it's stored to User Defaults).
+            // Otherwise begin app's flow from Event creation/joining controller
             if let currentEvent = DMUserDefaultsHelper.CurrentEventRecord {
                 rootViewController = DMSongQueueViewController(withEvent: currentEvent)
             } else {
@@ -36,6 +38,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             self.window?.rootViewController = rootViewController
         }
         
+        // If current User hasn't been determined yet, fetch full record
         guard DMUserDefaultsHelper.CloudKitUserRecord == nil else {
             updateRootViewController()
             return true
@@ -49,15 +52,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         
         userManager.fetchFullCurrentUserRecord(
             success: { user in
-                print(user)
-                print(DMUserDefaultsHelper.CloudKitUserRecord)
                 initialSetupGroup.leave()
             },
             failure: { error in
                 initialSetupGroup.leave()
             }
         )
-        
+    
+        // Update app's rootViewController after fetching User's record
         initialSetupGroup.notify(queue: DispatchQueue.main) {
             updateRootViewController()
         }
