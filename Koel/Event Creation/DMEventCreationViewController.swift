@@ -31,6 +31,7 @@ class DMEventCreationViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.tableView.dataSource = self
+        self.tableView.delegate = self
         self.tableView.register(UITableViewCell.self, forCellReuseIdentifier: CellID)
 
         eventManager.fetchAllEvents(
@@ -68,7 +69,14 @@ extension DMEventCreationViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let eventToJoin = self.events[indexPath.row]
-        userManager.join(event: eventToJoin)
+        userManager.join(
+            event: eventToJoin, joined: { joinedUser in
+                
+            },
+            failure: { error in
+            
+            }
+        )
     }
     
 }

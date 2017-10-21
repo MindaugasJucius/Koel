@@ -16,7 +16,7 @@ protocol CKRecordModel {
 enum EventKey: String {
     case code
     case name
-    case recordName
+    case recordID
     case eventHasFinished
 }
 
@@ -28,10 +28,16 @@ struct DMEvent: CKRecordModel {
     var eventHasFinished: Bool
     
     func asCKRecord() -> CKRecord {
-        let record = CKRecord(recordType: String(describing: DMEvent.self))
+        let record: CKRecord
+        
+        if let recordID = id {
+            record = CKRecord(recordType: String(describing: DMEvent.self), recordID: recordID)
+        } else {
+            record = CKRecord(recordType: String(describing: DMEvent.self))
+        }
+        
         record[EventKey.code] = code
         record[EventKey.name] = name
-        record[EventKey.recordName] = id
         record[EventKey.eventHasFinished] = eventHasFinished
 
         return record
@@ -40,7 +46,7 @@ struct DMEvent: CKRecordModel {
     static func from(CKRecord record: CKRecord) -> DMEvent {
         
         guard let code = record[EventKey.code] as? String,
-            let id = record[EventKey.recordName] as? CKRecordID,
+            let id = record[EventKey.recordID] as? CKRecordID,
             let name = record[EventKey.name] as? String,
             let finished = record[EventKey.eventHasFinished] as? Bool else
         {

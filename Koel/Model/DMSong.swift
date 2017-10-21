@@ -12,7 +12,7 @@ enum SongKey: String {
     case hasBeenPlayed
     case parentEvent
     case spotifySongID
-    case recordName
+    case recordID
 }
 
 struct DMSong: CKRecordModel {
@@ -26,9 +26,14 @@ struct DMSong: CKRecordModel {
     let spotifySongID: String
     
     func asCKRecord() -> CKRecord {
-        let record = CKRecord(recordType: String(describing: DMSong.self))
+        let record: CKRecord
+        let recordType = String(describing: DMSong.self)
+        if let recordID = id {
+            record = CKRecord(recordType: recordType, recordID: recordID)
+        } else {
+            record = CKRecord(recordType: recordType)
+        }
         record[SongKey.hasBeenPlayed] = hasBeenPlayed
-        record[SongKey.recordName] = id
         record[SongKey.parentEvent] = CKReference(recordID: eventID, action: .deleteSelf)
         record[SongKey.spotifySongID] = spotifySongID
         return record
@@ -37,7 +42,6 @@ struct DMSong: CKRecordModel {
     static func from(CKRecord record: CKRecord) -> DMSong {
         
         guard let alreadyPlayed = record[SongKey.hasBeenPlayed] as? Bool,
-            let id = record[SongKey.recordName] as? CKRecordID,
             let eventID = record[SongKey.parentEvent] as? CKRecordID,
             let spotifySongID = record[SongKey.spotifySongID] as? String else {
                 fatalError("Failed to unpack DMSong from CKRecord")
@@ -45,7 +49,7 @@ struct DMSong: CKRecordModel {
         
         return DMSong(
             hasBeenPlayed: alreadyPlayed,
-            id: id,
+            id: record.recordID,
             eventID: eventID,
             spotifySongID: spotifySongID
         )

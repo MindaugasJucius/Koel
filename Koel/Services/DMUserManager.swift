@@ -17,8 +17,59 @@ class DMUserManager: NSObject, DMManager {
     /// to passed in DMEvent's id. DMEvent should previously be saved to CloudKit (otherwise event entity won't have an ID).
     ///
     /// - Parameter event: an Event to join
-    func join(event: DMEvent) {
+    func join(event: DMEvent, joined: @escaping (DMUser) -> (), failure: @escaping FetchFailure) {
+        guard let user = DMUserDefaultsHelper.CloudKitUserRecord else {
+            fatalError("User must be present to join an event.")
+        }
+        
+        guard event.id != nil else {
+            fatalError("Event must have an ID")
+        }
+        
+        let userToJoinAnEvent = DMUser(currentJoinedEvent: event,
+                                       fullName: user.fullName,
+                                       id: user.id,
+                                       pastEvents: user.pastEvents)
+        
+        let modifyUserOperation = CKModifyRecordsOperation(recordsToSave: [userToJoinAnEvent.asCKRecord()], recordIDsToDelete: nil)
+        
+        modifyUserOperation.savePolicy = .allKeys
+        modifyUserOperation.qualityOfService = .userInitiated
+        modifyUserOperation.modifyRecordsCompletionBlock = { savedRecords, _, error in
+            if let error = error {
+                failure(error)
+            }
+            
+            guard let joinedUser = savedRecords?.first else {
+                fatalError("This shouldn't be empty")
+            }
+            
+            joined(DMUser.from(CKRecord: joinedUser))
+        }
+        
+        cloudKitContainer.publicCloudDatabase.add(modifyUserOperation)
+        
         // Ask user for full name and update user model if access is gained
+                    
+//        CKContainer.default().requestApplicationPermission(.userDiscoverability) { status, error in
+//            guard status == .granted, error == nil else {
+//                // error handling voodoo
+//                return
+//            }
+//
+//            CKContainer.default().discoverUserIdentity(withUserRecordID: user.id) { identity, error in
+//                guard let components = identity?.nameComponents, error == nil else {
+//                    // more error handling magic
+//                    return
+//                }
+//
+//                DispatchQueue.main.async {
+//                    let fullName = PersonNameComponentsFormatter().string(from: components)
+//                    print("The user's full name is \(fullName)")
+//                }
+//            }
+//        }
+        
         
     }
     
