@@ -16,12 +16,17 @@ class DMSongQueueViewController: UIViewController {
     @IBOutlet private weak var tableView: UITableView!
     
     let songManager: DMSongManager
-    let event: CKRecord
+    let event: DMEvent
+    let eventRecordID: CKRecordID
     
-    fileprivate var records: [CKRecord] = []
+    fileprivate var songs: [DMSong] = []
     
-    init(withEvent event: CKRecord) {
+    init(withEvent event: DMEvent) {
         self.event = event
+        guard let eventID = event.id else {
+            fatalError("Event has no ID")
+        }
+        self.eventRecordID = eventID
         self.songManager = DMSongManager(withEvent: event)
         super.init(nibName: nil, bundle: nil)
     }
@@ -47,11 +52,13 @@ class DMSongQueueViewController: UIViewController {
         let songNotificationReason = notification.userInfo?[DMSong.notificationReasonSongKey] as? CKQueryNotificationReason else {
             return
         }
+        
         print(songNotificationReason)
+        
         songManager.fetchASong(
             withSongRecordID: songIDRecord,
             completion: { [unowned self] songRecord in
-                self.handle(songRecord: songRecord, withNotificationReason: songNotificationReason)
+                self.handle(receivedSong: songRecord, withNotificationReason: songNotificationReason)
             },
             failure: { error in
                 print(error.localizedDescription)
@@ -59,42 +66,46 @@ class DMSongQueueViewController: UIViewController {
         )
     }
     
-    func handle(songRecord: CKRecord, withNotificationReason notificationReason: CKQueryNotificationReason) {
+    func handle(receivedSong: DMSong, withNotificationReason notificationReason: CKQueryNotificationReason) {
+        // Notifications aren't received on device that the record is created. This is why there are no checks
+        // to see if the received object exists in self.songs array
+        
         switch notificationReason {
         case .recordCreated:
-            let pathForNewRecord = IndexPath(item: records.count, section: 0)
-            records.append(songRecord)
+            let pathForNewRecord = IndexPath(item: songs.count, section: 0)
+            songs.append(receivedSong)
             DispatchQueue.main.async {
                 self.tableView.insertRows(at: [pathForNewRecord], with: .fade)
             }
         case .recordUpdated:
-            for (index, existingSongRecord) in records.enumerated() {
-                guard existingSongRecord.recordID == songRecord.recordID else {
-                    continue
-                }
-                records.remove(at: index)
-                records.insert(songRecord, at: index)
-                let pathForUpdatedRecord = IndexPath(item: index, section: 0)
-                DispatchQueue.main.async {
-                    self.tableView.reloadRows(at: [pathForUpdatedRecord], with: .right)
-                }
+            
+            let songIDs = songs.flatMap { $0.id }
+            
+            let index = songIDs.index(where: { $0 == receivedSong.id} )
+            
+            guard let matchingIndex = index else {
+                return
             }
+            
+            songs.remove(at: matchingIndex)
+            songs.insert(receivedSong, at: matchingIndex)
+            let pathForUpdatedRecord = IndexPath(item: matchingIndex, section: 0)
+            DispatchQueue.main.async {
+                self.tableView.reloadRows(at: [pathForUpdatedRecord], with: .right)
+            }
+            
         case .recordDeleted:
             print("wat")
         }
     }
     
-    @IBAction func updateSongList(_ sender: UIButton) {
-        fetchAllSongs()
-    }
-    
     func fetchAllSongs() {
 
         songManager.fetchSongs(
-            forEventID: event.recordID,
+            forEventID: eventRecordID,
             completion: { [weak self] songRecords in
                 DispatchQueue.main.async {
-                    self?.records = songRecords
+                    self?.songs = songRecords
                     self?.tableView.reloadData()
                 }
                 print("fetched \(songRecords.count) songs")
@@ -103,13 +114,24 @@ class DMSongQueueViewController: UIViewController {
                 print(error.localizedDescription)
             }
         )
+        
     }
     
     @IBAction func addSong(_ sender: UIButton) {
-        let song = DMSong(hasBeenPlayed: false, id: nil, eventID: event.recordID, spotifySongID: "dankid")
-        songManager.save(aSong: song) { song in
+        let song = DMSong(hasBeenPlayed: false,
+                          id: nil,
+                          eventID: eventRecordID,
+                          spotifySongID: "dankid",
+                          modificationDate: nil)
+        
+        songManager.save(aSong: song) { [unowned self] savedSong in
             print("lul")
-            
+
+            let pathForNewRecord = IndexPath(item: self.songs.count, section: 0)
+            self.songs.append(savedSong)
+            DispatchQueue.main.async {
+                self.tableView.insertRows(at: [pathForNewRecord], with: .middle)
+            }
         }
     }
     
@@ -118,13 +140,13 @@ class DMSongQueueViewController: UIViewController {
 extension DMSongQueueViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return records.count
+        return songs.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: CellID, for: indexPath)
-        let songRecord = self.records[indexPath.row]
-        let cellTitle = "A song modified at \(String(describing: songRecord.modificationDate!.description))"
+        let songRecord = self.songs[indexPath.row]
+        let cellTitle = "A song modified at \(songRecord.modificationDate?.description ?? "date doesn't exist")"
         cell.textLabel?.text = cellTitle
         return cell
     }

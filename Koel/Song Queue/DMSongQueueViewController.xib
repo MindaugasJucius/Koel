@@ -4,13 +4,14 @@
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13173"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13174"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DMSongQueueViewController" customModule="Koel" customModuleProvider="target">
             <connections>
+                <outlet property="tableView" destination="Z8U-9V-u6d" id="t11-dE-kqB"/>
                 <outlet property="view" destination="iN0-l3-epB" id="HLJ-oc-cjf"/>
             </connections>
         </placeholder>
@@ -18,8 +19,34 @@
         <view contentMode="scaleToFill" id="iN0-l3-epB">
             <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="Z8U-9V-u6d">
+                    <rect key="frame" x="0.0" y="20" width="375" height="602"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                </tableView>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zqO-8a-Lrm">
+                    <rect key="frame" x="0.0" y="622" width="375" height="45"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="45" id="crJ-q4-cF7"/>
+                    </constraints>
+                    <state key="normal" title="Button"/>
+                    <connections>
+                        <action selector="addSong:" destination="-1" eventType="touchUpInside" id="qW5-Ea-0zn"/>
+                    </connections>
+                </button>
+            </subviews>
             <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="zqO-8a-Lrm" secondAttribute="trailing" id="ASO-ib-ZCc"/>
+                <constraint firstItem="Z8U-9V-u6d" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="B81-3k-07j"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="bottom" secondItem="zqO-8a-Lrm" secondAttribute="bottom" id="YxQ-BW-s26"/>
+                <constraint firstItem="Z8U-9V-u6d" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="iVD-X9-4KA"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="Z8U-9V-u6d" secondAttribute="trailing" id="luf-hU-2hM"/>
+                <constraint firstItem="zqO-8a-Lrm" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="sfq-ba-9Ms"/>
+                <constraint firstItem="zqO-8a-Lrm" firstAttribute="top" secondItem="Z8U-9V-u6d" secondAttribute="bottom" id="yQb-Eg-Bly"/>
+            </constraints>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
+            <point key="canvasLocation" x="33.5" y="10.5"/>
         </view>
     </objects>
 </document>

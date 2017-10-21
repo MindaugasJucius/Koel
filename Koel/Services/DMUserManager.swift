@@ -11,6 +11,8 @@ import CloudKit
 
 class DMUserManager: NSObject, DMManager {
     
+    private let eventManager = DMEventManager()
+    
     /// Joins a specified event.
     /// Currently a user can only join one event at a time.
     /// Event joining is accomplished by setting User record field currentJoinedEvent as a reference
@@ -35,7 +37,7 @@ class DMUserManager: NSObject, DMManager {
         
         modifyUserOperation.savePolicy = .allKeys
         modifyUserOperation.qualityOfService = .userInitiated
-        modifyUserOperation.modifyRecordsCompletionBlock = { savedRecords, _, error in
+        modifyUserOperation.modifyRecordsCompletionBlock = { [unowned self] savedRecords, _, error in
             if let error = error {
                 failure(error)
             }
@@ -43,10 +45,12 @@ class DMUserManager: NSObject, DMManager {
             guard let joinedUser = savedRecords?.first else {
                 fatalError("This shouldn't be empty")
             }
-            
+            self.eventManager.saveSongCreationSubscription(forEvent: event)
+            let eventRecord = event.asCKRecord()
+            DMUserDefaultsHelper.set(anyEntity: eventRecord, forKey: DMUserDefaultsHelper.CurrentEventRecordKey)
             joined(DMUser.from(CKRecord: joinedUser))
         }
-        
+
         cloudKitContainer.publicCloudDatabase.add(modifyUserOperation)
         
         // Ask user for full name and update user model if access is gained

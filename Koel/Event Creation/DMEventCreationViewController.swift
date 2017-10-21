@@ -47,6 +47,19 @@ class DMEventCreationViewController: UIViewController {
         )
     }
 
+    fileprivate func performEventJoin(withEvent event: DMEvent) {
+        userManager.join(
+            event: event, joined: { [unowned self] joinedUser in
+                print("User joined an event. ID \(event.id?.recordName ?? "no id")")
+                let songQueue = DMSongQueueViewController(withEvent: event)
+                self.present(songQueue, animated: true, completion: nil)
+            },
+            failure: { error in
+                print("An error occurred while joining an event \(error.localizedDescription)")
+            }
+        )
+    }
+    
 }
 
 extension DMEventCreationViewController: UITableViewDataSource {
@@ -69,14 +82,7 @@ extension DMEventCreationViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let eventToJoin = self.events[indexPath.row]
-        userManager.join(
-            event: eventToJoin, joined: { joinedUser in
-                
-            },
-            failure: { error in
-            
-            }
-        )
+        performEventJoin(withEvent: eventToJoin)
     }
     
 }

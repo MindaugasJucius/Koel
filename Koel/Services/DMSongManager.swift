@@ -13,17 +13,23 @@ typealias FetchSuccessSong = (DMSong) -> ()
 
 class DMSongManager: NSObject, DMManager {
     
-    let event: CKRecord
+    let event: DMEvent
     
-    init(withEvent event: CKRecord) {
+    init(withEvent event: DMEvent) {
         self.event = event
         super.init()
     }
     
-    func fetchSongs(forEventID eventToMatchID: CKRecordID? = nil, completion: @escaping FetchSuccessMultipleRecords, failure: @escaping FetchFailure) {
-        let eventID = eventToMatchID ?? event.recordID
+    func fetchSongs(forEventID eventToMatchID: CKRecordID? = nil, completion: @escaping ([DMSong]) -> (), failure: @escaping FetchFailure) {
+        let eventID = eventToMatchID ?? event.id
         
-        let recordToMatch = CKReference(recordID: eventID, action: .deleteSelf)
+        guard let eventRecordID = eventID else {
+            let error = NSError(domain: "event has no ID", code: -1, userInfo: nil)
+            failure(error)
+            return
+        }
+        
+        let recordToMatch = CKReference(recordID: eventRecordID, action: .deleteSelf)
         let predicate = NSPredicate(format: "parentEvent == %@", recordToMatch)
         
         let query = CKQuery(recordType: String(describing: DMSong.self), predicate: predicate)
@@ -41,7 +47,7 @@ class DMSongManager: NSObject, DMManager {
             if let error = error {
                 failure(error)
             } else {
-                completion(songs)
+                completion(songs.map({ DMSong.from(CKRecord: $0) }))
             }
         }
         
@@ -62,7 +68,7 @@ class DMSongManager: NSObject, DMManager {
         )
     }
     
-    func fetchASong(withSongRecordID songID: CKRecordID, completion: @escaping FetchSuccessSingleRecord, failure: @escaping FetchFailure) {
+    func fetchASong(withSongRecordID songID: CKRecordID, completion: @escaping (DMSong) -> (), failure: @escaping FetchFailure) {
         let fetchSongOperation = CKFetchRecordsOperation(recordIDs: [songID])
         fetchSongOperation.queuePriority = .veryHigh
         fetchSongOperation.qualityOfService = .userInitiated
@@ -80,7 +86,7 @@ class DMSongManager: NSObject, DMManager {
             guard let songRecord = songsDict?[songID] else {
                 return
             }
-            completion(songRecord)
+            completion(DMSong.from(CKRecord: songRecord))
         }
         
         cloudKitContainer.publicCloudDatabase.add(fetchSongOperation)
