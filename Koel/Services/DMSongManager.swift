@@ -23,13 +23,7 @@ class DMSongManager: NSObject, DMManager {
     func fetchSongs(forEventID eventToMatchID: CKRecordID? = nil, completion: @escaping ([DMSong]) -> (), failure: @escaping FetchFailure) {
         let eventID = eventToMatchID ?? event.id
         
-        guard let eventRecordID = eventID else {
-            let error = NSError(domain: "event has no ID", code: -1, userInfo: nil)
-            failure(error)
-            return
-        }
-        
-        let recordToMatch = CKReference(recordID: eventRecordID, action: .deleteSelf)
+        let recordToMatch = CKReference(recordID: eventID, action: .deleteSelf)
         let predicate = NSPredicate(format: "parentEvent == %@", recordToMatch)
         
         let query = CKQuery(recordType: String(describing: DMSong.self), predicate: predicate)

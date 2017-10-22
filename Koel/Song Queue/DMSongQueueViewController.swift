@@ -17,16 +17,11 @@ class DMSongQueueViewController: UIViewController {
     
     let songManager: DMSongManager
     let event: DMEvent
-    let eventRecordID: CKRecordID
-    
+
     fileprivate var songs: [DMSong] = []
     
     init(withEvent event: DMEvent) {
         self.event = event
-        guard let eventID = event.id else {
-            fatalError("Event has no ID")
-        }
-        self.eventRecordID = eventID
         self.songManager = DMSongManager(withEvent: event)
         super.init(nibName: nil, bundle: nil)
     }
@@ -102,7 +97,7 @@ class DMSongQueueViewController: UIViewController {
     func fetchAllSongs() {
 
         songManager.fetchSongs(
-            forEventID: eventRecordID,
+            forEventID: event.id,
             completion: { [weak self] songRecords in
                 DispatchQueue.main.async {
                     self?.songs = songRecords
@@ -120,7 +115,7 @@ class DMSongQueueViewController: UIViewController {
     @IBAction func addSong(_ sender: UIButton) {
         let song = DMSong(hasBeenPlayed: false,
                           id: nil,
-                          eventID: eventRecordID,
+                          eventID: event.id,
                           spotifySongID: "dankid",
                           modificationDate: nil)
         

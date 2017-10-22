@@ -22,24 +22,25 @@ enum EventKey: String {
 
 struct DMEvent: CKRecordModel {
     
+    fileprivate static let recordName = String(describing: DMEvent.self)
+    
     let code: String
-    var id: CKRecordID?
-    var name: String
+    let name: String
     var eventHasFinished: Bool
+    var id: CKRecordID
+    
+    init(code: String, name: String, eventHasFinished: Bool, id: CKRecordID = CKRecordID(recordName: recordName)) {
+        self.code = code
+        self.name = name
+        self.eventHasFinished = eventHasFinished
+        self.id = id
+    }
     
     func asCKRecord() -> CKRecord {
-        let record: CKRecord
-        
-        if let recordID = id {
-            record = CKRecord(recordType: String(describing: DMEvent.self), recordID: recordID)
-        } else {
-            record = CKRecord(recordType: String(describing: DMEvent.self))
-        }
-        
+        let record = CKRecord(recordType: DMEvent.recordName, recordID: id)
         record[EventKey.code] = code
         record[EventKey.name] = name
         record[EventKey.eventHasFinished] = eventHasFinished
-
         return record
     }
     
@@ -55,10 +56,12 @@ struct DMEvent: CKRecordModel {
         
         return DMEvent(
             code: code,
-            id: id,
             name: name,
-            eventHasFinished: finished
+            eventHasFinished:
+            finished,
+            id: id
         )
+
     }
     
 }
