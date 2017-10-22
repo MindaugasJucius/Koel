@@ -17,6 +17,7 @@
 		5F01EC201F92570500E47E6A /* DMSong.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F01EC1F1F92570500E47E6A /* DMSong.swift */; };
 		5F01EC231F925EB200E47E6A /* DMCKRecordExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F01EC221F925EB200E47E6A /* DMCKRecordExtensions.swift */; };
 		5F01EC251F925F8C00E47E6A /* DMUserManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F01EC241F925F8C00E47E6A /* DMUserManager.swift */; };
+		5F58F0311F9CB793006B9B47 /* UIViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F58F0301F9CB793006B9B47 /* UIViewController+Extensions.swift */; };
 		5FB28BE11F90EA3900B670E6 /* DMEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB28BE01F90EA3900B670E6 /* DMEvent.swift */; };
 		5FB28BE31F90ECEA00B670E6 /* DMUserDefaultsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB28BE21F90ECEA00B670E6 /* DMUserDefaultsHelper.swift */; };
 		5FDEB6B01F97BEF400070930 /* DMSongQueueViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5FDEB6AF1F97BEF400070930 /* DMSongQueueViewController.xib */; };
@@ -54,6 +55,7 @@
 		5F01EC1F1F92570500E47E6A /* DMSong.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMSong.swift; sourceTree = "<group>"; };
 		5F01EC221F925EB200E47E6A /* DMCKRecordExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMCKRecordExtensions.swift; sourceTree = "<group>"; };
 		5F01EC241F925F8C00E47E6A /* DMUserManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMUserManager.swift; sourceTree = "<group>"; };
+		5F58F0301F9CB793006B9B47 /* UIViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extensions.swift"; sourceTree = "<group>"; };
 		5FB28BE01F90EA3900B670E6 /* DMEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEvent.swift; sourceTree = "<group>"; };
 		5FB28BE21F90ECEA00B670E6 /* DMUserDefaultsHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMUserDefaultsHelper.swift; sourceTree = "<group>"; };
 		5FDEB6AF1F97BEF400070930 /* DMSongQueueViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DMSongQueueViewController.xib; sourceTree = "<group>"; };
@@ -106,6 +108,7 @@
 		5F01EBF61F8FD28400E47E6A /* Koel */ = {
 			isa = PBXGroup;
 			children = (
+				5F58F0321F9CB7AE006B9B47 /* Extensions */,
 				5FDEB6B11F97C02C00070930 /* Event Creation */,
 				5FDEB6AE1F97BE4C00070930 /* Song Queue */,
 				5F01EC211F925E9700E47E6A /* Helpers */,
@@ -166,6 +169,14 @@
 				5FB28BE21F90ECEA00B670E6 /* DMUserDefaultsHelper.swift */,
 			);
 			path = Helpers;
+			sourceTree = "<group>";
+		};
+		5F58F0321F9CB7AE006B9B47 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				5F58F0301F9CB793006B9B47 /* UIViewController+Extensions.swift */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 		5FDEB6AE1F97BE4C00070930 /* Song Queue */ = {
@@ -304,6 +315,7 @@
 			files = (
 				5F01EC1D1F8FD8C100E47E6A /* DMEventManager.swift in Sources */,
 				5F01EC251F925F8C00E47E6A /* DMUserManager.swift in Sources */,
+				5F58F0311F9CB793006B9B47 /* UIViewController+Extensions.swift in Sources */,
 				5F01EC231F925EB200E47E6A /* DMCKRecordExtensions.swift in Sources */,
 				5FDEB6B71F99114800070930 /* DMUser.swift in Sources */,
 				5FF67D4B1F9795F7001E66FA /* DMSongManager.swift in Sources */,

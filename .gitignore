@@ -30,3 +30,7 @@ xcuserdata
 ## Playgrounds
 timeline.xctimeline
 playground.xcworkspace
+
+*.xcuserstate
+
+*.xcbkptlist

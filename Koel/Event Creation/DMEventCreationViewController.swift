@@ -28,12 +28,16 @@ class DMEventCreationViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    //MARK: - INJECTION
+    override func injected() {
+        viewDidLoad()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.tableView.dataSource = self
         self.tableView.delegate = self
         self.tableView.register(UITableViewCell.self, forCellReuseIdentifier: CellID)
-
         eventManager.fetchAllEvents(
             success: { [unowned self] events in
                 DispatchQueue.main.async {
