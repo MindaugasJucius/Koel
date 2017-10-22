@@ -53,7 +53,7 @@ extension DMUser: CKRecordModel {
         //because Users is a default record type, and it's name can't be changed
         let userRecord = CKRecord(recordType: "Users", recordID: recordID)
         userRecord[UserKey.fullName] = fullName
-        
+        userRecord[UserKey.identifier] = identifier
         if let joinedEventID = currentJoinedEvent?.recordID {
             userRecord[UserKey.currentJoinedEvent] = CKReference(recordID: joinedEventID, action: .none)
         }

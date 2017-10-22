@@ -47,7 +47,7 @@ class DMEventManager: NSObject, DMManager {
     static let SongCreationSubscriptionID = "Event-Song-Created"
     
     func createEvent() {
-        var event = DMEvent(code: "0101010", name: "dank parti", eventHasFinished: false)
+        let event = DMEvent(code: "0101010", name: "dank parti", eventHasFinished: false)
         
         self.cloudKitContainer.publicCloudDatabase.save(
             event.asCKRecord(),
@@ -61,14 +61,6 @@ class DMEventManager: NSObject, DMManager {
                     return
                 }
                 print("CREATED EVENT. ID: \(eventRecord.recordID.recordName)")
-                print("Paziuret ar toks pat id kaip UUID")
-                print(eventRecord.recordID)
-                //event.id = eventRecord.recordID
-                DMUserDefaultsHelper.set(
-                    anyEntity: eventRecord,
-                    forKey: DMUserDefaultsHelper.CurrentEventRecordKey
-                )
-                print("STORED EVENT TO USER DEFAULTS. ID: \(eventRecord.recordID.recordName)")
                 self.saveSongCreationSubscription(forEvent: event)
             }
         )

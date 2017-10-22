@@ -14,6 +14,7 @@ private let CellID = "CellID"
 class DMEventCreationViewController: UIViewController {
 
     @IBOutlet private weak var tableView: UITableView!
+    @IBOutlet weak var createEventButton: UIButton!
     
     fileprivate let eventManager = DMEventManager()
     private let userManager = DMUserManager()
@@ -35,6 +36,7 @@ class DMEventCreationViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        createEventButton.addTarget(self, action: #selector(tappedCreateEvent), for: .touchUpInside)
         self.tableView.dataSource = self
         self.tableView.delegate = self
         self.tableView.register(UITableViewCell.self, forCellReuseIdentifier: CellID)
@@ -64,6 +66,10 @@ class DMEventCreationViewController: UIViewController {
                 print("An error occurred while joining an event \(error.localizedDescription)")
             }
         )
+    }
+    
+    @objc func tappedCreateEvent() {
+        eventManager.createEvent()
     }
     
 }

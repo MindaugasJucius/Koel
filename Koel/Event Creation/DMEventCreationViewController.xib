@@ -11,6 +11,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DMEventCreationViewController" customModule="Koel" customModuleProvider="target">
             <connections>
+                <outlet property="createEventButton" destination="STJ-1e-vQD" id="l84-9b-6jN"/>
                 <outlet property="tableView" destination="QpU-Tg-Be7" id="WvQ-Bb-qcF"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>

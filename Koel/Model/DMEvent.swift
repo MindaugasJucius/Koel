@@ -38,6 +38,7 @@ extension DMEvent: CKRecordModel {
         let record = CKRecord(recordType: DMEvent.recordType, recordID: recordID)
         record[EventKey.code] = code
         record[EventKey.name] = name
+        record[EventKey.identifier] = identifier
         record[EventKey.eventHasFinished] = eventHasFinished
         return record
     }

@@ -12,6 +12,7 @@ enum SongKey: String {
     case hasBeenPlayed
     case parentEvent
     case spotifySongID
+    case identifier
     case recordID
 }
 
@@ -44,6 +45,7 @@ extension DMSong: CKRecordModel {
         record[SongKey.hasBeenPlayed] = hasBeenPlayed
         record[SongKey.parentEvent] = CKReference(recordID: eventID, action: .deleteSelf)
         record[SongKey.spotifySongID] = spotifySongID
+        record[SongKey.identifier] = identifier
         return record
     }
     
