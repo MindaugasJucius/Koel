@@ -74,9 +74,9 @@ class DMSongQueueViewController: UIViewController {
             }
         case .recordUpdated:
             
-            let songIDs = songs.flatMap { $0.id }
+            let songIDs = songs.map { $0.recordID }
             
-            let index = songIDs.index(where: { $0 == receivedSong.id} )
+            let index = songIDs.index(where: { $0 == receivedSong.recordID } )
             
             guard let matchingIndex = index else {
                 return
@@ -88,7 +88,6 @@ class DMSongQueueViewController: UIViewController {
             DispatchQueue.main.async {
                 self.tableView.reloadRows(at: [pathForUpdatedRecord], with: .right)
             }
-            
         case .recordDeleted:
             print("wat")
         }
@@ -97,7 +96,7 @@ class DMSongQueueViewController: UIViewController {
     func fetchAllSongs() {
 
         songManager.fetchSongs(
-            forEventID: event.id,
+            forEventID: event.recordID,
             completion: { [weak self] songRecords in
                 DispatchQueue.main.async {
                     self?.songs = songRecords
@@ -114,14 +113,10 @@ class DMSongQueueViewController: UIViewController {
     
     @IBAction func addSong(_ sender: UIButton) {
         let song = DMSong(hasBeenPlayed: false,
-                          id: nil,
-                          eventID: event.id,
-                          spotifySongID: "dankid",
-                          modificationDate: nil)
+                          eventID: event.recordID,
+                          spotifySongID: "dankid")
         
         songManager.save(aSong: song) { [unowned self] savedSong in
-            print("lul")
-
             let pathForNewRecord = IndexPath(item: self.songs.count, section: 0)
             self.songs.append(savedSong)
             DispatchQueue.main.async {

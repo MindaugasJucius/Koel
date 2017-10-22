@@ -61,7 +61,9 @@ class DMEventManager: NSObject, DMManager {
                     return
                 }
                 print("CREATED EVENT. ID: \(eventRecord.recordID.recordName)")
-                event.id = eventRecord.recordID
+                print("Paziuret ar toks pat id kaip UUID")
+                print(eventRecord.recordID)
+                //event.id = eventRecord.recordID
                 DMUserDefaultsHelper.set(
                     anyEntity: eventRecord,
                     forKey: DMUserDefaultsHelper.CurrentEventRecordKey
@@ -94,7 +96,7 @@ class DMEventManager: NSObject, DMManager {
             return
         }
         
-        let reference = CKReference(recordID: event.id, action: .deleteSelf)
+        let reference = CKReference(recordID: event.recordID, action: .deleteSelf)
         let predicate = NSPredicate(format: "parentEvent = %@", reference)
         let subscription = CKQuerySubscription(
             recordType: String(describing: DMSong.self),

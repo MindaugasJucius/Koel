@@ -15,25 +15,32 @@ enum SongKey: String {
     case recordID
 }
 
-struct DMSong: CKRecordModel {
+struct DMSong {
 
     static let notificationSongIDKey = "songID"
     static let notificationReasonSongKey = "songIDNotificationReason"
     
     let hasBeenPlayed: Bool
-    var id: CKRecordID?
     let eventID: CKRecordID
     let spotifySongID: String?
+    
+    var identifier: String
     var modificationDate: Date?
     
+    init(hasBeenPlayed: Bool, identifier: String? = nil, eventID: CKRecordID, spotifySongID: String?, modificationDate: Date? = nil) {
+        self.hasBeenPlayed = hasBeenPlayed
+        self.identifier = identifier ?? UUID().uuidString
+        self.eventID = eventID
+        self.spotifySongID = spotifySongID
+        self.modificationDate = modificationDate
+    }
+
+}
+
+extension DMSong: CKRecordModel {
+
     func asCKRecord() -> CKRecord {
-        let record: CKRecord
-        let recordType = String(describing: DMSong.self)
-        if let recordID = id {
-            record = CKRecord(recordType: recordType, recordID: recordID)
-        } else {
-            record = CKRecord(recordType: recordType)
-        }
+        let record = CKRecord(recordType: DMSong.recordType, recordID: recordID)
         record[SongKey.hasBeenPlayed] = hasBeenPlayed
         record[SongKey.parentEvent] = CKReference(recordID: eventID, action: .deleteSelf)
         record[SongKey.spotifySongID] = spotifySongID
@@ -42,16 +49,18 @@ struct DMSong: CKRecordModel {
     
     static func from(CKRecord record: CKRecord) -> DMSong {
         
-        guard let eventID = record[SongKey.parentEvent] as? CKReference else {
+        guard let eventID = record[SongKey.parentEvent] as? CKReference,
+            let identifier = record[EventKey.identifier] as? String else {
                 fatalError("Failed to unpack DMSong from CKRecord")
         }
         
         return DMSong(
             hasBeenPlayed: record[SongKey.hasBeenPlayed] as? Bool ?? false,
-            id: record.recordID,
+            identifier: identifier,
             eventID: eventID.recordID,
             spotifySongID: record[SongKey.spotifySongID] as? String,
             modificationDate: record.modificationDate
         )
     }
+    
 }

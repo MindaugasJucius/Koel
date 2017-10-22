@@ -13,42 +13,48 @@ enum UserKey: String {
     case fullName
     case recordID
     case pastEvents
+    case identifier
 }
 
-final class DMUser: NSObject, CKRecordModel, NSCoding {
+final class DMUser: NSObject, NSCoding {
 
     let currentJoinedEvent: DMEvent?
     let fullName: String?
-    let id: CKRecordID
     let pastEvents: [DMEvent]? // TODO ;]
     
-    init(currentJoinedEvent: DMEvent?, fullName: String?, id: CKRecordID, pastEvents: [DMEvent]?) {
+    var identifier: String
+    
+    init(currentJoinedEvent: DMEvent?, fullName: String?, identifier: String? = nil, pastEvents: [DMEvent]?) {
         self.currentJoinedEvent = currentJoinedEvent
         self.fullName = fullName
-        self.id = id
         self.pastEvents = pastEvents
+        self.identifier = identifier ?? UUID().uuidString
         super.init()
     }
     
     required convenience init?(coder aDecoder: NSCoder) {
-        guard let id = aDecoder.decodeObject(forKey: UserKey.recordID.rawValue) as? CKRecordID else {
+        guard let identifier = aDecoder.decodeObject(forKey: UserKey.identifier.rawValue) as? String else {
             return nil
         }
         let fullName = aDecoder.decodeObject(forKey: UserKey.fullName.rawValue) as? String
-        self.init(currentJoinedEvent: nil, fullName: fullName, id: id, pastEvents: nil)
+        self.init(currentJoinedEvent: nil, fullName: fullName, identifier: identifier, pastEvents: nil)
     }
 
     func encode(with aCoder: NSCoder) {
         aCoder.encode(fullName, forKey: UserKey.fullName.rawValue)
-        aCoder.encode(id, forKey: UserKey.recordID.rawValue)
+        aCoder.encode(identifier, forKey: UserKey.identifier.rawValue)
     }
+    
+}
+
+extension DMUser: CKRecordModel {
     
     func asCKRecord() -> CKRecord {
         //because Users is a default record type, and it's name can't be changed
-        let userRecord = CKRecord(recordType: "Users", recordID: id)
+        let userRecord = CKRecord(recordType: "Users", recordID: recordID)
         userRecord[UserKey.fullName] = fullName
         
-        if let joinedEventID = currentJoinedEvent?.id {
+        if let joinedEventID = currentJoinedEvent?.recordID {
             userRecord[UserKey.currentJoinedEvent] = CKReference(recordID: joinedEventID, action: .none)
         }
         
@@ -57,8 +63,14 @@ final class DMUser: NSObject, CKRecordModel, NSCoding {
     
     static func from(CKRecord record: CKRecord) -> DMUser {
         let fullName = record[UserKey.fullName] as? String
-        let id = record.recordID
-        return DMUser(currentJoinedEvent: nil, fullName: fullName, id: id, pastEvents: nil)
-    }
+        let identifier = record[UserKey.identifier] as? String
 
+        return DMUser(
+            currentJoinedEvent: nil,
+            fullName: fullName,
+            identifier: identifier,
+            pastEvents: nil
+        )
+    }
+    
 }

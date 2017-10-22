@@ -21,7 +21,7 @@ class DMSongManager: NSObject, DMManager {
     }
     
     func fetchSongs(forEventID eventToMatchID: CKRecordID? = nil, completion: @escaping ([DMSong]) -> (), failure: @escaping FetchFailure) {
-        let eventID = eventToMatchID ?? event.id
+        let eventID = eventToMatchID ?? event.recordID
         
         let recordToMatch = CKReference(recordID: eventID, action: .deleteSelf)
         let predicate = NSPredicate(format: "parentEvent == %@", recordToMatch)

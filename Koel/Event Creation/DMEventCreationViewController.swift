@@ -54,7 +54,7 @@ class DMEventCreationViewController: UIViewController {
     fileprivate func performEventJoin(withEvent event: DMEvent) {
         userManager.join(
             event: event, joined: { [unowned self] joinedUser in
-                print("User joined an event. ID \(event.id.recordName)")
+                print("User joined an event. ID \(event.recordID.recordName)")
                 let songQueue = DMSongQueueViewController(withEvent: event)
                 DispatchQueue.main.async {
                     self.present(songQueue, animated: true, completion: nil)
@@ -77,7 +77,7 @@ extension DMEventCreationViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: CellID, for: indexPath)
         let event = self.events[indexPath.row]
-        let cellTitle = "Event: \(event.name) with id \(event.id.recordName)"
+        let cellTitle = "Event: \(event.name) with id \(event.recordID.recordName)"
         cell.textLabel?.text = cellTitle
         return cell
     }

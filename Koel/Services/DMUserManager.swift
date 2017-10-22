@@ -24,14 +24,7 @@ class DMUserManager: NSObject, DMManager {
             fatalError("User must be present to join an event.")
         }
         
-        guard event.id != nil else {
-            fatalError("Event must have an ID")
-        }
-        
-        let userToJoinAnEvent = DMUser(currentJoinedEvent: event,
-                                       fullName: user.fullName,
-                                       id: user.id,
-                                       pastEvents: user.pastEvents)
+        let userToJoinAnEvent = DMUser(currentJoinedEvent: event, fullName: user.fullName, identifier: user.identifier, pastEvents: user.pastEvents)
         
         let modifyUserOperation = CKModifyRecordsOperation(recordsToSave: [userToJoinAnEvent.asCKRecord()], recordIDsToDelete: nil)
         
