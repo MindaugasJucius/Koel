@@ -19,7 +19,7 @@ class DMUserManager: NSObject, DMManager {
     /// to passed in DMEvent's id. DMEvent should previously be saved to CloudKit (otherwise event entity won't have an ID).
     ///
     /// - Parameter event: an Event to join
-    func join(event: DMEvent, joined: @escaping (DMUser) -> (), failure: @escaping FetchFailure) {
+    func join(event: DMEvent, joined: @escaping (DMUser) -> (), failure: @escaping KoelFailure) {
         guard let user = DMUserDefaultsHelper.CloudKitUserRecord else {
             fatalError("User must be present to join an event.")
         }
@@ -76,7 +76,7 @@ class DMUserManager: NSObject, DMManager {
     /// - Parameters:
     ///   - success: invoked with the record ID of user's record in case of success
     ///   - failure: invoked in case of a failure
-    private func fetchCloudKitCurrentUserId(success: @escaping (CKRecordID) -> (), failure: @escaping FetchFailure) {
+    private func fetchCloudKitCurrentUserId(success: @escaping (CKRecordID) -> (), failure: @escaping KoelFailure) {
         cloudKitContainer.fetchUserRecordID { recordId, error in
             if let error = error {
                 failure(error)
@@ -95,7 +95,7 @@ class DMUserManager: NSObject, DMManager {
     /// - Parameters:
     ///   - success: success closure is passed a User record
     ///   - failure: error handling closure
-    func fetchFullCurrentUserRecord(success: @escaping (DMUser) -> (), failure: @escaping FetchFailure) {
+    func fetchFullCurrentUserRecord(success: @escaping (DMUser) -> (), failure: @escaping KoelFailure) {
         
         let fetchFullUserRecord = { (userRecordID: CKRecordID) in
             self.cloudKitContainer.publicCloudDatabase.fetch(withRecordID: userRecordID) { fetchedRecord, error in

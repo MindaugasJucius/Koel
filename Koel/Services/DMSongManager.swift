@@ -20,7 +20,7 @@ class DMSongManager: NSObject, DMManager {
         super.init()
     }
     
-    func fetchSongs(forEventID eventToMatchID: CKRecordID? = nil, completion: @escaping ([DMSong]) -> (), failure: @escaping FetchFailure) {
+    func fetchSongs(forEventID eventToMatchID: CKRecordID? = nil, completion: @escaping ([DMSong]) -> (), failure: @escaping KoelFailure) {
         let eventID = eventToMatchID ?? event.recordID
         
         let recordToMatch = CKReference(recordID: eventID, action: .deleteSelf)
@@ -48,19 +48,25 @@ class DMSongManager: NSObject, DMManager {
         cloudKitContainer.publicCloudDatabase.add(queryOperation)
     }
         
-    func save(aSong song: DMSong, completion: @escaping FetchSuccessSong) {
+    func save(aSong song: DMSong, completion: @escaping FetchSuccessSong, failure: @escaping KoelFailure) {
         cloudKitContainer.publicCloudDatabase.save(
             song.asCKRecord(),
-            completionHandler: { songRecord, error in
+            completionHandler: { [unowned self] songRecord, error in
                 if let savedSongRecord = songRecord {
                     completion(DMSong.from(CKRecord: savedSongRecord))
                     print("INSERTED A SONG. ID: \(savedSongRecord.recordID.recordName)")
+                } else if let error = error {
+                    self.retryCloudKitOperationIfPossible(with: error, block: {
+                            self.save(aSong: song, completion: completion, failure: failure)
+                        }
+                    )
+                    failure(error)
                 }
             }
         )
     }
     
-    func fetchASong(withSongRecordID songID: CKRecordID, completion: @escaping (DMSong) -> (), failure: @escaping FetchFailure) {
+    func fetchASong(withSongRecordID songID: CKRecordID, completion: @escaping (DMSong) -> (), failure: @escaping KoelFailure) {
         let fetchSongOperation = CKFetchRecordsOperation(recordIDs: [songID])
         fetchSongOperation.queuePriority = .veryHigh
         fetchSongOperation.qualityOfService = .userInitiated

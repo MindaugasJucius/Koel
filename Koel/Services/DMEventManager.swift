@@ -11,7 +11,7 @@ import CloudKit
 protocol DMManager {
     typealias FetchSuccessSingleRecord = (CKRecord) -> ()
     typealias FetchSuccessMultipleRecords = ([CKRecord]) -> ()
-    typealias FetchFailure = (Error) -> ()
+    typealias KoelFailure = (Error) -> ()
     
     var cloudKitContainer: CKContainer { get }
 }
@@ -61,12 +61,27 @@ class DMEventManager: NSObject, DMManager {
                     return
                 }
                 print("CREATED EVENT. ID: \(eventRecord.recordID.recordName)")
-                self.saveSongCreationSubscription(forEvent: event)
+                #if DEBUG
+                    let songManager = DMSongManager(withEvent: event)
+                    let song = DMSong(hasBeenPlayed: false, eventID: event.recordID, spotifySongID: nil)
+                    songManager.save(
+                        aSong: song,
+                        completion: { savedSong in
+                            print("SAVED AN INITIAL SONG ID: \(savedSong.identifier) FOR EVENT.")
+                            self.saveSongCreationSubscription(forEvent: event)
+                        },
+                        failure: { error in
+                            fatalError("couldn't save initial song for event")
+                        }
+                    )
+                #else
+                    self.saveSongCreationSubscription(forEvent: event)
+                #endif
             }
         )
     }
     
-    func fetchAllEvents(success: @escaping ([DMEvent]) -> (), failure: @escaping FetchFailure) {
+    func fetchAllEvents(success: @escaping ([DMEvent]) -> (), failure: @escaping KoelFailure) {
         let eventQuery = CKQuery(recordType: String(describing: DMEvent.self), predicate: NSPredicate(value: true))
         
         cloudKitContainer.publicCloudDatabase.perform(
@@ -94,7 +109,7 @@ class DMEventManager: NSObject, DMManager {
             recordType: String(describing: DMSong.self),
             predicate: predicate,
             subscriptionID: DMEventManager.SongCreationSubscriptionID,
-            options: [.firesOnRecordCreation, .firesOnRecordUpdate]
+            options: [.firesOnRecordCreation, .firesOnRecordUpdate, .firesOnRecordDeletion]
         )
         
         let notificationInfo = CKNotificationInfo()

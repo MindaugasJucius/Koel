@@ -24,11 +24,11 @@ final class DMUser: NSObject, NSCoding {
     
     var identifier: String
     
-    init(currentJoinedEvent: DMEvent?, fullName: String?, identifier: String? = nil, pastEvents: [DMEvent]?) {
+    init(currentJoinedEvent: DMEvent?, fullName: String?, identifier: String, pastEvents: [DMEvent]?) {
         self.currentJoinedEvent = currentJoinedEvent
         self.fullName = fullName
         self.pastEvents = pastEvents
-        self.identifier = identifier ?? UUID().uuidString
+        self.identifier = identifier
         super.init()
     }
     
@@ -63,12 +63,11 @@ extension DMUser: CKRecordModel {
     
     static func from(CKRecord record: CKRecord) -> DMUser {
         let fullName = record[UserKey.fullName] as? String
-        let identifier = record[UserKey.identifier] as? String
-
+        
         return DMUser(
             currentJoinedEvent: nil,
             fullName: fullName,
-            identifier: identifier,
+            identifier: record.recordID.recordName,
             pastEvents: nil
         )
     }

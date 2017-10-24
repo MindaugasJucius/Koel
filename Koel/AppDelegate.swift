@@ -30,7 +30,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             let rootViewController: UIViewController
             // Show Queue controller if an event exists (means it has been joined, if it's stored to User Defaults).
             // Otherwise begin app's flow from Event creation/joining controller
+            
             if let currentEvent = DMUserDefaultsHelper.CurrentEventRecord {
+                //TODO: check if the stored still event exists/hasn't been marked as ended on CloudKit
                 rootViewController = DMSongQueueViewController(withEvent: DMEvent.from(CKRecord: currentEvent))
             } else {
                 rootViewController = DMEventCreationViewController()

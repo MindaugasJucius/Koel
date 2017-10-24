@@ -116,13 +116,19 @@ class DMSongQueueViewController: UIViewController {
                           eventID: event.recordID,
                           spotifySongID: "dankid")
         
-        songManager.save(aSong: song) { [unowned self] savedSong in
-            let pathForNewRecord = IndexPath(item: self.songs.count, section: 0)
-            self.songs.append(savedSong)
-            DispatchQueue.main.async {
-                self.tableView.insertRows(at: [pathForNewRecord], with: .middle)
+        songManager.save(
+            aSong: song,
+            completion: { [unowned self] savedSong in
+                let pathForNewRecord = IndexPath(item: self.songs.count, section: 0)
+                self.songs.append(savedSong)
+                DispatchQueue.main.async {
+                    self.tableView.insertRows(at: [pathForNewRecord], with: .middle)
+                }
+            },
+            failure: { error in
+                print(error.localizedDescription)
             }
-        }
+        )
     }
     
 }
