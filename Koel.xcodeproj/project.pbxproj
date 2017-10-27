@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		33CD43033F2349BABFA21363 /* Pods_Koel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 859C054680781DDB43D6FFC3 /* Pods_Koel.framework */; };
+		47ADB8775C90C90A34CB0B4E /* Pods_KoelTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C68936EB8AF29A19F4BC4C74 /* Pods_KoelTests.framework */; };
 		5F01EBF81F8FD28400E47E6A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F01EBF71F8FD28400E47E6A /* AppDelegate.swift */; };
 		5F01EBFA1F8FD28400E47E6A /* DMSongQueueViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F01EBF91F8FD28400E47E6A /* DMSongQueueViewController.swift */; };
 		5F01EBFF1F8FD28400E47E6A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5F01EBFE1F8FD28400E47E6A /* Assets.xcassets */; };
@@ -41,6 +43,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1EEEA22101255BEC78867464 /* Pods-Koel.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Koel.release.xcconfig"; path = "Pods/Target Support Files/Pods-Koel/Pods-Koel.release.xcconfig"; sourceTree = "<group>"; };
+		2F9833A4A17A19528964480E /* Pods-Koel.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Koel.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Koel/Pods-Koel.debug.xcconfig"; sourceTree = "<group>"; };
+		4BFB7D7E45702A7F3768CF64 /* Pods-KoelTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KoelTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-KoelTests/Pods-KoelTests.release.xcconfig"; sourceTree = "<group>"; };
 		5F01EBF41F8FD28400E47E6A /* Koel.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Koel.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5F01EBF71F8FD28400E47E6A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		5F01EBF91F8FD28400E47E6A /* DMSongQueueViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMSongQueueViewController.swift; sourceTree = "<group>"; };
@@ -67,6 +72,9 @@
 		5FDEB6B81F99235500070930 /* DMInitialLoadingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMInitialLoadingViewController.swift; sourceTree = "<group>"; };
 		5FDEB6B91F99235500070930 /* DMInitialLoadingViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DMInitialLoadingViewController.xib; sourceTree = "<group>"; };
 		5FF67D4A1F9795F7001E66FA /* DMSongManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMSongManager.swift; sourceTree = "<group>"; };
+		859C054680781DDB43D6FFC3 /* Pods_Koel.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Koel.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A861E7CF8C467D863DF841D6 /* Pods-KoelTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KoelTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-KoelTests/Pods-KoelTests.debug.xcconfig"; sourceTree = "<group>"; };
+		C68936EB8AF29A19F4BC4C74 /* Pods_KoelTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KoelTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,6 +83,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5F01EC1A1F8FD2AA00E47E6A /* CloudKit.framework in Frameworks */,
+				33CD43033F2349BABFA21363 /* Pods_Koel.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -82,12 +91,24 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				47ADB8775C90C90A34CB0B4E /* Pods_KoelTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4ED69C3232FD6FE416E4C8DB /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				2F9833A4A17A19528964480E /* Pods-Koel.debug.xcconfig */,
+				1EEEA22101255BEC78867464 /* Pods-Koel.release.xcconfig */,
+				A861E7CF8C467D863DF841D6 /* Pods-KoelTests.debug.xcconfig */,
+				4BFB7D7E45702A7F3768CF64 /* Pods-KoelTests.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 		5F01EBEB1F8FD28400E47E6A = {
 			isa = PBXGroup;
 			children = (
@@ -95,6 +116,7 @@
 				5F01EC0B1F8FD28400E47E6A /* KoelTests */,
 				5F01EBF51F8FD28400E47E6A /* Products */,
 				5F01EC181F8FD2AA00E47E6A /* Frameworks */,
+				4ED69C3232FD6FE416E4C8DB /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -140,6 +162,8 @@
 			isa = PBXGroup;
 			children = (
 				5F01EC191F8FD2AA00E47E6A /* CloudKit.framework */,
+				859C054680781DDB43D6FFC3 /* Pods_Koel.framework */,
+				C68936EB8AF29A19F4BC4C74 /* Pods_KoelTests.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -207,9 +231,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 5F01EC111F8FD28400E47E6A /* Build configuration list for PBXNativeTarget "Koel" */;
 			buildPhases = (
+				439022389726CF3FEB06DE29 /* [CP] Check Pods Manifest.lock */,
 				5F01EBF01F8FD28400E47E6A /* Sources */,
 				5F01EBF11F8FD28400E47E6A /* Frameworks */,
 				5F01EBF21F8FD28400E47E6A /* Resources */,
+				F1E132EE7CB0641C8526A141 /* [CP] Embed Pods Frameworks */,
+				A9AD169583329472B524897D /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -224,9 +251,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 5F01EC141F8FD28400E47E6A /* Build configuration list for PBXNativeTarget "KoelTests" */;
 			buildPhases = (
+				85CEA0DCFE884546CB896298 /* [CP] Check Pods Manifest.lock */,
 				5F01EC041F8FD28400E47E6A /* Sources */,
 				5F01EC051F8FD28400E47E6A /* Frameworks */,
 				5F01EC061F8FD28400E47E6A /* Resources */,
+				C2ADB3BE506FB9E7F03CE670 /* [CP] Embed Pods Frameworks */,
+				D97C56ABB716DF42B9213647 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -310,6 +340,110 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		439022389726CF3FEB06DE29 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Koel-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		85CEA0DCFE884546CB896298 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-KoelTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		A9AD169583329472B524897D /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Koel/Pods-Koel-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		C2ADB3BE506FB9E7F03CE670 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-KoelTests/Pods-KoelTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		D97C56ABB716DF42B9213647 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-KoelTests/Pods-KoelTests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		F1E132EE7CB0641C8526A141 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-Koel/Pods-Koel-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/RxCocoa/RxCocoa.framework",
+				"${BUILT_PRODUCTS_DIR}/RxSwift/RxSwift.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxCocoa.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxSwift.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Koel/Pods-Koel-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		5F01EBF01F8FD28400E47E6A /* Sources */ = {
@@ -472,6 +606,7 @@
 		};
 		5F01EC121F8FD28400E47E6A /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 2F9833A4A17A19528964480E /* Pods-Koel.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Koel/Koel.entitlements;
@@ -488,6 +623,7 @@
 		};
 		5F01EC131F8FD28400E47E6A /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1EEEA22101255BEC78867464 /* Pods-Koel.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Koel/Koel.entitlements;
@@ -504,6 +640,7 @@
 		};
 		5F01EC151F8FD28400E47E6A /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = A861E7CF8C467D863DF841D6 /* Pods-KoelTests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -521,6 +658,7 @@
 		};
 		5F01EC161F8FD28400E47E6A /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4BFB7D7E45702A7F3768CF64 /* Pods-KoelTests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
