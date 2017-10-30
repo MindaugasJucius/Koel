@@ -15,57 +15,21 @@ let SongsNotification = Notification(name: SongsUpdateNotificationName)
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
-
-    private let userManager = DMUserManager()
     
     var window: UIWindow? = UIWindow(frame: UIScreen.main.bounds)
-
+    private var appCoordinator: AppCoordinator?
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         
         application.registerForRemoteNotifications()
         
+        let navigationController = UINavigationController()
+        window?.rootViewController = navigationController
         window?.makeKeyAndVisible()
 
-        let updateRootViewController = {
-            let rootViewController: UIViewController
-            // Show Queue controller if an event exists (means it has been joined, if it's stored to User Defaults).
-            // Otherwise begin app's flow from Event creation/joining controller
-            
-            if let currentEvent = DMUserDefaultsHelper.CurrentEventRecord {
-                //TODO: check if the stored still event exists/hasn't been marked as ended on CloudKit
-                rootViewController = DMSongQueueViewController(withEvent: DMEvent.from(CKRecord: currentEvent))
-            } else {
-                rootViewController = DMEventCreationViewController()
-            }
-            self.window?.rootViewController = rootViewController
-        }
+        appCoordinator = AppCoordinator(withNavigationController: navigationController)
+        appCoordinator?.start()
         
-        // If current User hasn't been determined yet, fetch full record
-        guard DMUserDefaultsHelper.CloudKitUserRecord == nil else {
-            updateRootViewController()
-            return true
-        }
-        
-        self.window?.rootViewController = DMInitialLoadingViewController()
-        
-        let initialSetupGroup = DispatchGroup()
-        
-        initialSetupGroup.enter()
-        
-        userManager.fetchFullCurrentUserRecord(
-            success: { user in
-                initialSetupGroup.leave()
-            },
-            failure: { error in
-                initialSetupGroup.leave()
-            }
-        )
-    
-        // Update app's rootViewController after fetching User's record
-        initialSetupGroup.notify(queue: DispatchQueue.main) {
-            updateRootViewController()
-        }
-
         return true
     }
  
