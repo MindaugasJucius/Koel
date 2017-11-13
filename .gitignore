@@ -1,6 +1,9 @@
 # Xcode
 #
-# gitignore contributors: remember to update Global/Xcode.gitignore, Objective-C.gitignore & Swift.gitignore
+# gitignore contributors: remember to update Global/Xcode.gitignore, Objective-C.gitignore & 
+Swift.gitignore
+
+Pods/
 
 ## Build generated
 build/
@@ -34,4 +37,3 @@ playground.xcworkspace
 *.xcuserstate
 
 *.xcbkptlist
-Pods/

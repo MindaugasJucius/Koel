@@ -2,15 +2,18 @@ PODS:
   - RxCocoa (4.0.0):
     - RxSwift (~> 4.0)
   - RxSwift (4.0.0)
+  - SCSiriWaveformView (1.1.1)
 
 DEPENDENCIES:
   - RxCocoa (~> 4.0)
   - RxSwift (~> 4.0)
+  - SCSiriWaveformView
 
 SPEC CHECKSUMS:
   RxCocoa: d62846ca96495d862fa4c59ea7d87e5031d7340e
   RxSwift: fd680d75283beb5e2559486f3c0ff852f0d35334
+  SCSiriWaveformView: 15b9dd6f94c7536e2032b34a35c6ff74d38c7411
 
-PODFILE CHECKSUM: 399ca525d20ac4a8f843770269e65bb9527a2e40
+PODFILE CHECKSUM: a85167040611909d47b7608808cd791ac45872fe
 
 COCOAPODS: 1.3.1
