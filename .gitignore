@@ -34,3 +34,4 @@ playground.xcworkspace
 *.xcuserstate
 
 *.xcbkptlist
+Pods/
