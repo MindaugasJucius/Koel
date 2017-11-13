@@ -21,6 +21,7 @@ protocol DMInitialLoadingViewModelType {
 final class DMInitialLoadingViewModel: NSObject, DMInitialLoadingViewModelType {
     
     private var userVariable: Variable<DMUser>?
+    
     lazy var userObservable: Observable<DMUser>? = self.userVariable?.asObservable()
     
     let onInitialFetchComplete: InitialFetch
@@ -33,11 +34,17 @@ final class DMInitialLoadingViewModel: NSObject, DMInitialLoadingViewModelType {
     }
     
     private func fetchUser() {
+        
+        let observable = Observable<DMUser>.create { observer in
+            //observer.onNext(<#T##element: DMUser##DMUser#>)
+            return Disposables.create()
+        }.asObservable()
+        
         userManager.fetchFullCurrentUserRecord(
             success: { [unowned self] user in
                 self.userVariable?.value = user
             },
-            failure: { error in
+            failure: { [unowned self] error in
                 
             }
         )
