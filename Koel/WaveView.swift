@@ -43,15 +43,17 @@ class WaveView: UIView {
     init() {
         super.init(frame: CGRect.zero)
 
+        backWaveView.translatesAutoresizingMaskIntoConstraints = false
         backWaveView.backgroundColor = UIColor.clear
         backWaveView.phaseShift = -0.022
-        backWaveView.primaryWaveLineWidth = 0.5
+        backWaveView.primaryWaveLineWidth = 1
         //backWaveView.primaryWaveColor = PrimaryWaveInactiveColor
         backWaveView.secondaryWaveLineWidth = 0.5
         //backWaveView.secondaryWaveColor = UIColor.darkGray
         backWaveView.update(withLevel: 0)
         addSubview(backWaveView)
 
+        frontWaveView.translatesAutoresizingMaskIntoConstraints = false
         frontWaveView.backgroundColor = UIColor.clear
         frontWaveView.phaseShift = -0.02
         frontWaveView.primaryWaveLineWidth = 2
@@ -61,15 +63,27 @@ class WaveView: UIView {
         frontWaveView.update(withLevel: 0)
         addSubview(frontWaveView)
 
-        frontWaveView.snp.makeConstraints { make in
-            make.top.bottom.equalTo(self)
-            make.leading.trailing.equalTo(self).inset(-40)
-        }
-
-        backWaveView.snp.makeConstraints { make in
-            make.top.bottom.equalTo(self)
-            make.leading.trailing.equalTo(self).inset(-15)
-        }
+        let constraints = [
+                           frontWaveView.topAnchor.constraint(equalTo: topAnchor),
+                           frontWaveView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: -40),
+                           frontWaveView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 40),
+                           frontWaveView.bottomAnchor.constraint(equalTo: bottomAnchor),
+                           
+                           backWaveView.topAnchor.constraint(equalTo: topAnchor),
+                           backWaveView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: -15),
+                           backWaveView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 15),
+                           backWaveView.bottomAnchor.constraint(equalTo: bottomAnchor)
+                          ]
+        NSLayoutConstraint.activate(constraints)
+//        frontWaveView.snp.makeConstraints { make in
+//            make.top.bottom.equalTo(self)
+//            make.leading.trailing.equalTo(self).inset(-40)
+//        }
+//
+//        backWaveView.snp.makeConstraints { make in
+//            make.top.bottom.equalTo(self)
+//            make.leading.trailing.equalTo(self).inset(-15)
+//        }
 
         clipsToBounds = true
 
@@ -87,16 +101,16 @@ class WaveView: UIView {
         let lerp = CGFloat(colorLerp - Float(colorIndex))
         let fromColor = PrimaryWaveActiveColors[colorIndex]
         let toColor = PrimaryWaveActiveColors[(colorIndex + 1) % PrimaryWaveColorCount]
-        let currentColor = fromColor.lerp(toColor: toColor, step: lerp)
+//        let currentColor = fromColor.lerp(toColor: toColor, step: lerp)
 
         if active && waveLevel < WaveLevel {
             waveLevel += ActiveInactiveTransitionStep
-            frontWaveView.primaryWaveColor = PrimaryWaveInactiveColor.lerp(toColor: currentColor, step: waveLevel / WaveLevel)
+            //frontWaveView.primaryWaveColor = PrimaryWaveInactiveColor.lerp(toColor: currentColor, step: waveLevel / WaveLevel)
         } else if !active && waveLevel > 0 {
             waveLevel -= ActiveInactiveTransitionStep
-            frontWaveView.primaryWaveColor = currentColor.lerp(toColor: PrimaryWaveInactiveColor, step: (WaveLevel - waveLevel) / WaveLevel)
+            //frontWaveView.primaryWaveColor = currentColor.lerp(toColor: PrimaryWaveInactiveColor, step: (WaveLevel - waveLevel) / WaveLevel)
         } else if active {
-            frontWaveView.primaryWaveColor = currentColor
+            //frontWaveView.primaryWaveColor = currentColor
         }
 
         backWaveView.update(withLevel: waveLevel - 0.1)
