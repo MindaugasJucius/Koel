@@ -22,12 +22,12 @@ class AppCoordinator: NSObject, Coordinator {
     }
     
     func start() {
-        if DMUserDefaultsHelper.CloudKitUserRecord == nil {
+//        if DMUserDefaultsHelper.CloudKitUserRecord == nil {
             let initialCoordinator = initialLoadingCoordinator()
             initialCoordinator.start()
-        } else {
-            adjustToEventExistence()
-        }
+//        } else {
+//            adjustToEventExistence()
+//        }
     }
     
     private func performInitialConfiguration() {

@@ -75,15 +75,7 @@ class WaveView: UIView {
                            backWaveView.bottomAnchor.constraint(equalTo: bottomAnchor)
                           ]
         NSLayoutConstraint.activate(constraints)
-//        frontWaveView.snp.makeConstraints { make in
-//            make.top.bottom.equalTo(self)
-//            make.leading.trailing.equalTo(self).inset(-40)
-//        }
-//
-//        backWaveView.snp.makeConstraints { make in
-//            make.top.bottom.equalTo(self)
-//            make.leading.trailing.equalTo(self).inset(-15)
-//        }
+
 
         clipsToBounds = true
 
