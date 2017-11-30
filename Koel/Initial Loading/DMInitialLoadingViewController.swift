@@ -38,11 +38,6 @@ class DMInitialLoadingViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        let subscription = viewModel.userObservable?.subscribe(
-            { user in
-                
-            }
-        ).disposed(by: bag)
         
         view.addSubview(logoView)
         let constraints = [
