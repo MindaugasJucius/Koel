@@ -24,6 +24,8 @@
 		5F58F0311F9CB793006B9B47 /* UIViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F58F0301F9CB793006B9B47 /* UIViewController+Extensions.swift */; };
 		5F58F0341F9D142C006B9B47 /* CKRecordModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F58F0331F9D142C006B9B47 /* CKRecordModel.swift */; };
 		5F601D3B1FD043DC003DE897 /* DMEventAdvertiserService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F601D3A1FD043DC003DE897 /* DMEventAdvertiserService.swift */; };
+		5F601D3D1FD04851003DE897 /* DMEventCreationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F601D3C1FD04851003DE897 /* DMEventCreationViewModel.swift */; };
+		5F601D3F1FD04E0C003DE897 /* MCNearbyServiceAdvertiserDelegate+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F601D3E1FD04E0C003DE897 /* MCNearbyServiceAdvertiserDelegate+Rx.swift */; };
 		5F8186121FBB6EDB00477C71 /* DMKoelLogoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F8186111FBB6EDB00477C71 /* DMKoelLogoView.swift */; };
 		5FB28BE11F90EA3900B670E6 /* DMEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB28BE01F90EA3900B670E6 /* DMEvent.swift */; };
 		5FB28BE31F90ECEA00B670E6 /* DMUserDefaultsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB28BE21F90ECEA00B670E6 /* DMUserDefaultsHelper.swift */; };
@@ -74,6 +76,8 @@
 		5F58F0301F9CB793006B9B47 /* UIViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extensions.swift"; sourceTree = "<group>"; };
 		5F58F0331F9D142C006B9B47 /* CKRecordModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CKRecordModel.swift; sourceTree = "<group>"; };
 		5F601D3A1FD043DC003DE897 /* DMEventAdvertiserService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventAdvertiserService.swift; sourceTree = "<group>"; };
+		5F601D3C1FD04851003DE897 /* DMEventCreationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventCreationViewModel.swift; sourceTree = "<group>"; };
+		5F601D3E1FD04E0C003DE897 /* MCNearbyServiceAdvertiserDelegate+Rx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MCNearbyServiceAdvertiserDelegate+Rx.swift"; sourceTree = "<group>"; };
 		5F8186111FBB6EDB00477C71 /* DMKoelLogoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMKoelLogoView.swift; sourceTree = "<group>"; };
 		5FB28BE01F90EA3900B670E6 /* DMEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEvent.swift; sourceTree = "<group>"; };
 		5FB28BE21F90ECEA00B670E6 /* DMUserDefaultsHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMUserDefaultsHelper.swift; sourceTree = "<group>"; };
@@ -203,6 +207,7 @@
 				5F01EC241F925F8C00E47E6A /* DMUserManager.swift */,
 				5FF67D4A1F9795F7001E66FA /* DMSongManager.swift */,
 				5F601D3A1FD043DC003DE897 /* DMEventAdvertiserService.swift */,
+				5F601D3E1FD04E0C003DE897 /* MCNearbyServiceAdvertiserDelegate+Rx.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -260,6 +265,7 @@
 			children = (
 				5FDEB6B21F97C07000070930 /* DMEventCreationViewController.swift */,
 				5FDEB6B31F97C07000070930 /* DMEventCreationViewController.xib */,
+				5F601D3C1FD04851003DE897 /* DMEventCreationViewModel.swift */,
 			);
 			path = "Event Creation";
 			sourceTree = "<group>";
@@ -492,9 +498,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5F601D3F1FD04E0C003DE897 /* MCNearbyServiceAdvertiserDelegate+Rx.swift in Sources */,
 				5FB665DC1FA346DE005C5165 /* Coordinator.swift in Sources */,
 				5F01EC1D1F8FD8C100E47E6A /* DMEventManager.swift in Sources */,
 				5F8186121FBB6EDB00477C71 /* DMKoelLogoView.swift in Sources */,
+				5F601D3D1FD04851003DE897 /* DMEventCreationViewModel.swift in Sources */,
 				5F01EC251F925F8C00E47E6A /* DMUserManager.swift in Sources */,
 				5F58F0311F9CB793006B9B47 /* UIViewController+Extensions.swift in Sources */,
 				5F01EC231F925EB200E47E6A /* CKRecord+Extensions.swift in Sources */,
