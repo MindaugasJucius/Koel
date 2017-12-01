@@ -12,6 +12,8 @@ import RxSwift
 fileprivate let IdentityCacheKey = "IdentityCacheKey"
 fileprivate let EventServiceType = "song-event"
 
+typealias Invitation = (MCPeerID, [String: Any]?, (Bool) -> ())
+
 class DMEventMultipeerService: NSObject {
     
     fileprivate let myPeerID: MCPeerID
@@ -20,11 +22,12 @@ class DMEventMultipeerService: NSObject {
     fileprivate let browser: MCNearbyServiceBrowser
     fileprivate let session: MCSession
     
-    fileprivate let incomingConnections: PublishSubject<(MCPeerID, [String: Any]?, (Bool, MCSession?) -> Void)> = PublishSubject()
+    fileprivate let incomingInvitations: PublishSubject<(MCPeerID, [String: Any]?, (Bool, MCSession?) -> Void)> = PublishSubject()
     fileprivate let nearbyPeers: Variable<[(MCPeerID, [String: String]?)]> = Variable([])
     
     fileprivate let connections = Variable<[MCPeerID]>([])
-    fileprivate let connectionErrors: PublishSubject<Error> = PublishSubject()
+    fileprivate let advertisingConnectionErrors: PublishSubject<MCError> = PublishSubject()
+    fileprivate let browsingConnectionErrors: PublishSubject<MCError> = PublishSubject()
     
     init(withDisplayName displayName: String) {
         self.myPeerID = DMEventMultipeerService.retrieveIdentity(withDisplayName: displayName)
@@ -52,22 +55,26 @@ class DMEventMultipeerService: NSObject {
     
     //MARK: - Observables
     
-    func incomingPeerConnections() -> Observable<(MCPeerID, [String: Any]?, (Bool) -> ())> {
-        return incomingConnections
+    func incomingPeerInvitations() -> Observable<Invitation> {
+        return incomingInvitations
             .map { [unowned self] (client, context, handler) in
                 // Do not expose session to observers
                 return (client, context, { (accept: Bool) in
-                        handler(accept, self.session)
+                    handler(accept, self.session)
                 })
         }
-    }
-
-    func peerConnectionErrors() -> Observable<Error> {
-        return connectionErrors
     }
     
     func connectedPeers() -> Observable<[MCPeerID]> {
         return connections.asObservable()
+    }
+    
+    func advertisingErrors() -> Observable<MCError> {
+        return advertisingConnectionErrors.asObservable()
+    }
+    
+    func browsingErrors() -> Observable<MCError> {
+        return advertisingConnectionErrors.asObservable()
     }
     
     func nearbyFoundPeers() -> Observable<[(MCPeerID, [String: String]?)]> {
@@ -82,33 +89,32 @@ class DMEventMultipeerService: NSObject {
     
     //MARK: - Advertising
     
-    func startAdvertising() {
-        advertiser.startAdvertisingPeer()
+    func startAdvertising() -> Observable<Void> {
+        return .just(advertiser.startAdvertisingPeer())
     }
     
-    func stopAdvertising() {
-        advertiser.stopAdvertisingPeer()
+    func stopAdvertising() -> Observable<Void> {
+        return .just(advertiser.stopAdvertisingPeer())
     }
 
     //MARK: - Browsing
     
-    func startBrowsing() {
-        browser.startBrowsingForPeers()
+    func startBrowsing() -> Observable<Void> {
+        return .just(browser.startBrowsingForPeers())
     }
     
-    func stopBrowsing() {
-        browser.stopBrowsingForPeers()
+    func stopBrowsing() -> Observable<Void> {
         nearbyPeers.value = []
+        return .just(browser.stopBrowsingForPeers())
     }
     
-    func connect(_ peer: MCPeerID, context: [String: Any]?, timeout: TimeInterval) {
+    func connect(_ peer: MCPeerID, context: [String: Any]?, timeout: TimeInterval) -> Observable<Void> {
         guard let context = context,
             let data = try? JSONSerialization.data(withJSONObject: context, options: JSONSerialization.WritingOptions()) else {
-            browser.invitePeer(peer, to: self.session, withContext: nil, timeout: timeout)
-            return
+            return .just(browser.invitePeer(peer, to: self.session, withContext: nil, timeout: timeout))
         }
     
-        browser.invitePeer(peer, to: self.session, withContext: data, timeout: timeout)
+        return .just(browser.invitePeer(peer, to: self.session, withContext: data, timeout: timeout))
     }
     
     /// Retrieve MCPeerID from UserDefaults if one exists, or create and store a new one
@@ -154,7 +160,8 @@ extension DMEventMultipeerService: MCNearbyServiceBrowserDelegate {
     }
     
     func browser(_ browser: MCNearbyServiceBrowser, didNotStartBrowsingForPeers error: Error) {
-        connectionErrors.onNext(error)
+        let mcError = MCError(_nsError: error as NSError)
+        browsingConnectionErrors.onNext(mcError)
     }
     
 }
@@ -162,17 +169,18 @@ extension DMEventMultipeerService: MCNearbyServiceBrowserDelegate {
 extension DMEventMultipeerService: MCNearbyServiceAdvertiserDelegate {
     
     func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didNotStartAdvertisingPeer error: Error) {
-        connectionErrors.onNext(error)
+        let mcError = MCError(_nsError: error as NSError)
+        advertisingConnectionErrors.onNext(mcError)
     }
     
     func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didReceiveInvitationFromPeer peerID: MCPeerID, withContext context: Data?, invitationHandler: @escaping (Bool, MCSession?) -> Void) {
         
         guard let context = context, let json = try? JSONSerialization.jsonObject(with: context) else {
-            incomingConnections.onNext((peerID, nil, invitationHandler))
+            incomingInvitations.onNext((peerID, nil, invitationHandler))
             return
         }
 
-        incomingConnections.onNext((peerID, json as? [String: Any], invitationHandler))
+        incomingInvitations.onNext((peerID, json as? [String: Any], invitationHandler))
     }
     
 }
