@@ -10,16 +10,18 @@ import MultipeerConnectivity
 import RxSwift
 import Action
 
+typealias PeerWithContext = (MCPeerID, [String: String]?)
+
 struct DMEventCreationViewModel {
 
     let multipeerEventService = DMEventMultipeerService(withDisplayName: UIDevice.current.name)
     
-    var allPeers: Observable<[(MCPeerID, [String: String]?)]> {
+    var allPeers: Observable<[PeerWithContext]> {
         return multipeerEventService.nearbyFoundPeers()
     }
     
     var connectedPeers: Observable<[MCPeerID]> {
-        return multipeerEventService.connectedPeers()
+        return multipeerEventService.connectedPeers().skip(1)
     }
     
     var incommingInvitations: Observable<Invitation> {

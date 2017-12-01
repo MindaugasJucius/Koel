@@ -22,9 +22,13 @@ class AppCoordinator: NSObject, Coordinator {
     }
     
     func start() {
+        let viewModel = DMEventCreationViewModel()
+        let creation = DMEventCreationViewController(withCreationViewModel: viewModel)
+        navigationController?.pushViewController(creation, animated: true)
 //        if DMUserDefaultsHelper.CloudKitUserRecord == nil {
-            let initialCoordinator = initialLoadingCoordinator()
-            initialCoordinator.start()
+        
+        //            let initialCoordinator = initialLoadingCoordinator()
+//            initialCoordinator.start()
 //        } else {
 //            adjustToEventExistence()
 //        }
