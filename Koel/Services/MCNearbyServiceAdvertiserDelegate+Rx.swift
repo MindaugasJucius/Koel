@@ -11,23 +11,3 @@ import MultipeerConnectivity
 import RxSwift
 import RxCocoa
 
-class RxMCNearbyServiceAdvertiserDelegateProxy: DelegateProxy<AnyObject, AnyObject>, DelegateProxyType, MCNearbyServiceAdvertiserDelegate {
-    
-    static func registerKnownImplementations() {
-        
-    }
-    
-    static func currentDelegate(for object: AnyObject) -> AnyObject? {
-        <#code#>
-    }
-    
-    static func setCurrentDelegate(_ delegate: AnyObject?, to object: AnyObject) {
-        <#code#>
-    }
-    
-    func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didReceiveInvitationFromPeer peerID: MCPeerID, withContext context: Data?, invitationHandler: @escaping (Bool, MCSession?) -> Void) {
-        <#code#>
-    }
-    
-
-}
