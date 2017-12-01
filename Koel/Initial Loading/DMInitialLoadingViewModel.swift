@@ -25,29 +25,10 @@ final class DMInitialLoadingViewModel: NSObject, DMInitialLoadingViewModelType {
     lazy var userObservable: Observable<DMUser>? = self.userVariable?.asObservable()
     
     let onInitialFetchComplete: InitialFetch
-    private let userManager: DMUserManager = DMUserManager()
-    
+
     init(withInitialFetchCompletion initialFetchCompletion: @escaping InitialFetch) {
         self.onInitialFetchComplete = initialFetchCompletion
         super.init()
-        fetchUser()
-    }
-    
-    private func fetchUser() {
-        
-        let observable = Observable<DMUser>.create { observer in
-            //observer.onNext(<#T##element: DMUser##DMUser#>)
-            return Disposables.create()
-        }.asObservable()
-        
-        userManager.fetchFullCurrentUserRecord(
-            success: { [unowned self] user in
-                self.userVariable?.value = user
-            },
-            failure: { [unowned self] error in
-                
-            }
-        )
     }
     
 }

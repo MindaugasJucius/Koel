@@ -12,15 +12,12 @@
 		5F014BD41FB9E20000079009 /* WaveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F014BD31FB9E20000079009 /* WaveView.swift */; };
 		5F014BD61FB9E29700079009 /* UIColor+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F014BD51FB9E29700079009 /* UIColor+Extensions.swift */; };
 		5F01EBF81F8FD28400E47E6A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F01EBF71F8FD28400E47E6A /* AppDelegate.swift */; };
-		5F01EBFA1F8FD28400E47E6A /* DMSongQueueViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F01EBF91F8FD28400E47E6A /* DMSongQueueViewController.swift */; };
 		5F01EBFF1F8FD28400E47E6A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5F01EBFE1F8FD28400E47E6A /* Assets.xcassets */; };
 		5F01EC021F8FD28400E47E6A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5F01EC001F8FD28400E47E6A /* LaunchScreen.storyboard */; };
 		5F01EC0D1F8FD28400E47E6A /* KoelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F01EC0C1F8FD28400E47E6A /* KoelTests.swift */; };
 		5F01EC1A1F8FD2AA00E47E6A /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F01EC191F8FD2AA00E47E6A /* CloudKit.framework */; };
-		5F01EC1D1F8FD8C100E47E6A /* DMEventManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F01EC1C1F8FD8C100E47E6A /* DMEventManager.swift */; };
 		5F01EC201F92570500E47E6A /* DMSong.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F01EC1F1F92570500E47E6A /* DMSong.swift */; };
 		5F01EC231F925EB200E47E6A /* CKRecord+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F01EC221F925EB200E47E6A /* CKRecord+Extensions.swift */; };
-		5F01EC251F925F8C00E47E6A /* DMUserManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F01EC241F925F8C00E47E6A /* DMUserManager.swift */; };
 		5F58F0311F9CB793006B9B47 /* UIViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F58F0301F9CB793006B9B47 /* UIViewController+Extensions.swift */; };
 		5F58F0341F9D142C006B9B47 /* CKRecordModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F58F0331F9D142C006B9B47 /* CKRecordModel.swift */; };
 		5F601D3B1FD043DC003DE897 /* DMEventMultipeerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F601D3A1FD043DC003DE897 /* DMEventMultipeerService.swift */; };
@@ -32,13 +29,9 @@
 		5FB665DC1FA346DE005C5165 /* Coordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB665DB1FA346DE005C5165 /* Coordinator.swift */; };
 		5FB665DF1FA34B61005C5165 /* DMInitialLoadingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB665DE1FA34B61005C5165 /* DMInitialLoadingViewModel.swift */; };
 		5FB665E11FA351A9005C5165 /* DMInitialLoadingCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB665E01FA351A9005C5165 /* DMInitialLoadingCoordinator.swift */; };
-		5FDEB6B01F97BEF400070930 /* DMSongQueueViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5FDEB6AF1F97BEF400070930 /* DMSongQueueViewController.xib */; };
-		5FDEB6B41F97C07000070930 /* DMEventCreationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FDEB6B21F97C07000070930 /* DMEventCreationViewController.swift */; };
-		5FDEB6B51F97C07000070930 /* DMEventCreationViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5FDEB6B31F97C07000070930 /* DMEventCreationViewController.xib */; };
 		5FDEB6B71F99114800070930 /* DMUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FDEB6B61F99114800070930 /* DMUser.swift */; };
 		5FDEB6BA1F99235500070930 /* DMInitialLoadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FDEB6B81F99235500070930 /* DMInitialLoadingViewController.swift */; };
 		5FDEB6BB1F99235500070930 /* DMInitialLoadingViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5FDEB6B91F99235500070930 /* DMInitialLoadingViewController.xib */; };
-		5FF67D4B1F9795F7001E66FA /* DMSongManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FF67D4A1F9795F7001E66FA /* DMSongManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -59,7 +52,6 @@
 		5F014BD51FB9E29700079009 /* UIColor+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extensions.swift"; sourceTree = "<group>"; };
 		5F01EBF41F8FD28400E47E6A /* Koel.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Koel.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5F01EBF71F8FD28400E47E6A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		5F01EBF91F8FD28400E47E6A /* DMSongQueueViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMSongQueueViewController.swift; sourceTree = "<group>"; };
 		5F01EBFE1F8FD28400E47E6A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5F01EC011F8FD28400E47E6A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		5F01EC031F8FD28400E47E6A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -68,10 +60,8 @@
 		5F01EC0E1F8FD28400E47E6A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5F01EC171F8FD2A600E47E6A /* Koel.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Koel.entitlements; sourceTree = "<group>"; };
 		5F01EC191F8FD2AA00E47E6A /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
-		5F01EC1C1F8FD8C100E47E6A /* DMEventManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventManager.swift; sourceTree = "<group>"; };
 		5F01EC1F1F92570500E47E6A /* DMSong.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMSong.swift; sourceTree = "<group>"; };
 		5F01EC221F925EB200E47E6A /* CKRecord+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CKRecord+Extensions.swift"; sourceTree = "<group>"; };
-		5F01EC241F925F8C00E47E6A /* DMUserManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMUserManager.swift; sourceTree = "<group>"; };
 		5F58F0301F9CB793006B9B47 /* UIViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extensions.swift"; sourceTree = "<group>"; };
 		5F58F0331F9D142C006B9B47 /* CKRecordModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CKRecordModel.swift; sourceTree = "<group>"; };
 		5F601D3A1FD043DC003DE897 /* DMEventMultipeerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventMultipeerService.swift; sourceTree = "<group>"; };
@@ -83,13 +73,9 @@
 		5FB665DB1FA346DE005C5165 /* Coordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coordinator.swift; sourceTree = "<group>"; };
 		5FB665DE1FA34B61005C5165 /* DMInitialLoadingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMInitialLoadingViewModel.swift; sourceTree = "<group>"; };
 		5FB665E01FA351A9005C5165 /* DMInitialLoadingCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMInitialLoadingCoordinator.swift; sourceTree = "<group>"; };
-		5FDEB6AF1F97BEF400070930 /* DMSongQueueViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DMSongQueueViewController.xib; sourceTree = "<group>"; };
-		5FDEB6B21F97C07000070930 /* DMEventCreationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventCreationViewController.swift; sourceTree = "<group>"; };
-		5FDEB6B31F97C07000070930 /* DMEventCreationViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DMEventCreationViewController.xib; sourceTree = "<group>"; };
 		5FDEB6B61F99114800070930 /* DMUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMUser.swift; sourceTree = "<group>"; };
 		5FDEB6B81F99235500070930 /* DMInitialLoadingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMInitialLoadingViewController.swift; sourceTree = "<group>"; };
 		5FDEB6B91F99235500070930 /* DMInitialLoadingViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DMInitialLoadingViewController.xib; sourceTree = "<group>"; };
-		5FF67D4A1F9795F7001E66FA /* DMSongManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMSongManager.swift; sourceTree = "<group>"; };
 		859C054680781DDB43D6FFC3 /* Pods_Koel.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Koel.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A861E7CF8C467D863DF841D6 /* Pods-KoelTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KoelTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-KoelTests/Pods-KoelTests.debug.xcconfig"; sourceTree = "<group>"; };
 		C68936EB8AF29A19F4BC4C74 /* Pods_KoelTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KoelTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -155,7 +141,6 @@
 				5FB665DA1FA346C5005C5165 /* AppCoordinator */,
 				5F58F0321F9CB7AE006B9B47 /* Extensions */,
 				5FDEB6B11F97C02C00070930 /* Event Creation */,
-				5FDEB6AE1F97BE4C00070930 /* Song Queue */,
 				5F01EC211F925E9700E47E6A /* Helpers */,
 				5F01EC1E1F9256CB00E47E6A /* Services */,
 				5F01EC1B1F8FD89600E47E6A /* Model */,
@@ -201,9 +186,6 @@
 		5F01EC1E1F9256CB00E47E6A /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				5F01EC1C1F8FD8C100E47E6A /* DMEventManager.swift */,
-				5F01EC241F925F8C00E47E6A /* DMUserManager.swift */,
-				5FF67D4A1F9795F7001E66FA /* DMSongManager.swift */,
 				5F601D3A1FD043DC003DE897 /* DMEventMultipeerService.swift */,
 			);
 			path = Services;
@@ -248,20 +230,9 @@
 			path = "Initial Loading";
 			sourceTree = "<group>";
 		};
-		5FDEB6AE1F97BE4C00070930 /* Song Queue */ = {
-			isa = PBXGroup;
-			children = (
-				5F01EBF91F8FD28400E47E6A /* DMSongQueueViewController.swift */,
-				5FDEB6AF1F97BEF400070930 /* DMSongQueueViewController.xib */,
-			);
-			path = "Song Queue";
-			sourceTree = "<group>";
-		};
 		5FDEB6B11F97C02C00070930 /* Event Creation */ = {
 			isa = PBXGroup;
 			children = (
-				5FDEB6B21F97C07000070930 /* DMEventCreationViewController.swift */,
-				5FDEB6B31F97C07000070930 /* DMEventCreationViewController.xib */,
 				5F601D3C1FD04851003DE897 /* DMEventCreationViewModel.swift */,
 			);
 			path = "Event Creation";
@@ -367,10 +338,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5FDEB6B01F97BEF400070930 /* DMSongQueueViewController.xib in Resources */,
 				5F01EC021F8FD28400E47E6A /* LaunchScreen.storyboard in Resources */,
 				5F01EBFF1F8FD28400E47E6A /* Assets.xcassets in Resources */,
-				5FDEB6B51F97C07000070930 /* DMEventCreationViewController.xib in Resources */,
 				5FDEB6BB1F99235500070930 /* DMInitialLoadingViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -502,18 +471,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				5FB665DC1FA346DE005C5165 /* Coordinator.swift in Sources */,
-				5F01EC1D1F8FD8C100E47E6A /* DMEventManager.swift in Sources */,
 				5F8186121FBB6EDB00477C71 /* DMKoelLogoView.swift in Sources */,
 				5F601D3D1FD04851003DE897 /* DMEventCreationViewModel.swift in Sources */,
-				5F01EC251F925F8C00E47E6A /* DMUserManager.swift in Sources */,
 				5F58F0311F9CB793006B9B47 /* UIViewController+Extensions.swift in Sources */,
 				5F01EC231F925EB200E47E6A /* CKRecord+Extensions.swift in Sources */,
 				5F601D3B1FD043DC003DE897 /* DMEventMultipeerService.swift in Sources */,
 				5FDEB6B71F99114800070930 /* DMUser.swift in Sources */,
-				5FF67D4B1F9795F7001E66FA /* DMSongManager.swift in Sources */,
 				5FB665E11FA351A9005C5165 /* DMInitialLoadingCoordinator.swift in Sources */,
 				5F58F0341F9D142C006B9B47 /* CKRecordModel.swift in Sources */,
-				5F01EBFA1F8FD28400E47E6A /* DMSongQueueViewController.swift in Sources */,
 				5FB28BE31F90ECEA00B670E6 /* DMUserDefaultsHelper.swift in Sources */,
 				5F014BD61FB9E29700079009 /* UIColor+Extensions.swift in Sources */,
 				5FDEB6BA1F99235500070930 /* DMInitialLoadingViewController.swift in Sources */,
@@ -523,7 +488,6 @@
 				5F014BD41FB9E20000079009 /* WaveView.swift in Sources */,
 				5FB665D91FA346BC005C5165 /* AppCoordinator.swift in Sources */,
 				5F01EC201F92570500E47E6A /* DMSong.swift in Sources */,
-				5FDEB6B41F97C07000070930 /* DMEventCreationViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

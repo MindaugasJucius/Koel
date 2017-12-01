@@ -34,25 +34,6 @@ class AppCoordinator: NSObject, Coordinator {
         navigationController?.isNavigationBarHidden = true
     }
     
-    private func adjustToEventExistence() {
-        if let currentEvent = DMUserDefaultsHelper.CurrentEventRecord {
-            showSongQueue(withCurrentEvent: currentEvent)
-        } else {
-            showEventCreation()
-        }
-    }
-    
-    private func showSongQueue(withCurrentEvent eventRecord: CKRecord) {
-        let event = DMEvent.from(CKRecord: eventRecord)
-        let queueVC = DMSongQueueViewController(withEvent: event)
-        navigationController?.pushViewController(queueVC, animated: false)
-    }
-    
-    private func showEventCreation() {
-        let eventVC = DMEventCreationViewController()
-        navigationController?.pushViewController(eventVC, animated: false)
-    }
-    
     // MARK: - Child Coordinator Creation
     
     private func initialLoadingCoordinator() -> DMInitialLoadingCoordinator {
@@ -67,9 +48,7 @@ class AppCoordinator: NSObject, Coordinator {
 extension AppCoordinator: DMInitialLoadingCoordinatorDelegate {
     
     func initialLoadingSucceeded(withUser user: DMUser) {
-        // Show Song Queue controller if an event exists (means it has been joined, if it's stored to User Defaults).
-        // Otherwise adjusts app's flow from Event creation/joining controller
-        adjustToEventExistence()
+        
     }
     
     func initialLoadingFailed(withError error: Error) {
