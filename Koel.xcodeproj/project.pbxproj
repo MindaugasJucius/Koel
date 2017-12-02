@@ -16,22 +16,17 @@
 		5F01EC021F8FD28400E47E6A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5F01EC001F8FD28400E47E6A /* LaunchScreen.storyboard */; };
 		5F01EC0D1F8FD28400E47E6A /* KoelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F01EC0C1F8FD28400E47E6A /* KoelTests.swift */; };
 		5F01EC1A1F8FD2AA00E47E6A /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F01EC191F8FD2AA00E47E6A /* CloudKit.framework */; };
-		5F01EC201F92570500E47E6A /* DMSong.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F01EC1F1F92570500E47E6A /* DMSong.swift */; };
 		5F01EC231F925EB200E47E6A /* CKRecord+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F01EC221F925EB200E47E6A /* CKRecord+Extensions.swift */; };
 		5F54458B1FD1976D0059A975 /* DMEventSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F54458A1FD1976D0059A975 /* DMEventSearchViewModel.swift */; };
 		5F54458E1FD198C40059A975 /* DMEventCreationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F54458C1FD198C40059A975 /* DMEventCreationViewController.swift */; };
 		5F58F0311F9CB793006B9B47 /* UIViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F58F0301F9CB793006B9B47 /* UIViewController+Extensions.swift */; };
-		5F58F0341F9D142C006B9B47 /* CKRecordModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F58F0331F9D142C006B9B47 /* CKRecordModel.swift */; };
 		5F601D3B1FD043DC003DE897 /* DMEventMultipeerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F601D3A1FD043DC003DE897 /* DMEventMultipeerService.swift */; };
 		5F601D3D1FD04851003DE897 /* DMEventCreationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F601D3C1FD04851003DE897 /* DMEventCreationViewModel.swift */; };
 		5F8186121FBB6EDB00477C71 /* DMKoelLogoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F8186111FBB6EDB00477C71 /* DMKoelLogoView.swift */; };
-		5FB28BE11F90EA3900B670E6 /* DMEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB28BE01F90EA3900B670E6 /* DMEvent.swift */; };
 		5FB28BE31F90ECEA00B670E6 /* DMUserDefaultsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB28BE21F90ECEA00B670E6 /* DMUserDefaultsHelper.swift */; };
 		5FB665D91FA346BC005C5165 /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB665D81FA346BC005C5165 /* AppCoordinator.swift */; };
 		5FB665DC1FA346DE005C5165 /* Coordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB665DB1FA346DE005C5165 /* Coordinator.swift */; };
-		5FB665DF1FA34B61005C5165 /* DMInitialLoadingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB665DE1FA34B61005C5165 /* DMInitialLoadingViewModel.swift */; };
 		5FB665E11FA351A9005C5165 /* DMInitialLoadingCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB665E01FA351A9005C5165 /* DMInitialLoadingCoordinator.swift */; };
-		5FDEB6B71F99114800070930 /* DMUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FDEB6B61F99114800070930 /* DMUser.swift */; };
 		5FDEB6BA1F99235500070930 /* DMInitialLoadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FDEB6B81F99235500070930 /* DMInitialLoadingViewController.swift */; };
 		5FDEB6BB1F99235500070930 /* DMInitialLoadingViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5FDEB6B91F99235500070930 /* DMInitialLoadingViewController.xib */; };
 /* End PBXBuildFile section */
@@ -62,22 +57,17 @@
 		5F01EC0E1F8FD28400E47E6A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5F01EC171F8FD2A600E47E6A /* Koel.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Koel.entitlements; sourceTree = "<group>"; };
 		5F01EC191F8FD2AA00E47E6A /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
-		5F01EC1F1F92570500E47E6A /* DMSong.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMSong.swift; sourceTree = "<group>"; };
 		5F01EC221F925EB200E47E6A /* CKRecord+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CKRecord+Extensions.swift"; sourceTree = "<group>"; };
 		5F54458A1FD1976D0059A975 /* DMEventSearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventSearchViewModel.swift; sourceTree = "<group>"; };
 		5F54458C1FD198C40059A975 /* DMEventCreationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventCreationViewController.swift; sourceTree = "<group>"; };
 		5F58F0301F9CB793006B9B47 /* UIViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extensions.swift"; sourceTree = "<group>"; };
-		5F58F0331F9D142C006B9B47 /* CKRecordModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CKRecordModel.swift; sourceTree = "<group>"; };
 		5F601D3A1FD043DC003DE897 /* DMEventMultipeerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventMultipeerService.swift; sourceTree = "<group>"; };
 		5F601D3C1FD04851003DE897 /* DMEventCreationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventCreationViewModel.swift; sourceTree = "<group>"; };
 		5F8186111FBB6EDB00477C71 /* DMKoelLogoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMKoelLogoView.swift; sourceTree = "<group>"; };
-		5FB28BE01F90EA3900B670E6 /* DMEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEvent.swift; sourceTree = "<group>"; };
 		5FB28BE21F90ECEA00B670E6 /* DMUserDefaultsHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMUserDefaultsHelper.swift; sourceTree = "<group>"; };
 		5FB665D81FA346BC005C5165 /* AppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
 		5FB665DB1FA346DE005C5165 /* Coordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coordinator.swift; sourceTree = "<group>"; };
-		5FB665DE1FA34B61005C5165 /* DMInitialLoadingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMInitialLoadingViewModel.swift; sourceTree = "<group>"; };
 		5FB665E01FA351A9005C5165 /* DMInitialLoadingCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMInitialLoadingCoordinator.swift; sourceTree = "<group>"; };
-		5FDEB6B61F99114800070930 /* DMUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMUser.swift; sourceTree = "<group>"; };
 		5FDEB6B81F99235500070930 /* DMInitialLoadingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMInitialLoadingViewController.swift; sourceTree = "<group>"; };
 		5FDEB6B91F99235500070930 /* DMInitialLoadingViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DMInitialLoadingViewController.xib; sourceTree = "<group>"; };
 		859C054680781DDB43D6FFC3 /* Pods_Koel.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Koel.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -179,10 +169,6 @@
 		5F01EC1B1F8FD89600E47E6A /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				5FB28BE01F90EA3900B670E6 /* DMEvent.swift */,
-				5F01EC1F1F92570500E47E6A /* DMSong.swift */,
-				5FDEB6B61F99114800070930 /* DMUser.swift */,
-				5F58F0331F9D142C006B9B47 /* CKRecordModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -227,7 +213,6 @@
 			children = (
 				5FDEB6B81F99235500070930 /* DMInitialLoadingViewController.swift */,
 				5FDEB6B91F99235500070930 /* DMInitialLoadingViewController.xib */,
-				5FB665DE1FA34B61005C5165 /* DMInitialLoadingViewModel.swift */,
 				5FB665E01FA351A9005C5165 /* DMInitialLoadingCoordinator.swift */,
 				5F8186111FBB6EDB00477C71 /* DMKoelLogoView.swift */,
 			);
@@ -482,20 +467,15 @@
 				5F58F0311F9CB793006B9B47 /* UIViewController+Extensions.swift in Sources */,
 				5F01EC231F925EB200E47E6A /* CKRecord+Extensions.swift in Sources */,
 				5F601D3B1FD043DC003DE897 /* DMEventMultipeerService.swift in Sources */,
-				5FDEB6B71F99114800070930 /* DMUser.swift in Sources */,
 				5FB665E11FA351A9005C5165 /* DMInitialLoadingCoordinator.swift in Sources */,
-				5F58F0341F9D142C006B9B47 /* CKRecordModel.swift in Sources */,
 				5F54458E1FD198C40059A975 /* DMEventCreationViewController.swift in Sources */,
 				5FB28BE31F90ECEA00B670E6 /* DMUserDefaultsHelper.swift in Sources */,
 				5F014BD61FB9E29700079009 /* UIColor+Extensions.swift in Sources */,
 				5FDEB6BA1F99235500070930 /* DMInitialLoadingViewController.swift in Sources */,
-				5FB665DF1FA34B61005C5165 /* DMInitialLoadingViewModel.swift in Sources */,
 				5F01EBF81F8FD28400E47E6A /* AppDelegate.swift in Sources */,
-				5FB28BE11F90EA3900B670E6 /* DMEvent.swift in Sources */,
 				5F54458B1FD1976D0059A975 /* DMEventSearchViewModel.swift in Sources */,
 				5F014BD41FB9E20000079009 /* WaveView.swift in Sources */,
 				5FB665D91FA346BC005C5165 /* AppCoordinator.swift in Sources */,
-				5F01EC201F92570500E47E6A /* DMSong.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

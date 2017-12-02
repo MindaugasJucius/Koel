@@ -40,11 +40,6 @@ class DMUserDefaultsHelper: NSObject {
         return NSKeyedUnarchiver.unarchiveObject(with: entityData)
     }
     
-    static var CloudKitUserRecord: DMUser? {
-        let data = DMUserDefaultsHelper.getArchivedEntity(withKey: CloudKitUserKey)
-        return data as? DMUser
-    }
-    
     static var CurrentEventRecord: CKRecord? {
         return DMUserDefaultsHelper.getCKRecord(withKey: CurrentEventRecordKey)
     }

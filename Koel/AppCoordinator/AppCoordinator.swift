@@ -42,21 +42,8 @@ class AppCoordinator: NSObject, Coordinator {
     
     private func initialLoadingCoordinator() -> DMInitialLoadingCoordinator {
         let coordinator = DMInitialLoadingCoordinator(withNavigationController: navigationController)
-        coordinator.delegate = self
         childCoordinators.append(coordinator)
         return coordinator
-    }
-    
-}
-
-extension AppCoordinator: DMInitialLoadingCoordinatorDelegate {
-    
-    func initialLoadingSucceeded(withUser user: DMUser) {
-        
-    }
-    
-    func initialLoadingFailed(withError error: Error) {
-        
     }
     
 }

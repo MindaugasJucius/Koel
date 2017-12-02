@@ -11,14 +11,12 @@ import RxSwift
 
 class DMInitialLoadingViewController: UIViewController {
 
-    let viewModel: DMInitialLoadingViewModelType
 
     let logoView = DMKoelLogoView()
     
     let bag = DisposeBag()
     
-    init(withViewModelOfType viewModel: DMInitialLoadingViewModelType) {
-        self.viewModel = viewModel
+    init() {
         super.init(nibName: nil, bundle: nil)
     }
     
