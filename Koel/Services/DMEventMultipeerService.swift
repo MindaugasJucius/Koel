@@ -12,8 +12,6 @@ import RxSwift
 fileprivate let IdentityCacheKey = "IdentityCacheKey"
 fileprivate let EventServiceType = "song-event"
 
-typealias Invitation = (MCPeerID, [String: Any]?, (Bool) -> ())
-
 class DMEventMultipeerService: NSObject {
     
     fileprivate let myPeerID: MCPeerID
@@ -26,6 +24,7 @@ class DMEventMultipeerService: NSObject {
     fileprivate let nearbyPeers: Variable<[(MCPeerID, [String: String]?)]> = Variable([])
     
     fileprivate let connections = Variable<[MCPeerID]>([])
+    fileprivate let latestConnection = PublishSubject<MCPeerID>()
     fileprivate let advertisingConnectionErrors: PublishSubject<MCError> = PublishSubject()
     fileprivate let browsingConnectionErrors: PublishSubject<MCError> = PublishSubject()
     
@@ -55,7 +54,7 @@ class DMEventMultipeerService: NSObject {
     
     //MARK: - Observables
     
-    func incomingPeerInvitations() -> Observable<Invitation> {
+    func incomingPeerInvitations() -> Observable<(MCPeerID, [String: Any]?, (Bool) -> ())> {
         return incomingInvitations
             .map { [unowned self] (client, context, handler) in
                 // Do not expose session to observers
@@ -67,6 +66,10 @@ class DMEventMultipeerService: NSObject {
     
     func connectedPeers() -> Observable<[MCPeerID]> {
         return connections.asObservable()
+    }
+    
+    func latestConnectedPeer() -> Observable<MCPeerID> {
+        return latestConnection.asObservable()
     }
     
     func advertisingErrors() -> Observable<MCError> {
@@ -189,8 +192,9 @@ extension DMEventMultipeerService: MCSessionDelegate {
 
     public func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
         // Only emit to observers when peer has connected
-        if state != .connecting {
+        if state == .connected {
             connections.value = session.connectedPeers
+            latestConnection.onNext(peerID)
         }
     }
     

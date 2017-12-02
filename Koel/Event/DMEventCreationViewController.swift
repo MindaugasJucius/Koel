@@ -46,8 +46,9 @@ class DMEventCreationViewController: UIViewController {
             return cell
         }.disposed(by: bag)
         
-        viewModel.connectedPeers.subscribe(onNext: { [unowned self] peerIDs in
-            let alert = UIAlertController(title: "New connection", message: "connected to \(peerIDs.map { $0.displayName })", preferredStyle: .alert)
+        viewModel.latestConnectedPeer.subscribe(onNext: { [unowned self] peerID in
+            let alert = UIAlertController(title: "New connection", message: "connected to \(peerID.displayName)", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
             self.present(alert, animated: true, completion: nil)
         }).disposed(by: bag)
         
@@ -70,6 +71,8 @@ class DMEventCreationViewController: UIViewController {
             }
         ).disposed(by: bag)
         
+        additionalSafeAreaInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
+        
         let constraints = [tableView.topAnchor.constraint(equalTo: view.topAnchor),
                            tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
                            tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
@@ -84,15 +87,14 @@ class DMEventCreationViewController: UIViewController {
         view.addSubview(browseButton)
         browseButton.translatesAutoresizingMaskIntoConstraints = false
 
-        
         let browseButtonConstraints = [
-            browseButton.leftAnchor.constraint(equalTo: view.leftAnchor),
-            browseButton.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            browseButton.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant:         view.safeAreaInsets.left),
+            browseButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ]
         
         let advertiseButtonConstraints = [
-            advertiseButton.rightAnchor.constraint(equalTo: view.rightAnchor),
-            advertiseButton.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            advertiseButton.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: view.safeAreaInsets.right),
+            advertiseButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ]
         
         NSLayoutConstraint.activate(browseButtonConstraints)
@@ -100,7 +102,6 @@ class DMEventCreationViewController: UIViewController {
         
         advertiseButton.rx.action = viewModel.onStartAdvertising()
         browseButton.rx.action = viewModel.onStartBrowsing()
-        
         
     }
 

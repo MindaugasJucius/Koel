@@ -24,7 +24,11 @@ struct DMEventCreationViewModel {
         return multipeerEventService.connectedPeers().skip(1)
     }
     
-    var incommingInvitations: Observable<Invitation> {
+    var latestConnectedPeer: Observable<MCPeerID> {
+        return multipeerEventService.latestConnectedPeer()
+    }
+    
+    var incommingInvitations: Observable<(MCPeerID, [String: Any]?, (Bool) -> ())> {
         return multipeerEventService.incomingPeerInvitations()
     }
     
