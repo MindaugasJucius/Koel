@@ -23,6 +23,7 @@
 		5F601D3B1FD043DC003DE897 /* DMEventMultipeerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F601D3A1FD043DC003DE897 /* DMEventMultipeerService.swift */; };
 		5F601D3D1FD04851003DE897 /* DMEventCreationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F601D3C1FD04851003DE897 /* DMEventCreationViewModel.swift */; };
 		5F8186121FBB6EDB00477C71 /* DMKoelLogoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F8186111FBB6EDB00477C71 /* DMKoelLogoView.swift */; };
+		5F8186141FD2ADA800477C71 /* DMEventPeer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F8186131FD2ADA800477C71 /* DMEventPeer.swift */; };
 		5FB28BE31F90ECEA00B670E6 /* DMUserDefaultsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB28BE21F90ECEA00B670E6 /* DMUserDefaultsHelper.swift */; };
 		5FB665D91FA346BC005C5165 /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB665D81FA346BC005C5165 /* AppCoordinator.swift */; };
 		5FB665DC1FA346DE005C5165 /* Coordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB665DB1FA346DE005C5165 /* Coordinator.swift */; };
@@ -64,6 +65,7 @@
 		5F601D3A1FD043DC003DE897 /* DMEventMultipeerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventMultipeerService.swift; sourceTree = "<group>"; };
 		5F601D3C1FD04851003DE897 /* DMEventCreationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventCreationViewModel.swift; sourceTree = "<group>"; };
 		5F8186111FBB6EDB00477C71 /* DMKoelLogoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMKoelLogoView.swift; sourceTree = "<group>"; };
+		5F8186131FD2ADA800477C71 /* DMEventPeer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventPeer.swift; sourceTree = "<group>"; };
 		5FB28BE21F90ECEA00B670E6 /* DMUserDefaultsHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMUserDefaultsHelper.swift; sourceTree = "<group>"; };
 		5FB665D81FA346BC005C5165 /* AppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
 		5FB665DB1FA346DE005C5165 /* Coordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coordinator.swift; sourceTree = "<group>"; };
@@ -169,6 +171,7 @@
 		5F01EC1B1F8FD89600E47E6A /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				5F8186131FD2ADA800477C71 /* DMEventPeer.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -472,6 +475,7 @@
 				5FB28BE31F90ECEA00B670E6 /* DMUserDefaultsHelper.swift in Sources */,
 				5F014BD61FB9E29700079009 /* UIColor+Extensions.swift in Sources */,
 				5FDEB6BA1F99235500070930 /* DMInitialLoadingViewController.swift in Sources */,
+				5F8186141FD2ADA800477C71 /* DMEventPeer.swift in Sources */,
 				5F01EBF81F8FD28400E47E6A /* AppDelegate.swift in Sources */,
 				5F54458B1FD1976D0059A975 /* DMEventSearchViewModel.swift in Sources */,
 				5F014BD41FB9E20000079009 /* WaveView.swift in Sources */,

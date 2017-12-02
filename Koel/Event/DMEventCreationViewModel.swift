@@ -10,34 +10,35 @@ import MultipeerConnectivity
 import RxSwift
 import Action
 
-typealias PeerWithContext = (MCPeerID, [String: String]?)
-
 struct DMEventCreationViewModel {
 
     let multipeerEventService = DMEventMultipeerService(withDisplayName: UIDevice.current.name)
     
-    var allPeers: Observable<[PeerWithContext]> {
+    var allPeers: Observable<[DMEventPeer]> {
         return multipeerEventService.nearbyFoundPeers()
     }
     
-    var connectedPeers: Observable<[MCPeerID]> {
-        return multipeerEventService.connectedPeers().skip(1)
+    var connectedPeers: Observable<[DMEventPeer]> {
+        return multipeerEventService.connectedPeers()
     }
     
-    var latestConnectedPeer: Observable<MCPeerID> {
+    var latestConnectedPeer: Observable<DMEventPeer> {
         return multipeerEventService.latestConnectedPeer()
     }
     
-    var incommingInvitations: Observable<(MCPeerID, [String: Any]?, (Bool) -> ())> {
-        return multipeerEventService.incomingPeerInvitations()
+    var incommingInvitations: Observable<(DMEventPeer, (Bool) -> ())> {
+        return multipeerEventService.incomingPeerInvitations().map({ (client, context, handler) in
+            let eventPeer = DMEventPeer.init(withContext: context as? [String : String], peerID: client)
+            return (eventPeer, handler)
+        })
     }
     
     //MARK: - Actions
     
-    lazy var inviteAction: Action<(MCPeerID, [String: Any]?), Void> = { this in
+    lazy var inviteAction: Action<(DMEventPeer, [String: Any]?), Void> = { this in
         return Action(
-            workFactory: { (peerID: MCPeerID, context: [String: Any]?) in
-                return this.multipeerEventService.connect(peerID, context: context, timeout: 60)
+            workFactory: { (eventPeer: DMEventPeer, context: [String: Any]?) in
+                return this.multipeerEventService.connect(eventPeer.peerID, context: context, timeout: 60)
             }
         )
     }(self)

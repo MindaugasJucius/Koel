@@ -11,7 +11,6 @@ import RxCocoa
 import Action
 import RxSwift
 import RxDataSources
-import MultipeerConnectivity
 
 class DMEventCreationViewController: UIViewController {
 
@@ -39,31 +38,31 @@ class DMEventCreationViewController: UIViewController {
         
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
         
-        viewModel.allPeers.bind(to: tableView.rx.items) { (tableView: UITableView, index: Int, element: PeerWithContext) in
+        viewModel.allPeers.bind(to: tableView.rx.items) { (tableView: UITableView, index: Int, element: DMEventPeer) in
             let path = IndexPath(item: index, section: 0)
             let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: path)
-            cell.textLabel?.text = element.0.displayName
+            cell.textLabel?.text = element.peerDeviceDisplayName
             return cell
         }.disposed(by: bag)
         
-        viewModel.latestConnectedPeer.subscribe(onNext: { [unowned self] peerID in
-            let alert = UIAlertController(title: "New connection", message: "connected to \(peerID.displayName)", preferredStyle: .alert)
+        viewModel.latestConnectedPeer.subscribe(onNext: { [unowned self] eventPeer in
+            let alert = UIAlertController(title: "New connection", message: "connected to \(eventPeer.peerDeviceDisplayName)", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
             self.present(alert, animated: true, completion: nil)
         }).disposed(by: bag)
         
         tableView.rx.itemSelected
             .map { [unowned self] indexPath in
-                let peerWithContext: PeerWithContext = try! self.tableView.rx.model(at: indexPath)
-                return (peerWithContext.0, nil)
+                let peerWithContext: DMEventPeer = try! self.tableView.rx.model(at: indexPath)
+                return (peerWithContext, nil)
             }
             .subscribe(viewModel.inviteAction.inputs)
             .disposed(by: bag)
         
         viewModel.incommingInvitations.subscribe(onNext: { invitation in
-                let alert = UIAlertController(title: "Connection request", message: "connect to \(invitation.0.displayName)?", preferredStyle: .alert)
+                let alert = UIAlertController(title: "Connection request", message: "connect to \(invitation.0.peerDeviceDisplayName)?", preferredStyle: .alert)
                 let connectAction = UIAlertAction(title: "Yes", style: UIAlertActionStyle.default, handler: { action in
-                    let invitationHandler = invitation.2
+                    let invitationHandler = invitation.1
                     invitationHandler(true)
                 })
                 alert.addAction(connectAction)

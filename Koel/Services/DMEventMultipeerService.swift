@@ -14,30 +14,31 @@ fileprivate let EventServiceType = "song-event"
 
 class DMEventMultipeerService: NSObject {
     
-    fileprivate let myPeerID: MCPeerID
+    fileprivate let myEventPeer: DMEventPeer
 
     fileprivate let advertiser: MCNearbyServiceAdvertiser
     fileprivate let browser: MCNearbyServiceBrowser
     fileprivate let session: MCSession
     
     fileprivate let incomingInvitations: PublishSubject<(MCPeerID, [String: Any]?, (Bool, MCSession?) -> Void)> = PublishSubject()
-    fileprivate let nearbyPeers: Variable<[(MCPeerID, [String: String]?)]> = Variable([])
+    fileprivate let nearbyPeers: Variable<[DMEventPeer]> = Variable([])
+    fileprivate let connections = Variable<[DMEventPeer]>([])
     
-    fileprivate let connections = Variable<[MCPeerID]>([])
-    fileprivate let latestConnection = PublishSubject<MCPeerID>()
+    fileprivate let latestConnection = PublishSubject<DMEventPeer>()
+    
     fileprivate let advertisingConnectionErrors: PublishSubject<MCError> = PublishSubject()
     fileprivate let browsingConnectionErrors: PublishSubject<MCError> = PublishSubject()
     
     init(withDisplayName displayName: String) {
-        self.myPeerID = DMEventMultipeerService.retrieveIdentity(withDisplayName: displayName)
+        self.myEventPeer = DMEventMultipeerService.retrieveIdentity(withDisplayName: displayName)
         
         self.advertiser = MCNearbyServiceAdvertiser(
-            peer: myPeerID,
+            peer: myEventPeer.peerID,
             discoveryInfo: nil,
             serviceType: EventServiceType)
         
         self.session = MCSession(
-            peer: self.myPeerID,
+            peer: myEventPeer.peerID,
             securityIdentity: nil,
             encryptionPreference: .none)
         
@@ -64,11 +65,11 @@ class DMEventMultipeerService: NSObject {
         }
     }
     
-    func connectedPeers() -> Observable<[MCPeerID]> {
+    func connectedPeers() -> Observable<[DMEventPeer]> {
         return connections.asObservable()
     }
     
-    func latestConnectedPeer() -> Observable<MCPeerID> {
+    func latestConnectedPeer() -> Observable<DMEventPeer> {
         return latestConnection.asObservable()
     }
     
@@ -80,7 +81,7 @@ class DMEventMultipeerService: NSObject {
         return advertisingConnectionErrors.asObservable()
     }
     
-    func nearbyFoundPeers() -> Observable<[(MCPeerID, [String: String]?)]> {
+    func nearbyFoundPeers() -> Observable<[DMEventPeer]> {
         return nearbyPeers.asObservable()
     }
     
@@ -124,14 +125,14 @@ class DMEventMultipeerService: NSObject {
     ///
     /// - Parameter displayName: string to display to browsers
     /// - Returns: identity
-    private static func retrieveIdentity(withDisplayName displayName: String) -> MCPeerID {
+    private static func retrieveIdentity(withDisplayName displayName: String) -> DMEventPeer {
         if let data = UserDefaults.standard.data(forKey: IdentityCacheKey),
-            let peerID = NSKeyedUnarchiver.unarchiveObject(with: data) as? MCPeerID,
-            peerID.displayName == displayName {
-            return peerID
+            let eventPeer = NSKeyedUnarchiver.unarchiveObject(with: data) as? DMEventPeer,
+            eventPeer.peerDeviceDisplayName == displayName {
+            return eventPeer
         }
         
-        let identity = MCPeerID(displayName: displayName)
+        let identity = DMEventPeer.init(peerID: MCPeerID(displayName: displayName))
         
         let identityData = NSKeyedArchiver.archivedData(withRootObject: identity)
         UserDefaults.standard.set(identityData, forKey: IdentityCacheKey)
@@ -144,21 +145,19 @@ class DMEventMultipeerService: NSObject {
 extension DMEventMultipeerService: MCNearbyServiceBrowserDelegate {
     
     func browser(_ browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String : String]?) {
-        var result: [(MCPeerID, [String: String]?)] = []
-        for peerIDWithInfo in (self.nearbyPeers.value + [(peerID, info)]) {
-            
-            if (result.map { $0.0 }).index(of: peerIDWithInfo.0) == nil {
-                result = result + [peerIDWithInfo]
-            }
-            
+        var result: [DMEventPeer] = []
+        let eventPeer = DMEventPeer.init(withContext: info, peerID: peerID)
+
+        if nearbyPeers.value.map({ $0.peerID }).index(of: peerID) == .none {
+            result = nearbyPeers.value + [eventPeer]
         }
-        
+                
         self.nearbyPeers.value = result
     }
     
     func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {
-        nearbyPeers.value = nearbyPeers.value.filter { (existingPeerID, _) -> Bool in
-            return existingPeerID != peerID
+        nearbyPeers.value = nearbyPeers.value.filter { existingNearbyPeer in
+            return existingNearbyPeer.peerID != peerID
         }
     }
     
@@ -191,10 +190,24 @@ extension DMEventMultipeerService: MCNearbyServiceAdvertiserDelegate {
 extension DMEventMultipeerService: MCSessionDelegate {
 
     public func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
-        // Only emit to observers when peer has connected
         if state == .connected {
-            connections.value = session.connectedPeers
-            latestConnection.onNext(peerID)
+            let filtered = nearbyPeers.value.filter { $0.peerID == peerID }
+            guard let matchingNearbyPeer = filtered.first else {
+                return
+            }
+            latestConnection.onNext(matchingNearbyPeer)
+        }
+        
+        if state != .connecting {
+            var eventPeerConnections: [DMEventPeer] = []
+            
+            nearbyPeers.value.forEach({ eventPeer in
+                if session.connectedPeers.index(of: eventPeer.peerID) != .none {
+                    eventPeerConnections.append(eventPeer)
+                }
+            })
+            
+            connections.value = eventPeerConnections
         }
     }
     
