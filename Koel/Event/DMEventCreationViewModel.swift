@@ -12,7 +12,12 @@ import Action
 
 struct DMEventCreationViewModel {
 
-    let multipeerEventService = DMEventMultipeerService(withDisplayName: UIDevice.current.name)
+    private let multipeerEventService = DMEventMultipeerService(withDisplayName: UIDevice.current.name)
+    private let sceneCoordinator: SceneCoordinatorType
+    
+    init(withSceneCoordinator sceneCoordinator: SceneCoordinatorType) {
+        self.sceneCoordinator = sceneCoordinator
+    }
     
     var allPeers: Observable<[DMEventPeer]> {
         return multipeerEventService.nearbyFoundPeers()
@@ -24,13 +29,6 @@ struct DMEventCreationViewModel {
     
     var latestConnectedPeer: Observable<DMEventPeer> {
         return multipeerEventService.latestConnectedPeer()
-    }
-    
-    var incommingInvitations: Observable<(DMEventPeer, (Bool) -> ())> {
-        return multipeerEventService.incomingPeerInvitations().map({ (client, context, handler) in
-            let eventPeer = DMEventPeer.init(withContext: context as? [String : String], peerID: client)
-            return (eventPeer, handler)
-        })
     }
     
     //MARK: - Actions

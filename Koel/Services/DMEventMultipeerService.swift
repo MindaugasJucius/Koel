@@ -29,6 +29,8 @@ class DMEventMultipeerService: NSObject {
     fileprivate let advertisingConnectionErrors: PublishSubject<MCError> = PublishSubject()
     fileprivate let browsingConnectionErrors: PublishSubject<MCError> = PublishSubject()
     
+    fileprivate let receivedData: PublishSubject<(MCPeerID, Data)> = PublishSubject()
+    
     init(withDisplayName displayName: String) {
         self.myEventPeer = DMEventMultipeerService.retrieveIdentity(withDisplayName: displayName)
         
@@ -121,7 +123,7 @@ class DMEventMultipeerService: NSObject {
         return .just(browser.invitePeer(peer, to: self.session, withContext: data, timeout: timeout))
     }
     
-    /// Retrieve MCPeerID from UserDefaults if one exists, or create and store a new one
+    /// Retrieve DMEventPeer from UserDefaults if one exists, or create and store a new one
     ///
     /// - Parameter displayName: string to display to browsers
     /// - Returns: identity
@@ -138,6 +140,32 @@ class DMEventMultipeerService: NSObject {
         UserDefaults.standard.set(identityData, forKey: IdentityCacheKey)
         
         return identity
+    }
+    
+    //MARK: - Sending
+    
+    func send(toPeer other: MCPeerID,
+              data: Data,
+              mode: MCSessionSendDataMode) -> Observable<()> {
+        return Observable.create { observer in
+            do {
+                try self.session.send(data, toPeers: [other], with: mode)
+                observer.on(.next(()))
+                observer.on(.completed)
+            } catch let error {
+                observer.on(.error(error))
+            }
+            
+            // There's no way to cancel this operation,
+            // so do nothing on dispose.
+            return Disposables.create {}
+        }
+    }
+    
+    //MARK: - Receiving
+    
+    func receive() -> Observable<(MCPeerID, Data)> {
+        return receivedData
     }
     
 }
@@ -212,7 +240,7 @@ extension DMEventMultipeerService: MCSessionDelegate {
     }
     
     public func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
-        
+        receivedData.on(.next((peerID, data)))
     }
     
     public func session(_ session: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) {

@@ -17,18 +17,18 @@ let SongsNotification = Notification(name: SongsUpdateNotificationName)
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     
     var window: UIWindow? = UIWindow(frame: UIScreen.main.bounds)
-    private var appCoordinator: AppCoordinator?
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        
-        application.registerForRemoteNotifications()
-        
+
         let navigationController = UINavigationController()
         window?.rootViewController = navigationController
         window?.makeKeyAndVisible()
-
-        appCoordinator = AppCoordinator(withNavigationController: navigationController)
-        appCoordinator?.start()
+        
+        let sceneCoordinator = SceneCoordinator(window: window!)
+        
+        let eventCreationViewModel = DMEventCreationViewModel(withSceneCoordinator: sceneCoordinator)
+        let eventCreationScene = Scene.create(eventCreationViewModel)
+        sceneCoordinator.transition(to: eventCreationScene, type: .root)
         
         return true
     }

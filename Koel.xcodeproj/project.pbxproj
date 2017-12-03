@@ -24,10 +24,12 @@
 		5F601D3D1FD04851003DE897 /* DMEventCreationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F601D3C1FD04851003DE897 /* DMEventCreationViewModel.swift */; };
 		5F8186121FBB6EDB00477C71 /* DMKoelLogoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F8186111FBB6EDB00477C71 /* DMKoelLogoView.swift */; };
 		5F8186141FD2ADA800477C71 /* DMEventPeer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F8186131FD2ADA800477C71 /* DMEventPeer.swift */; };
+		5F8186161FD3F62000477C71 /* Scene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F8186151FD3F62000477C71 /* Scene.swift */; };
+		5F8186181FD3F7F200477C71 /* BindableType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F8186171FD3F7F200477C71 /* BindableType.swift */; };
+		5F81861A1FD3FA6800477C71 /* SceneCoordinatorType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F8186191FD3FA6800477C71 /* SceneCoordinatorType.swift */; };
+		5F81861C1FD3FAB000477C71 /* SceneCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F81861B1FD3FAB000477C71 /* SceneCoordinator.swift */; };
+		5F81861E1FD3FADB00477C71 /* UINavigationController+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F81861D1FD3FADB00477C71 /* UINavigationController+Rx.swift */; };
 		5FB28BE31F90ECEA00B670E6 /* DMUserDefaultsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB28BE21F90ECEA00B670E6 /* DMUserDefaultsHelper.swift */; };
-		5FB665D91FA346BC005C5165 /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB665D81FA346BC005C5165 /* AppCoordinator.swift */; };
-		5FB665DC1FA346DE005C5165 /* Coordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB665DB1FA346DE005C5165 /* Coordinator.swift */; };
-		5FB665E11FA351A9005C5165 /* DMInitialLoadingCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB665E01FA351A9005C5165 /* DMInitialLoadingCoordinator.swift */; };
 		5FDEB6BA1F99235500070930 /* DMInitialLoadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FDEB6B81F99235500070930 /* DMInitialLoadingViewController.swift */; };
 		5FDEB6BB1F99235500070930 /* DMInitialLoadingViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5FDEB6B91F99235500070930 /* DMInitialLoadingViewController.xib */; };
 /* End PBXBuildFile section */
@@ -66,10 +68,12 @@
 		5F601D3C1FD04851003DE897 /* DMEventCreationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventCreationViewModel.swift; sourceTree = "<group>"; };
 		5F8186111FBB6EDB00477C71 /* DMKoelLogoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMKoelLogoView.swift; sourceTree = "<group>"; };
 		5F8186131FD2ADA800477C71 /* DMEventPeer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventPeer.swift; sourceTree = "<group>"; };
+		5F8186151FD3F62000477C71 /* Scene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scene.swift; sourceTree = "<group>"; };
+		5F8186171FD3F7F200477C71 /* BindableType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BindableType.swift; sourceTree = "<group>"; };
+		5F8186191FD3FA6800477C71 /* SceneCoordinatorType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneCoordinatorType.swift; sourceTree = "<group>"; };
+		5F81861B1FD3FAB000477C71 /* SceneCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneCoordinator.swift; sourceTree = "<group>"; };
+		5F81861D1FD3FADB00477C71 /* UINavigationController+Rx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UINavigationController+Rx.swift"; sourceTree = "<group>"; };
 		5FB28BE21F90ECEA00B670E6 /* DMUserDefaultsHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMUserDefaultsHelper.swift; sourceTree = "<group>"; };
-		5FB665D81FA346BC005C5165 /* AppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
-		5FB665DB1FA346DE005C5165 /* Coordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coordinator.swift; sourceTree = "<group>"; };
-		5FB665E01FA351A9005C5165 /* DMInitialLoadingCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMInitialLoadingCoordinator.swift; sourceTree = "<group>"; };
 		5FDEB6B81F99235500070930 /* DMInitialLoadingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMInitialLoadingViewController.swift; sourceTree = "<group>"; };
 		5FDEB6B91F99235500070930 /* DMInitialLoadingViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DMInitialLoadingViewController.xib; sourceTree = "<group>"; };
 		859C054680781DDB43D6FFC3 /* Pods_Koel.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Koel.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -134,7 +138,7 @@
 			children = (
 				5F014BD31FB9E20000079009 /* WaveView.swift */,
 				5FB665DD1FA34B32005C5165 /* Initial Loading */,
-				5FB665DA1FA346C5005C5165 /* AppCoordinator */,
+				5FB665DA1FA346C5005C5165 /* Coordinator */,
 				5F58F0321F9CB7AE006B9B47 /* Extensions */,
 				5FDEB6B11F97C02C00070930 /* Event */,
 				5F01EC211F925E9700E47E6A /* Helpers */,
@@ -198,17 +202,20 @@
 				5F58F0301F9CB793006B9B47 /* UIViewController+Extensions.swift */,
 				5F01EC221F925EB200E47E6A /* CKRecord+Extensions.swift */,
 				5F014BD51FB9E29700079009 /* UIColor+Extensions.swift */,
+				5F81861D1FD3FADB00477C71 /* UINavigationController+Rx.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
 		};
-		5FB665DA1FA346C5005C5165 /* AppCoordinator */ = {
+		5FB665DA1FA346C5005C5165 /* Coordinator */ = {
 			isa = PBXGroup;
 			children = (
-				5FB665D81FA346BC005C5165 /* AppCoordinator.swift */,
-				5FB665DB1FA346DE005C5165 /* Coordinator.swift */,
+				5F8186151FD3F62000477C71 /* Scene.swift */,
+				5F8186171FD3F7F200477C71 /* BindableType.swift */,
+				5F8186191FD3FA6800477C71 /* SceneCoordinatorType.swift */,
+				5F81861B1FD3FAB000477C71 /* SceneCoordinator.swift */,
 			);
-			path = AppCoordinator;
+			path = Coordinator;
 			sourceTree = "<group>";
 		};
 		5FB665DD1FA34B32005C5165 /* Initial Loading */ = {
@@ -216,7 +223,6 @@
 			children = (
 				5FDEB6B81F99235500070930 /* DMInitialLoadingViewController.swift */,
 				5FDEB6B91F99235500070930 /* DMInitialLoadingViewController.xib */,
-				5FB665E01FA351A9005C5165 /* DMInitialLoadingCoordinator.swift */,
 				5F8186111FBB6EDB00477C71 /* DMKoelLogoView.swift */,
 			);
 			path = "Initial Loading";
@@ -464,22 +470,24 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5FB665DC1FA346DE005C5165 /* Coordinator.swift in Sources */,
 				5F8186121FBB6EDB00477C71 /* DMKoelLogoView.swift in Sources */,
+				5F81861E1FD3FADB00477C71 /* UINavigationController+Rx.swift in Sources */,
 				5F601D3D1FD04851003DE897 /* DMEventCreationViewModel.swift in Sources */,
 				5F58F0311F9CB793006B9B47 /* UIViewController+Extensions.swift in Sources */,
 				5F01EC231F925EB200E47E6A /* CKRecord+Extensions.swift in Sources */,
 				5F601D3B1FD043DC003DE897 /* DMEventMultipeerService.swift in Sources */,
-				5FB665E11FA351A9005C5165 /* DMInitialLoadingCoordinator.swift in Sources */,
 				5F54458E1FD198C40059A975 /* DMEventCreationViewController.swift in Sources */,
 				5FB28BE31F90ECEA00B670E6 /* DMUserDefaultsHelper.swift in Sources */,
 				5F014BD61FB9E29700079009 /* UIColor+Extensions.swift in Sources */,
+				5F81861C1FD3FAB000477C71 /* SceneCoordinator.swift in Sources */,
+				5F8186181FD3F7F200477C71 /* BindableType.swift in Sources */,
+				5F81861A1FD3FA6800477C71 /* SceneCoordinatorType.swift in Sources */,
+				5F8186161FD3F62000477C71 /* Scene.swift in Sources */,
 				5FDEB6BA1F99235500070930 /* DMInitialLoadingViewController.swift in Sources */,
 				5F8186141FD2ADA800477C71 /* DMEventPeer.swift in Sources */,
 				5F01EBF81F8FD28400E47E6A /* AppDelegate.swift in Sources */,
 				5F54458B1FD1976D0059A975 /* DMEventSearchViewModel.swift in Sources */,
 				5F014BD41FB9E20000079009 /* WaveView.swift in Sources */,
-				5FB665D91FA346BC005C5165 /* AppCoordinator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
