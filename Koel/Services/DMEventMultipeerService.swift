@@ -146,7 +146,7 @@ class DMEventMultipeerService: NSObject {
     
     func send(toPeer other: MCPeerID,
               data: Data,
-              mode: MCSessionSendDataMode) -> Observable<()> {
+              mode: MCSessionSendDataMode) -> Observable<Void> {
         return Observable.create { observer in
             do {
                 try self.session.send(data, toPeers: [other], with: mode)

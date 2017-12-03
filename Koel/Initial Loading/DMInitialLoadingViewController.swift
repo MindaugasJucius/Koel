@@ -11,7 +11,6 @@ import RxSwift
 
 class DMInitialLoadingViewController: UIViewController {
 
-
     let logoView = DMKoelLogoView()
     
     let bag = DisposeBag()

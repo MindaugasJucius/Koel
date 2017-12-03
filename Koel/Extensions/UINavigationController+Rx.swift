@@ -16,7 +16,6 @@ class RxNavigationControllerDelegateProxy: DelegateProxy<UINavigationController,
         //TODO: - wat
     }
     
-    
     static func currentDelegateFor(_ object: AnyObject) -> AnyObject? {
         guard let navigationController = object as? UINavigationController else {
             fatalError()

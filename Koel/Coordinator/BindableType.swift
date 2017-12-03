@@ -14,10 +14,13 @@ protocol BindableType {
     
     var viewModel: ViewModelType! { get set }
     
+    init(withViewModel viewModel: ViewModelType)
+    
     func bindViewModel()
 }
 
 extension BindableType where Self: UIViewController {
+        
     func setupForViewModel() {
         loadViewIfNeeded()
         bindViewModel()

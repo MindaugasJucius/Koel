@@ -22,7 +22,7 @@ class DMEventCreationViewController: UIViewController, BindableType {
     
     private var bag = DisposeBag()
     
-    init(withCreationViewModel viewModel: DMEventCreationViewModel) {
+    required init(withViewModel viewModel: DMEventCreationViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
@@ -37,17 +37,6 @@ class DMEventCreationViewController: UIViewController, BindableType {
         tableView.translatesAutoresizingMaskIntoConstraints = false
         
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
-//
-//        viewModel.incommingInvitations.subscribe(onNext: { invitation in
-//                let alert = UIAlertController(title: "Connection request", message: "connect to \(invitation.0.peerDeviceDisplayName)?", preferredStyle: .alert)
-//                let connectAction = UIAlertAction(title: "Yes", style: UIAlertActionStyle.default, handler: { action in
-//                    let invitationHandler = invitation.1
-//                    invitationHandler(true)
-//                })
-//                alert.addAction(connectAction)
-//                self.present(alert, animated: true, completion: nil)
-//            }
-//        ).disposed(by: bag)
         
         additionalSafeAreaInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
         

@@ -17,6 +17,7 @@
 		5F01EC0D1F8FD28400E47E6A /* KoelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F01EC0C1F8FD28400E47E6A /* KoelTests.swift */; };
 		5F01EC1A1F8FD2AA00E47E6A /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F01EC191F8FD2AA00E47E6A /* CloudKit.framework */; };
 		5F01EC231F925EB200E47E6A /* CKRecord+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F01EC221F925EB200E47E6A /* CKRecord+Extensions.swift */; };
+		5F47B8341FD403780053A0A5 /* DMEventSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F47B8331FD403780053A0A5 /* DMEventSearchViewController.swift */; };
 		5F54458B1FD1976D0059A975 /* DMEventSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F54458A1FD1976D0059A975 /* DMEventSearchViewModel.swift */; };
 		5F54458E1FD198C40059A975 /* DMEventCreationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F54458C1FD198C40059A975 /* DMEventCreationViewController.swift */; };
 		5F58F0311F9CB793006B9B47 /* UIViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F58F0301F9CB793006B9B47 /* UIViewController+Extensions.swift */; };
@@ -61,6 +62,7 @@
 		5F01EC171F8FD2A600E47E6A /* Koel.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Koel.entitlements; sourceTree = "<group>"; };
 		5F01EC191F8FD2AA00E47E6A /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		5F01EC221F925EB200E47E6A /* CKRecord+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CKRecord+Extensions.swift"; sourceTree = "<group>"; };
+		5F47B8331FD403780053A0A5 /* DMEventSearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventSearchViewController.swift; sourceTree = "<group>"; };
 		5F54458A1FD1976D0059A975 /* DMEventSearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventSearchViewModel.swift; sourceTree = "<group>"; };
 		5F54458C1FD198C40059A975 /* DMEventCreationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventCreationViewController.swift; sourceTree = "<group>"; };
 		5F58F0301F9CB793006B9B47 /* UIViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extensions.swift"; sourceTree = "<group>"; };
@@ -140,7 +142,8 @@
 				5FB665DD1FA34B32005C5165 /* Initial Loading */,
 				5FB665DA1FA346C5005C5165 /* Coordinator */,
 				5F58F0321F9CB7AE006B9B47 /* Extensions */,
-				5FDEB6B11F97C02C00070930 /* Event */,
+				5F47B8321FD4034B0053A0A5 /* Event Search */,
+				5FDEB6B11F97C02C00070930 /* Event Creation */,
 				5F01EC211F925E9700E47E6A /* Helpers */,
 				5F01EC1E1F9256CB00E47E6A /* Services */,
 				5F01EC1B1F8FD89600E47E6A /* Model */,
@@ -196,6 +199,15 @@
 			path = Helpers;
 			sourceTree = "<group>";
 		};
+		5F47B8321FD4034B0053A0A5 /* Event Search */ = {
+			isa = PBXGroup;
+			children = (
+				5F54458A1FD1976D0059A975 /* DMEventSearchViewModel.swift */,
+				5F47B8331FD403780053A0A5 /* DMEventSearchViewController.swift */,
+			);
+			path = "Event Search";
+			sourceTree = "<group>";
+		};
 		5F58F0321F9CB7AE006B9B47 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -228,14 +240,13 @@
 			path = "Initial Loading";
 			sourceTree = "<group>";
 		};
-		5FDEB6B11F97C02C00070930 /* Event */ = {
+		5FDEB6B11F97C02C00070930 /* Event Creation */ = {
 			isa = PBXGroup;
 			children = (
 				5F601D3C1FD04851003DE897 /* DMEventCreationViewModel.swift */,
-				5F54458A1FD1976D0059A975 /* DMEventSearchViewModel.swift */,
 				5F54458C1FD198C40059A975 /* DMEventCreationViewController.swift */,
 			);
-			path = Event;
+			path = "Event Creation";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -488,6 +499,7 @@
 				5F01EBF81F8FD28400E47E6A /* AppDelegate.swift in Sources */,
 				5F54458B1FD1976D0059A975 /* DMEventSearchViewModel.swift in Sources */,
 				5F014BD41FB9E20000079009 /* WaveView.swift in Sources */,
+				5F47B8341FD403780053A0A5 /* DMEventSearchViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

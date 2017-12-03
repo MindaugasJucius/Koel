@@ -11,7 +11,7 @@ import UIKit
 
 enum Scene {
     case create(DMEventCreationViewModel)
-    case join(DMEventSearchViewModel)
+    case search(DMEventSearchViewModel)
 }
 
 
@@ -19,12 +19,13 @@ extension Scene {
     func viewController() -> UIViewController {
         switch self {
         case .create(let viewModel):
-            let eventCreationVC = DMEventCreationViewController(withCreationViewModel: viewModel)
+            let eventCreationVC = DMEventCreationViewController(withViewModel: viewModel)
             eventCreationVC.setupForViewModel()
             return eventCreationVC
-        case .join(let viewModel):
-            print("lul")
+        case .search(let viewModel):
+            let eventSearchVC = DMEventSearchViewController(withViewModel: viewModel)
+            eventSearchVC.setupForViewModel()
+            return eventSearchVC
         }
-        return UIViewController()
     }
 }
