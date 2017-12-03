@@ -18,6 +18,9 @@
 		5F01EC1A1F8FD2AA00E47E6A /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F01EC191F8FD2AA00E47E6A /* CloudKit.framework */; };
 		5F01EC231F925EB200E47E6A /* CKRecord+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F01EC221F925EB200E47E6A /* CKRecord+Extensions.swift */; };
 		5F47B8341FD403780053A0A5 /* DMEventSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F47B8331FD403780053A0A5 /* DMEventSearchViewController.swift */; };
+		5F47B8361FD4064C0053A0A5 /* DMFlowSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F47B8351FD4064C0053A0A5 /* DMFlowSelectionViewController.swift */; };
+		5F47B8391FD406FB0053A0A5 /* DMFlowSelectionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F47B8381FD406FB0053A0A5 /* DMFlowSelectionViewModel.swift */; };
+		5F47B83B1FD4073F0053A0A5 /* ViewModelType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F47B83A1FD4073F0053A0A5 /* ViewModelType.swift */; };
 		5F54458B1FD1976D0059A975 /* DMEventSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F54458A1FD1976D0059A975 /* DMEventSearchViewModel.swift */; };
 		5F54458E1FD198C40059A975 /* DMEventCreationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F54458C1FD198C40059A975 /* DMEventCreationViewController.swift */; };
 		5F58F0311F9CB793006B9B47 /* UIViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F58F0301F9CB793006B9B47 /* UIViewController+Extensions.swift */; };
@@ -62,6 +65,9 @@
 		5F01EC191F8FD2AA00E47E6A /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		5F01EC221F925EB200E47E6A /* CKRecord+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CKRecord+Extensions.swift"; sourceTree = "<group>"; };
 		5F47B8331FD403780053A0A5 /* DMEventSearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventSearchViewController.swift; sourceTree = "<group>"; };
+		5F47B8351FD4064C0053A0A5 /* DMFlowSelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMFlowSelectionViewController.swift; sourceTree = "<group>"; };
+		5F47B8381FD406FB0053A0A5 /* DMFlowSelectionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMFlowSelectionViewModel.swift; sourceTree = "<group>"; };
+		5F47B83A1FD4073F0053A0A5 /* ViewModelType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModelType.swift; sourceTree = "<group>"; };
 		5F54458A1FD1976D0059A975 /* DMEventSearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventSearchViewModel.swift; sourceTree = "<group>"; };
 		5F54458C1FD198C40059A975 /* DMEventCreationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventCreationViewController.swift; sourceTree = "<group>"; };
 		5F58F0301F9CB793006B9B47 /* UIViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extensions.swift"; sourceTree = "<group>"; };
@@ -140,6 +146,7 @@
 				5FB665DD1FA34B32005C5165 /* Initial Loading */,
 				5FB665DA1FA346C5005C5165 /* Coordinator */,
 				5F58F0321F9CB7AE006B9B47 /* Extensions */,
+				5F47B8371FD4065A0053A0A5 /* Event Flow Selection */,
 				5F47B8321FD4034B0053A0A5 /* Event Search */,
 				5FDEB6B11F97C02C00070930 /* Event Creation */,
 				5F01EC211F925E9700E47E6A /* Helpers */,
@@ -205,6 +212,15 @@
 			path = "Event Search";
 			sourceTree = "<group>";
 		};
+		5F47B8371FD4065A0053A0A5 /* Event Flow Selection */ = {
+			isa = PBXGroup;
+			children = (
+				5F47B8351FD4064C0053A0A5 /* DMFlowSelectionViewController.swift */,
+				5F47B8381FD406FB0053A0A5 /* DMFlowSelectionViewModel.swift */,
+			);
+			path = "Event Flow Selection";
+			sourceTree = "<group>";
+		};
 		5F58F0321F9CB7AE006B9B47 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -223,6 +239,7 @@
 				5F8186171FD3F7F200477C71 /* BindableType.swift */,
 				5F8186191FD3FA6800477C71 /* SceneCoordinatorType.swift */,
 				5F81861B1FD3FAB000477C71 /* SceneCoordinator.swift */,
+				5F47B83A1FD4073F0053A0A5 /* ViewModelType.swift */,
 			);
 			path = Coordinator;
 			sourceTree = "<group>";
@@ -481,6 +498,8 @@
 				5F8186121FBB6EDB00477C71 /* DMKoelLogoView.swift in Sources */,
 				5F81861E1FD3FADB00477C71 /* UINavigationController+Rx.swift in Sources */,
 				5F601D3D1FD04851003DE897 /* DMEventCreationViewModel.swift in Sources */,
+				5F47B8361FD4064C0053A0A5 /* DMFlowSelectionViewController.swift in Sources */,
+				5F47B8391FD406FB0053A0A5 /* DMFlowSelectionViewModel.swift in Sources */,
 				5F58F0311F9CB793006B9B47 /* UIViewController+Extensions.swift in Sources */,
 				5F01EC231F925EB200E47E6A /* CKRecord+Extensions.swift in Sources */,
 				5F601D3B1FD043DC003DE897 /* DMEventMultipeerService.swift in Sources */,
@@ -496,6 +515,7 @@
 				5F54458B1FD1976D0059A975 /* DMEventSearchViewModel.swift in Sources */,
 				5F014BD41FB9E20000079009 /* WaveView.swift in Sources */,
 				5F47B8341FD403780053A0A5 /* DMEventSearchViewController.swift in Sources */,
+				5F47B83B1FD4073F0053A0A5 /* ViewModelType.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

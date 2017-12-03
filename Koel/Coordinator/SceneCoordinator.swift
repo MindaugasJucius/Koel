@@ -12,12 +12,29 @@ import RxCocoa
 
 class SceneCoordinator: NSObject, SceneCoordinatorType {
 
+    private let disposeBag = DisposeBag()
+    
+    private let navigationControllerStackObserver = PublishSubject<UIViewController>()
+    
     fileprivate var window: UIWindow
     fileprivate var currentViewController: UIViewController
     
     required init(window: UIWindow) {
         self.window = window
         currentViewController = window.rootViewController!
+        super.init()
+        observeStackChanges()
+    }
+    
+    private func observeStackChanges() {
+        navigationControllerStackObserver.subscribe(
+            onNext: { [weak self] viewController in
+                guard let this = self else {
+                    return
+                }
+                this.currentViewController = viewController
+            }
+        ).disposed(by: disposeBag)
     }
     
     static func actualViewController(for viewController: UIViewController) -> UIViewController {
@@ -26,6 +43,15 @@ class SceneCoordinator: NSObject, SceneCoordinatorType {
         } else {
             return viewController
         }
+    }
+    
+    func navigationControllerInStack() -> UINavigationController? {
+        if let currentNavigationController = currentViewController as? UINavigationController {
+            return currentNavigationController
+        } else if let currentVCsParent = currentViewController.navigationController {
+            return currentVCsParent
+        }
+        return .none
     }
     
     @discardableResult
@@ -39,12 +65,25 @@ class SceneCoordinator: NSObject, SceneCoordinatorType {
             subject.onCompleted()
             
         case .push:
-            guard let navigationController = currentViewController.navigationController else {
+
+            guard let navigationController = navigationControllerInStack() else {
                 fatalError("Can't push a view controller without a current navigation controller")
             }
-            // one-off subscription to be notified when push complete
-            _ = navigationController.rx.delegate
-                .sentMessage(#selector(UINavigationControllerDelegate.navigationController(_:didShow:animated:)))
+            
+            let selector = #selector(UINavigationControllerDelegate.navigationController(_:didShow:animated:))
+            
+            let observable = navigationController.rx.delegate
+                .sentMessage(selector)
+                .map({ parameters in
+                    return parameters[1] as! UIViewController
+                })
+            
+            observable
+                .subscribe(navigationControllerStackObserver.asObserver())
+                .disposed(by: disposeBag)
+            
+            // one-off subscription to be notified when push completes
+            _ = observable
                 .map { _ in }
                 .take(1)
                 .bind(to: subject)

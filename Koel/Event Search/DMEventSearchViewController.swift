@@ -16,7 +16,7 @@ class DMEventSearchViewController: UIViewController, BindableType {
     
     typealias ViewModelType = DMEventSearchViewModel
     
-    var viewModel: DMEventSearchViewModel!
+    var viewModel: DMEventSearchViewModel
     
     private var bag = DisposeBag()
     
@@ -31,6 +31,8 @@ class DMEventSearchViewController: UIViewController, BindableType {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = .white
+        title = "search"
     }
 
     func bindViewModel() {

@@ -10,9 +10,6 @@ import UIKit
 import CloudKit
 import UserNotifications
 
-let SongsUpdateNotificationName = Notification.Name("Songs-Updated-Notification")
-let SongsNotification = Notification(name: SongsUpdateNotificationName)
-
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     
@@ -20,15 +17,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
 
-        let navigationController = UINavigationController()
-        window?.rootViewController = navigationController
         window?.makeKeyAndVisible()
+        let navigationControllerScene = Scene.rootNavigation
+        window?.rootViewController = navigationControllerScene.viewController()
         
         let sceneCoordinator = SceneCoordinator(window: window!)
-        
-        let eventCreationViewModel = DMEventCreationViewModel(withSceneCoordinator: sceneCoordinator)
-        let eventCreationScene = Scene.create(eventCreationViewModel)
-        sceneCoordinator.transition(to: eventCreationScene, type: .root)
+
+        let flowSelectionViewModel = DMFlowSelectionViewModel(withSceneCoordinator: sceneCoordinator)
+        let flowSelectionCreationScene = Scene.selectFlow(flowSelectionViewModel)
+
+        sceneCoordinator.transition(to: flowSelectionCreationScene, type: .push)
         
         return true
     }

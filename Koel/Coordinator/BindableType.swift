@@ -12,7 +12,7 @@ import RxSwift
 protocol BindableType {
     associatedtype ViewModelType
     
-    var viewModel: ViewModelType! { get set }
+    var viewModel: ViewModelType { get }
     
     init(withViewModel viewModel: ViewModelType)
     

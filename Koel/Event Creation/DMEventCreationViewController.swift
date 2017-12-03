@@ -13,8 +13,8 @@ import RxSwift
 import RxDataSources
 
 class DMEventCreationViewController: UIViewController, BindableType {
-    
-    var viewModel: DMEventCreationViewModel!
+        
+    var viewModel: DMEventCreationViewModel
     
     private let tableView = UITableView()
     private var advertiseButton = UIButton(type: .system)
@@ -33,6 +33,8 @@ class DMEventCreationViewController: UIViewController, BindableType {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        title = "create"
+
         view.addSubview(tableView)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         

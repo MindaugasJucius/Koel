@@ -12,8 +12,14 @@ import RxCocoa
 
 class RxNavigationControllerDelegateProxy: DelegateProxy<UINavigationController, UINavigationControllerDelegate>, DelegateProxyType, UINavigationControllerDelegate {
     
+    init(navigationController: UINavigationController) {
+        super.init(parentObject: navigationController, delegateProxy: RxNavigationControllerDelegateProxy.self)
+    }
+    
     static func registerKnownImplementations() {
-        //TODO: - wat
+        self.register {
+            RxNavigationControllerDelegateProxy(navigationController: $0)
+        }
     }
     
     static func currentDelegateFor(_ object: AnyObject) -> AnyObject? {

@@ -10,10 +10,10 @@ import Foundation
 import Action
 import RxSwift
 
-struct DMEventSearchViewModel {
+struct DMEventSearchViewModel: ViewModelType {
     
     private let multipeerEventService = DMEventMultipeerService(withDisplayName: UIDevice.current.name)
-    private let sceneCoordinator: SceneCoordinatorType
+    let sceneCoordinator: SceneCoordinatorType
     
     var incommingInvitations: Observable<(DMEventPeer, (Bool) -> ())> {
         return multipeerEventService.incomingPeerInvitations().map({ (client, context, handler) in

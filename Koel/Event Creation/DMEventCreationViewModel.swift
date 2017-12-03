@@ -10,10 +10,10 @@ import MultipeerConnectivity
 import RxSwift
 import Action
 
-struct DMEventCreationViewModel {
+struct DMEventCreationViewModel: ViewModelType {
 
     private let multipeerEventService = DMEventMultipeerService(withDisplayName: UIDevice.current.name)
-    private let sceneCoordinator: SceneCoordinatorType
+    let sceneCoordinator: SceneCoordinatorType
     
     init(withSceneCoordinator sceneCoordinator: SceneCoordinatorType) {
         self.sceneCoordinator = sceneCoordinator
