@@ -42,6 +42,9 @@ class DMEventSearchViewModel: ViewModelType {
             .latestConnectedPeer()
             .subscribe(onNext: { [unowned self] eventPeer in
                 self.eventHost.value = eventPeer
+                let managementModel = DMEventManagementViewModel(withMultipeerService: self.multipeerEventService)
+                let managementScene = Scene.management(managementModel)
+                self.sceneCoordinator.transition(to: managementScene, type: .push)
             }
         ).disposed(by: disposeBag)
     }

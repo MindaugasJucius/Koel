@@ -23,6 +23,8 @@
 		5F47B83B1FD4073F0053A0A5 /* ViewModelType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F47B83A1FD4073F0053A0A5 /* ViewModelType.swift */; };
 		5F54458B1FD1976D0059A975 /* DMEventSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F54458A1FD1976D0059A975 /* DMEventSearchViewModel.swift */; };
 		5F54458E1FD198C40059A975 /* DMEventCreationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F54458C1FD198C40059A975 /* DMEventCreationViewController.swift */; };
+		5F5445951FD594460059A975 /* DMEventManagementViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F5445941FD594460059A975 /* DMEventManagementViewModel.swift */; };
+		5F5445971FD594570059A975 /* DMEventManagementViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F5445961FD594570059A975 /* DMEventManagementViewController.swift */; };
 		5F58F0311F9CB793006B9B47 /* UIViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F58F0301F9CB793006B9B47 /* UIViewController+Extensions.swift */; };
 		5F601D3B1FD043DC003DE897 /* DMEventMultipeerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F601D3A1FD043DC003DE897 /* DMEventMultipeerService.swift */; };
 		5F601D3D1FD04851003DE897 /* DMEventCreationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F601D3C1FD04851003DE897 /* DMEventCreationViewModel.swift */; };
@@ -70,6 +72,8 @@
 		5F47B83A1FD4073F0053A0A5 /* ViewModelType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModelType.swift; sourceTree = "<group>"; };
 		5F54458A1FD1976D0059A975 /* DMEventSearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventSearchViewModel.swift; sourceTree = "<group>"; };
 		5F54458C1FD198C40059A975 /* DMEventCreationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventCreationViewController.swift; sourceTree = "<group>"; };
+		5F5445941FD594460059A975 /* DMEventManagementViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventManagementViewModel.swift; sourceTree = "<group>"; };
+		5F5445961FD594570059A975 /* DMEventManagementViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventManagementViewController.swift; sourceTree = "<group>"; };
 		5F58F0301F9CB793006B9B47 /* UIViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extensions.swift"; sourceTree = "<group>"; };
 		5F601D3A1FD043DC003DE897 /* DMEventMultipeerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventMultipeerService.swift; sourceTree = "<group>"; };
 		5F601D3C1FD04851003DE897 /* DMEventCreationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventCreationViewModel.swift; sourceTree = "<group>"; };
@@ -147,9 +151,9 @@
 				5FB665DA1FA346C5005C5165 /* Coordinator */,
 				5F58F0321F9CB7AE006B9B47 /* Extensions */,
 				5F47B8371FD4065A0053A0A5 /* Event Flow Selection */,
+				5F5445931FD590470059A975 /* Event Management */,
 				5F47B8321FD4034B0053A0A5 /* Event Search */,
 				5FDEB6B11F97C02C00070930 /* Event Creation */,
-				5F01EC211F925E9700E47E6A /* Helpers */,
 				5F01EC1E1F9256CB00E47E6A /* Services */,
 				5F01EC1B1F8FD89600E47E6A /* Model */,
 				5F01EC171F8FD2A600E47E6A /* Koel.entitlements */,
@@ -196,13 +200,6 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
-		5F01EC211F925E9700E47E6A /* Helpers */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Helpers;
-			sourceTree = "<group>";
-		};
 		5F47B8321FD4034B0053A0A5 /* Event Search */ = {
 			isa = PBXGroup;
 			children = (
@@ -219,6 +216,15 @@
 				5F47B8381FD406FB0053A0A5 /* DMFlowSelectionViewModel.swift */,
 			);
 			path = "Event Flow Selection";
+			sourceTree = "<group>";
+		};
+		5F5445931FD590470059A975 /* Event Management */ = {
+			isa = PBXGroup;
+			children = (
+				5F5445941FD594460059A975 /* DMEventManagementViewModel.swift */,
+				5F5445961FD594570059A975 /* DMEventManagementViewController.swift */,
+			);
+			path = "Event Management";
 			sourceTree = "<group>";
 		};
 		5F58F0321F9CB7AE006B9B47 /* Extensions */ = {
@@ -394,7 +400,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 		85CEA0DCFE884546CB896298 /* [CP] Check Pods Manifest.lock */ = {
@@ -412,7 +418,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 		A9AD169583329472B524897D /* [CP] Copy Pods Resources */ = {
@@ -497,6 +503,7 @@
 			files = (
 				5F8186121FBB6EDB00477C71 /* DMKoelLogoView.swift in Sources */,
 				5F81861E1FD3FADB00477C71 /* UINavigationController+Rx.swift in Sources */,
+				5F5445951FD594460059A975 /* DMEventManagementViewModel.swift in Sources */,
 				5F601D3D1FD04851003DE897 /* DMEventCreationViewModel.swift in Sources */,
 				5F47B8361FD4064C0053A0A5 /* DMFlowSelectionViewController.swift in Sources */,
 				5F47B8391FD406FB0053A0A5 /* DMFlowSelectionViewModel.swift in Sources */,
@@ -504,6 +511,7 @@
 				5F01EC231F925EB200E47E6A /* CKRecord+Extensions.swift in Sources */,
 				5F601D3B1FD043DC003DE897 /* DMEventMultipeerService.swift in Sources */,
 				5F54458E1FD198C40059A975 /* DMEventCreationViewController.swift in Sources */,
+				5F5445971FD594570059A975 /* DMEventManagementViewController.swift in Sources */,
 				5F014BD61FB9E29700079009 /* UIColor+Extensions.swift in Sources */,
 				5F81861C1FD3FAB000477C71 /* SceneCoordinator.swift in Sources */,
 				5F8186181FD3F7F200477C71 /* BindableType.swift in Sources */,

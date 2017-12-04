@@ -14,11 +14,16 @@ enum Scene {
     case create(DMEventCreationViewModel)
     case search(DMEventSearchViewModel)
     case selectFlow(DMFlowSelectionViewModel)
+    case management(DMEventManagementViewModel)
 }
 
 extension Scene {
     func viewController() -> UIViewController {
         switch self {
+        case .management(let viewModel):
+            let eventManagementVC = DMEventManagementViewController(withViewModel: viewModel)
+            eventManagementVC.setupForViewModel()
+            return eventManagementVC
         case .rootNavigation:
             let navigationController = UINavigationController()
             navigationController.navigationBar.prefersLargeTitles = true

@@ -53,11 +53,13 @@ class DMEventCreationViewController: UIViewController, BindableType {
             .bind(to: tableView.rx.items(dataSource: tableViewDataSource))
             .disposed(by: bag)
         
-        viewModel.latestConnectedPeer.subscribe(onNext: { [unowned self] eventPeer in
-            let alert = UIAlertController(title: "New connection", message: "connected to \(eventPeer.peerDeviceDisplayName)", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
-            self.present(alert, animated: true, completion: nil)
-        }).disposed(by: bag)
+        viewModel.latestConnectedPeer
+            .subscribe(onNext: { [unowned self] eventPeer in
+                let alert = UIAlertController(title: "New connection", message: "connected to \(eventPeer.peerDeviceDisplayName)", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+                self.present(alert, animated: true, completion: nil)
+            })
+            .disposed(by: bag)
         
         tableView.rx
             .modelSelected(DMEventPeer.self)
