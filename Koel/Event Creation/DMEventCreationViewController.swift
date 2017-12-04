@@ -49,6 +49,18 @@ class DMEventCreationViewController: UIViewController, BindableType {
     }
     
     func bindViewModel() {
+        viewModel.incommingParticipantInvitations
+            .subscribe(onNext: { invitation in
+                let alert = UIAlertController(title: "Connection request", message: "\(invitation.0.peerDeviceDisplayName) wants to join your party", preferredStyle: .alert)
+                let connectAction = UIAlertAction(title: "Yes", style: UIAlertActionStyle.default, handler: { action in
+                    let invitationHandler = invitation.1
+                    invitationHandler(true)
+                })
+                alert.addAction(connectAction)
+                self.present(alert, animated: true, completion: nil)
+            })
+            .disposed(by: bag)
+        
         viewModel.allPeersSectioned
             .bind(to: tableView.rx.items(dataSource: tableViewDataSource))
             .disposed(by: bag)

@@ -129,7 +129,7 @@ class DMEventMultipeerService: NSObject {
         return .just(browser.stopBrowsingForPeers())
     }
     
-    func connect(_ peer: MCPeerID, context: [String: Any]?, timeout: TimeInterval) -> Observable<Void> {
+    func connect(_ peer: MCPeerID, context: [String: Any]?, timeout: TimeInterval = 60) -> Observable<Void> {
         guard let context = context,
             let data = try? JSONSerialization.data(withJSONObject: context, options: JSONSerialization.WritingOptions()) else {
             return .just(browser.invitePeer(peer, to: self.session, withContext: nil, timeout: timeout))

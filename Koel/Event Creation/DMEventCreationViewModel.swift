@@ -42,11 +42,20 @@ struct DMEventCreationViewModel: ViewModelType {
     
     //MARK: - Actions
     
+    var incommingParticipantInvitations: Observable<(DMEventPeer, (Bool) -> ())> {
+        return multipeerEventService
+            .incomingPeerInvitations()
+            .map { (client, context, handler) in
+                let eventPeer = DMEventPeer.init(withContext: context as? [String : String], peerID: client)
+                return (eventPeer, handler)
+        }
+    }
+    
     lazy var inviteAction: Action<(DMEventPeer), Void> = { this in
         return Action(
             workFactory: { (eventPeer: DMEventPeer) in
                 let hostContext = DMEventMultipeerService.HostDiscoveryInfoDict
-                return this.multipeerEventService.connect(eventPeer.peerID, context: hostContext, timeout: 60)
+                return this.multipeerEventService.connect(eventPeer.peerID, context: hostContext)
             }
         )
     }(self)

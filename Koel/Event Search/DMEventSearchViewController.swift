@@ -10,7 +10,6 @@ import UIKit
 import RxCocoa
 import Action
 import RxSwift
-import RxDataSources
 
 class DMEventSearchViewController: UIViewController, BindableType {
     
@@ -20,7 +19,8 @@ class DMEventSearchViewController: UIViewController, BindableType {
     
     private var bag = DisposeBag()
     
-    private var sendButton = UIButton(type: .system)
+    //MARK: - UI
+    private let tableView = UITableView()
     
     required init(withViewModel viewModel: DMEventSearchViewModel) {
         self.viewModel = viewModel
@@ -33,17 +33,20 @@ class DMEventSearchViewController: UIViewController, BindableType {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        title = "search for party hosts"
+
         view.backgroundColor = .white
-        sendButton.setTitle("send msg", for: .normal)
-        sendButton.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(sendButton)
-        let constraints = [
-            sendButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            sendButton.centerYAnchor.constraint(equalTo: view.centerYAnchor)
-        ]
-        NSLayoutConstraint.activate(constraints)
         
-        title = "search"
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(tableView)
+        additionalSafeAreaInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
+        
+        let constraints = [tableView.topAnchor.constraint(equalTo: view.topAnchor),
+                           tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
+                           tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
+                           tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)]
+        NSLayoutConstraint.activate(constraints)
     }
 
     func bindViewModel() {
@@ -58,30 +61,19 @@ class DMEventSearchViewController: UIViewController, BindableType {
                 self.present(alert, animated: true, completion: nil)
             })
             .disposed(by: bag)
-
-        let eventHostObservable = viewModel
-            .eventHost
-            .asObservable()
         
-        eventHostObservable
-            .map { $0 == nil }
-            .bind(to: sendButton.rx.isHidden)
+        viewModel.hosts
+            .bind(to: tableView.rx.items) { (tableView: UITableView, index: Int, element: DMEventPeer) in
+                let cell = UITableViewCell(style: .default, reuseIdentifier: "cell")
+                cell.textLabel?.text = element.peerDeviceDisplayName
+                return cell
+            }
             .disposed(by: bag)
         
-        sendButton.rx.action = viewModel.sendMessage()
-        
-        eventHostObservable
-            .skip(1)
-            .subscribe(onNext: { [unowned self] eventPeer in
-                guard let host = eventPeer else {
-                    return
-                }
-                
-                let alert = UIAlertController(title: "Joined", message: "Joined a Party hosted by \(host.peerDeviceDisplayName)", preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
-                
-                self.present(alert, animated: true, completion: nil)
-            })
+        tableView.rx
+            .modelSelected(DMEventPeer.self)
+            .filter { !$0.isConnected }
+            .subscribe(viewModel.requestAccess.inputs)
             .disposed(by: bag)
     }
     

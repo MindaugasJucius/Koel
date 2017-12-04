@@ -14,12 +14,15 @@ import MultipeerConnectivity
 class DMEventSearchViewModel: ViewModelType {
     
     private let disposeBag = DisposeBag()
+    private let multipeerEventService = DMEventMultipeerService(
+        withDisplayName: UIDevice.current.name,
+        asEventHost: false
+    )
     
-    private let multipeerEventService = DMEventMultipeerService(withDisplayName: UIDevice.current.name, asEventHost: false)
     let sceneCoordinator: SceneCoordinatorType
 
-    var eventHost = Variable<DMEventPeer?>(.none)
-    
+    private var eventHost = Variable<DMEventPeer?>(.none)
+
     var incommingInvitations: Observable<(DMEventPeer, (Bool) -> ())> {
         return multipeerEventService
             .incomingPeerInvitations()
@@ -35,32 +38,43 @@ class DMEventSearchViewModel: ViewModelType {
     var hosts: Observable<[DMEventPeer]> {
         return multipeerEventService.nearbyFoundHostPeers()
     }
+    
+    var host: Observable<DMEventPeer> {
+        return multipeerEventService.latestConnectedPeer().share()
+    }
+    
+    private lazy var pushManagement: Action<Void, Void> = {
+        return Action(
+            workFactory: { [unowned self] in
+                let managementModel = DMEventManagementViewModel(withMultipeerService: self.multipeerEventService)
+                let managementScene = Scene.management(managementModel)
+                return self.sceneCoordinator.transition(to: managementScene, type: .push)
+            }
+        )
+    }()
+    
+    lazy var requestAccess: Action<(DMEventPeer), Void> = { this in
+        return Action(
+            workFactory: { (eventPeer: DMEventPeer) in
+                return this.multipeerEventService.connect(eventPeer.peerID, context: nil)
+            }
+        )
+    }(self)
 
     required init(withSceneCoordinator sceneCoordinator: SceneCoordinatorType) {
         self.sceneCoordinator = sceneCoordinator
-        multipeerEventService
-            .latestConnectedPeer()
+        
+        host
             .subscribe(onNext: { [unowned self] eventPeer in
                 self.eventHost.value = eventPeer
-                let managementModel = DMEventManagementViewModel(withMultipeerService: self.multipeerEventService)
-                let managementScene = Scene.management(managementModel)
-                self.sceneCoordinator.transition(to: managementScene, type: .push)
-            }
-        ).disposed(by: disposeBag)
-    }
-    
-    func sendMessage() -> CocoaAction {
-        return CocoaAction { [unowned self] in
-            guard let host = self.eventHost.value else {
-                return .just(())
-            }
-            let song = "message".data(using: .utf8)!
-            return self.multipeerEventService.send(
-                toPeer: host.peerID,
-                data: song,
-                mode: .reliable
-            )
-        }
+            })
+            .disposed(by: disposeBag)
+        
+        host
+            .map { _ in }
+            .observeOn(MainScheduler.instance)
+            .subscribe(pushManagement.inputs)
+            .disposed(by: disposeBag)
     }
     
     func onStartAdvertising() {
