@@ -74,9 +74,8 @@ class SceneCoordinator: NSObject, SceneCoordinatorType {
             
             let observable = navigationController.rx.delegate
                 .sentMessage(selector)
-                .map({ parameters in
-                    return parameters[1] as! UIViewController
-                })
+                .map { parameters in return parameters[1] as! UIViewController }
+                .share()
             
             observable
                 .subscribe(navigationControllerStackObserver.asObserver())
@@ -87,6 +86,7 @@ class SceneCoordinator: NSObject, SceneCoordinatorType {
                 .map { _ in }
                 .take(1)
                 .bind(to: subject)
+            
             navigationController.pushViewController(viewController, animated: true)
             currentViewController = SceneCoordinator.actualViewController(for: viewController)
             

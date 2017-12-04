@@ -249,6 +249,7 @@ extension DMEventMultipeerService: MCSessionDelegate {
             nearbyPeers.value.forEach({ eventPeer in
                 if session.connectedPeers.index(of: eventPeer.peerID) != .none {
                     eventPeerConnections.append(eventPeer)
+                    eventPeer.isConnected = state == .connected
                 }
             })
             

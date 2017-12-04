@@ -16,6 +16,7 @@ class DMEventCreationViewController: UIViewController, BindableType {
         
     var viewModel: DMEventCreationViewModel
     
+    private let tableViewDataSource = DMEventCreationViewController.dataSource()
     private let tableView = UITableView()
     
     private var bag = DisposeBag()
@@ -48,13 +49,9 @@ class DMEventCreationViewController: UIViewController, BindableType {
     }
     
     func bindViewModel() {
-        
-        viewModel.allPeers.bind(to: tableView.rx.items) { (tableView: UITableView, index: Int, element: DMEventPeer) in
-            let path = IndexPath(item: index, section: 0)
-            let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: path)
-            cell.textLabel?.text = element.peerDeviceDisplayName
-            return cell
-            }.disposed(by: bag)
+        viewModel.allPeersSectioned
+            .bind(to: tableView.rx.items(dataSource: tableViewDataSource))
+            .disposed(by: bag)
         
         viewModel.latestConnectedPeer.subscribe(onNext: { [unowned self] eventPeer in
             let alert = UIAlertController(title: "New connection", message: "connected to \(eventPeer.peerDeviceDisplayName)", preferredStyle: .alert)
@@ -62,14 +59,28 @@ class DMEventCreationViewController: UIViewController, BindableType {
             self.present(alert, animated: true, completion: nil)
         }).disposed(by: bag)
         
-        tableView.rx.itemSelected
-            .map { [unowned self] indexPath in
-                let peerWithContext: DMEventPeer = try! self.tableView.rx.model(at: indexPath)
-                return peerWithContext
-            }
+        tableView.rx
+            .modelSelected(DMEventPeer.self)
+            .filter { !$0.isConnected }
             .subscribe(viewModel.inviteAction.inputs)
             .disposed(by: bag)
     }
-    
+}
 
+extension DMEventCreationViewController {
+    
+    static func dataSource() -> RxTableViewSectionedAnimatedDataSource<EventPeerSection> {
+        return RxTableViewSectionedAnimatedDataSource<EventPeerSection>(
+            animationConfiguration: AnimationConfiguration(insertAnimation: .top, reloadAnimation: .fade, deleteAnimation: .left),
+            configureCell: { (dataSource, tableView, indexPath, element) -> UITableViewCell in
+                let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+                cell.textLabel?.text = element.peerDeviceDisplayName
+                return cell
+            },
+            titleForHeaderInSection: { dataSource, sectionIndex in
+                return dataSource[sectionIndex].model
+            }
+        )
+    }
+    
 }

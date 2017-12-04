@@ -17,10 +17,13 @@ enum Peer: String {
     case isHost
 }
 
+typealias EventPeerSection = AnimatableSectionModel<String, DMEventPeer>
+
 class DMEventPeer: NSObject, NSCoding {
     
     var fullName: String?
     let isHost: Bool
+    var isConnected: Bool
     let peerID: MCPeerID
     private let uuid: String
     
@@ -28,10 +31,11 @@ class DMEventPeer: NSObject, NSCoding {
         return peerID.displayName
     }
     
-    init(fullName: String? = nil, peerID: MCPeerID, isHost: Bool = false) {
+    init(fullName: String? = nil, peerID: MCPeerID, isHost: Bool = false, isConnected: Bool = false) {
         self.fullName = fullName
         self.peerID = peerID
         self.isHost = isHost
+        self.isConnected = isConnected
         self.uuid = UUID.init().uuidString
     }
     
@@ -59,6 +63,7 @@ class DMEventPeer: NSObject, NSCoding {
             let uuid = aDecoder.decodeObject(forKey: Peer.uuid.rawValue) as? String else {
             fatalError("failed to deserialize")
         }
+        self.isConnected = false
         self.peerID = peerID
         self.uuid = uuid
         self.isHost = aDecoder.decodeBool(forKey: Peer.isHost.rawValue)
@@ -75,4 +80,9 @@ extension DMEventPeer: IdentifiableType {
     var identity: String {
         return uuid
     }
+}
+
+func == (lhs: DMEventPeer, rhs: DMEventPeer) -> Bool {
+    return lhs.peerDeviceDisplayName == rhs.peerDeviceDisplayName
+        && lhs.isConnected == rhs.isConnected
 }
