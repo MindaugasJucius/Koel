@@ -13,36 +13,43 @@ fileprivate let IdentityCacheKey = "IdentityCacheKey"
 fileprivate let EventServiceType = "song-event"
 
 class DMEventMultipeerService: NSObject {
-    
-    fileprivate let myEventPeer: DMEventPeer
 
-    fileprivate let advertiser: MCNearbyServiceAdvertiser
-    fileprivate let browser: MCNearbyServiceBrowser
-    fileprivate let session: MCSession
+    static let HostDiscoveryInfoDict = [Peer.isHost.rawValue: "true"]
     
-    fileprivate let incomingInvitations: PublishSubject<(MCPeerID, [String: Any]?, (Bool, MCSession?) -> Void)> = PublishSubject()
-    fileprivate let nearbyPeers: Variable<[DMEventPeer]> = Variable([])
-    fileprivate let connections = Variable<[DMEventPeer]>([])
+    private let myEventPeer: DMEventPeer
+    private let asEventHost: Bool
     
-    fileprivate let latestConnection = PublishSubject<DMEventPeer>()
+    private let advertiser: MCNearbyServiceAdvertiser
+    private let browser: MCNearbyServiceBrowser
+    private let session: MCSession
     
-    fileprivate let advertisingConnectionErrors: PublishSubject<MCError> = PublishSubject()
-    fileprivate let browsingConnectionErrors: PublishSubject<MCError> = PublishSubject()
+    private let incomingInvitations: PublishSubject<(MCPeerID, [String: Any]?, (Bool, MCSession?) -> Void)> = PublishSubject()
     
-    fileprivate let receivedData: PublishSubject<(MCPeerID, Data)> = PublishSubject()
+    private let nearbyPeers: Variable<[DMEventPeer]> = Variable([])
+    private let nearbyHostPeers: Variable<[DMEventPeer]> = Variable([])
     
-    init(withDisplayName displayName: String) {
-        self.myEventPeer = DMEventMultipeerService.retrieveIdentity(withDisplayName: displayName)
-        
-        self.advertiser = MCNearbyServiceAdvertiser(
-            peer: myEventPeer.peerID,
-            discoveryInfo: nil,
-            serviceType: EventServiceType)
+    private let connections = Variable<[DMEventPeer]>([])
+    
+    private let latestConnection = PublishSubject<DMEventPeer>()
+    
+    private let advertisingConnectionErrors: PublishSubject<MCError> = PublishSubject()
+    private let browsingConnectionErrors: PublishSubject<MCError> = PublishSubject()
+    
+    private let receivedData: PublishSubject<(MCPeerID, Data)> = PublishSubject()
+    
+    init(withDisplayName displayName: String, asEventHost eventHost: Bool) {
+        self.myEventPeer = DMEventMultipeerService.retrieveIdentity(withDisplayName: displayName, asHost: eventHost)
+        self.asEventHost = eventHost
         
         self.session = MCSession(
             peer: myEventPeer.peerID,
             securityIdentity: nil,
             encryptionPreference: .none)
+        
+        self.advertiser = MCNearbyServiceAdvertiser(
+            peer: self.session.myPeerID,
+            discoveryInfo: eventHost ? DMEventMultipeerService.HostDiscoveryInfoDict : nil,
+            serviceType: EventServiceType)
         
         self.browser = MCNearbyServiceBrowser(
             peer: self.session.myPeerID,
@@ -87,6 +94,10 @@ class DMEventMultipeerService: NSObject {
         return nearbyPeers.asObservable()
     }
     
+    func nearbyFoundHostPeers() -> Observable<[DMEventPeer]> {
+        return nearbyHostPeers.asObservable()
+    }
+    
     //MARK: - Lifecycle management
     
     func disconnect() {
@@ -95,20 +106,24 @@ class DMEventMultipeerService: NSObject {
     
     //MARK: - Advertising
     
+    @discardableResult
     func startAdvertising() -> Observable<Void> {
         return .just(advertiser.startAdvertisingPeer())
     }
-    
+
+    @discardableResult
     func stopAdvertising() -> Observable<Void> {
         return .just(advertiser.stopAdvertisingPeer())
     }
 
     //MARK: - Browsing
     
+    @discardableResult
     func startBrowsing() -> Observable<Void> {
         return .just(browser.startBrowsingForPeers())
     }
     
+    @discardableResult
     func stopBrowsing() -> Observable<Void> {
         nearbyPeers.value = []
         return .just(browser.stopBrowsingForPeers())
@@ -127,14 +142,15 @@ class DMEventMultipeerService: NSObject {
     ///
     /// - Parameter displayName: string to display to browsers
     /// - Returns: identity
-    private static func retrieveIdentity(withDisplayName displayName: String) -> DMEventPeer {
+    private static func retrieveIdentity(withDisplayName displayName: String, asHost host: Bool) -> DMEventPeer {
         if let data = UserDefaults.standard.data(forKey: IdentityCacheKey),
             let eventPeer = NSKeyedUnarchiver.unarchiveObject(with: data) as? DMEventPeer,
             eventPeer.peerDeviceDisplayName == displayName {
             return eventPeer
         }
         
-        let identity = DMEventPeer.init(peerID: MCPeerID(displayName: displayName))
+        let peerID = MCPeerID(displayName: displayName)
+        let identity = DMEventPeer.init(peerID: peerID, isHost: host)
         
         let identityData = NSKeyedArchiver.archivedData(withRootObject: identity)
         UserDefaults.standard.set(identityData, forKey: IdentityCacheKey)
@@ -181,6 +197,7 @@ extension DMEventMultipeerService: MCNearbyServiceBrowserDelegate {
         }
                 
         self.nearbyPeers.value = result
+        self.nearbyHostPeers.value = result.filter { $0.isHost }
     }
     
     func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {
@@ -240,6 +257,8 @@ extension DMEventMultipeerService: MCSessionDelegate {
     }
     
     public func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
+        let string = String(data: data, encoding: .utf8)
+        print("msg \(string)")
         receivedData.on(.next((peerID, data)))
     }
     

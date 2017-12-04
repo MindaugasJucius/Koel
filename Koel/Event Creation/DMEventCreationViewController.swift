@@ -17,8 +17,6 @@ class DMEventCreationViewController: UIViewController, BindableType {
     var viewModel: DMEventCreationViewModel
     
     private let tableView = UITableView()
-    private var advertiseButton = UIButton(type: .system)
-    private var browseButton = UIButton(type: .system)
     
     private var bag = DisposeBag()
     
@@ -47,33 +45,9 @@ class DMEventCreationViewController: UIViewController, BindableType {
                            tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
                            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)]
         NSLayoutConstraint.activate(constraints)
-        
-        advertiseButton.setTitle("advertise", for: .normal)
-        browseButton.setTitle("browse", for: .normal)
-        
-        view.addSubview(advertiseButton)
-        advertiseButton.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(browseButton)
-        browseButton.translatesAutoresizingMaskIntoConstraints = false
-
-        let browseButtonConstraints = [
-            browseButton.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant:         view.safeAreaInsets.left),
-            browseButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
-        ]
-        
-        let advertiseButtonConstraints = [
-            advertiseButton.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: view.safeAreaInsets.right),
-            advertiseButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
-        ]
-        
-        NSLayoutConstraint.activate(browseButtonConstraints)
-        NSLayoutConstraint.activate(advertiseButtonConstraints)
     }
     
     func bindViewModel() {
-
-        advertiseButton.rx.action = viewModel.onStartAdvertising()
-        browseButton.rx.action = viewModel.onStartBrowsing()
         
         viewModel.allPeers.bind(to: tableView.rx.items) { (tableView: UITableView, index: Int, element: DMEventPeer) in
             let path = IndexPath(item: index, section: 0)
@@ -91,7 +65,7 @@ class DMEventCreationViewController: UIViewController, BindableType {
         tableView.rx.itemSelected
             .map { [unowned self] indexPath in
                 let peerWithContext: DMEventPeer = try! self.tableView.rx.model(at: indexPath)
-                return (peerWithContext, nil)
+                return peerWithContext
             }
             .subscribe(viewModel.inviteAction.inputs)
             .disposed(by: bag)

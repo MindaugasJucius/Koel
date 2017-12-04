@@ -14,11 +14,13 @@ enum Peer: String {
     case fullName
     case peerID
     case uuid
+    case isHost
 }
 
 class DMEventPeer: NSObject, NSCoding {
     
     var fullName: String?
+    let isHost: Bool
     let peerID: MCPeerID
     private let uuid: String
     
@@ -26,26 +28,29 @@ class DMEventPeer: NSObject, NSCoding {
         return peerID.displayName
     }
     
-    init(fullName: String? = nil, peerID: MCPeerID) {
+    init(fullName: String? = nil, peerID: MCPeerID, isHost: Bool = false) {
         self.fullName = fullName
         self.peerID = peerID
+        self.isHost = isHost
         self.uuid = UUID.init().uuidString
     }
     
     convenience init(withContext context: [String: String]?, peerID: MCPeerID)
     {
-        guard let contextDict = context,
-         let fullName = contextDict[Peer.fullName.rawValue] else {
+        guard let contextDict = context else {
             self.init(fullName: .none, peerID: peerID)
             return
         }
-        self.init(fullName: fullName, peerID: peerID)
+        let fullName = contextDict[Peer.fullName.rawValue]
+        let isHost = contextDict[Peer.isHost.rawValue]
+        self.init(fullName: fullName, peerID: peerID, isHost: isHost != .none)
     }
     
     func encode(with aCoder: NSCoder) {
         aCoder.encode(fullName, forKey: Peer.fullName.rawValue)
         aCoder.encode(peerID, forKey: Peer.peerID.rawValue)
         aCoder.encode(uuid, forKey: Peer.uuid.rawValue)
+        aCoder.encode(isHost, forKey: Peer.isHost.rawValue)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -56,6 +61,12 @@ class DMEventPeer: NSObject, NSCoding {
         }
         self.peerID = peerID
         self.uuid = uuid
+        self.isHost = aDecoder.decodeBool(forKey: Peer.isHost.rawValue)
+    }
+    
+    //to be used with non failable Units
+    static var empty: DMEventPeer {
+        return DMEventPeer(peerID: MCPeerID(displayName: "empty"))
     }
     
 }

@@ -20,6 +20,8 @@ class DMEventSearchViewController: UIViewController, BindableType {
     
     private var bag = DisposeBag()
     
+    private var sendButton = UIButton(type: .system)
+    
     required init(withViewModel viewModel: DMEventSearchViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -32,6 +34,15 @@ class DMEventSearchViewController: UIViewController, BindableType {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
+        sendButton.setTitle("send msg", for: .normal)
+        sendButton.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(sendButton)
+        let constraints = [
+            sendButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            sendButton.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+        ]
+        NSLayoutConstraint.activate(constraints)
+        
         title = "search"
     }
 
@@ -46,6 +57,31 @@ class DMEventSearchViewController: UIViewController, BindableType {
             self.present(alert, animated: true, completion: nil)
         }
         ).disposed(by: bag)
+
+        let eventHostObservable = viewModel
+            .eventHost
+            .asObservable()
+        
+        eventHostObservable
+            .map { $0 == nil }
+            .bind(to: sendButton.rx.isHidden)
+            .disposed(by: bag)
+        
+        sendButton.rx.action = viewModel.sendMessage()
+        
+        eventHostObservable
+            .skip(1)
+            .subscribe(onNext: { [unowned self] eventPeer in
+                guard let host = eventPeer else {
+                    return
+                }
+                
+                let alert = UIAlertController(title: "Joined", message: "Joined a Party hosted by \(host.peerDeviceDisplayName)", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+                
+                self.present(alert, animated: true, completion: nil)
+            })
+            .disposed(by: bag)
     }
     
 }

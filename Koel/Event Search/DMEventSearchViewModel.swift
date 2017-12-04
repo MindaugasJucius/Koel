@@ -9,35 +9,62 @@
 import Foundation
 import Action
 import RxSwift
+import MultipeerConnectivity
 
-struct DMEventSearchViewModel: ViewModelType {
+class DMEventSearchViewModel: ViewModelType {
     
-    private let multipeerEventService = DMEventMultipeerService(withDisplayName: UIDevice.current.name)
+    private let disposeBag = DisposeBag()
+    
+    private let multipeerEventService = DMEventMultipeerService(withDisplayName: UIDevice.current.name, asEventHost: false)
     let sceneCoordinator: SceneCoordinatorType
+
+    var eventHost = Variable<DMEventPeer?>(.none)
     
     var incommingInvitations: Observable<(DMEventPeer, (Bool) -> ())> {
-        return multipeerEventService.incomingPeerInvitations().map({ (client, context, handler) in
-            let eventPeer = DMEventPeer.init(withContext: context as? [String : String], peerID: client)
-            return (eventPeer, handler)
-        })
+        return multipeerEventService
+            .incomingPeerInvitations()
+            .map { (client, context, handler) in
+                let eventPeer = DMEventPeer.init(withContext: context as? [String : String], peerID: client)
+                return (eventPeer, handler)
+            }
+            .filter {
+                $0.0.isHost
+            }
     }
     
-    var latestConnectedPeer: Observable<DMEventPeer> {
-        return multipeerEventService.latestConnectedPeer().do(onNext: { eventHost in
-            
-        })
+    var hosts: Observable<[DMEventPeer]> {
+        return multipeerEventService.nearbyFoundHostPeers()
     }
 
-    init(withSceneCoordinator sceneCoordinator: SceneCoordinatorType) {
+    required init(withSceneCoordinator sceneCoordinator: SceneCoordinatorType) {
         self.sceneCoordinator = sceneCoordinator
-    }
-    
-    func onStartAdvertising() -> CocoaAction {
-        return CocoaAction(
-            workFactory: {
-                return self.multipeerEventService.startAdvertising()
+        multipeerEventService
+            .latestConnectedPeer()
+            .subscribe(onNext: { [unowned self] eventPeer in
+                self.eventHost.value = eventPeer
             }
-        )
+        ).disposed(by: disposeBag)
     }
     
+    func sendMessage() -> CocoaAction {
+        return CocoaAction { [unowned self] in
+            guard let host = self.eventHost.value else {
+                return .just(())
+            }
+            let song = "message".data(using: .utf8)!
+            return self.multipeerEventService.send(
+                toPeer: host.peerID,
+                data: song,
+                mode: .reliable
+            )
+        }
+    }
+    
+    func onStartAdvertising() {
+        self.multipeerEventService.startAdvertising()
+    }
+    
+    func onStartBrowsing() {
+        self.multipeerEventService.startBrowsing()
+    }
 }

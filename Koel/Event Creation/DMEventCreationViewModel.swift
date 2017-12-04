@@ -12,12 +12,8 @@ import Action
 
 struct DMEventCreationViewModel: ViewModelType {
 
-    private let multipeerEventService = DMEventMultipeerService(withDisplayName: UIDevice.current.name)
+    private let multipeerEventService = DMEventMultipeerService(withDisplayName: UIDevice.current.name, asEventHost: true)
     let sceneCoordinator: SceneCoordinatorType
-    
-    init(withSceneCoordinator sceneCoordinator: SceneCoordinatorType) {
-        self.sceneCoordinator = sceneCoordinator
-    }
     
     var allPeers: Observable<[DMEventPeer]> {
         return multipeerEventService.nearbyFoundPeers()
@@ -33,28 +29,25 @@ struct DMEventCreationViewModel: ViewModelType {
     
     //MARK: - Actions
     
-    lazy var inviteAction: Action<(DMEventPeer, [String: Any]?), Void> = { this in
+    lazy var inviteAction: Action<(DMEventPeer), Void> = { this in
         return Action(
-            workFactory: { (eventPeer: DMEventPeer, context: [String: Any]?) in
-                return this.multipeerEventService.connect(eventPeer.peerID, context: context, timeout: 60)
+            workFactory: { (eventPeer: DMEventPeer) in
+                let hostContext = DMEventMultipeerService.HostDiscoveryInfoDict
+                return this.multipeerEventService.connect(eventPeer.peerID, context: hostContext, timeout: 60)
             }
         )
     }(self)
     
-    func onStartAdvertising() -> CocoaAction {
-        return CocoaAction(
-            workFactory: {
-                return self.multipeerEventService.startAdvertising()
-            }
-        )
+    init(withSceneCoordinator sceneCoordinator: SceneCoordinatorType) {
+        self.sceneCoordinator = sceneCoordinator
+    }
+    
+    func onStartAdvertising(){
+        self.multipeerEventService.startAdvertising()
     }
 
-    func onStartBrowsing() -> CocoaAction {
-        return CocoaAction(
-            workFactory: {
-                return self.multipeerEventService.startBrowsing()
-            }
-        )
+    func onStartBrowsing() {
+        self.multipeerEventService.startBrowsing()
     }
     
 }
