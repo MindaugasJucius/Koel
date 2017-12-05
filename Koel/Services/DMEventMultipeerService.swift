@@ -30,7 +30,8 @@ class DMEventMultipeerService: NSObject {
     
     private let connections = Variable<[DMEventPeer]>([])
     
-    private let latestConnection = PublishSubject<DMEventPeer>()
+    private let latestConnection = BehaviorSubject<DMEventPeer>(value: DMEventPeer.empty)
+    private let latestDisconnection = BehaviorSubject<DMEventPeer>(value: DMEventPeer.empty)
     
     private let advertisingConnectionErrors: PublishSubject<MCError> = PublishSubject()
     private let browsingConnectionErrors: PublishSubject<MCError> = PublishSubject()
@@ -44,7 +45,7 @@ class DMEventMultipeerService: NSObject {
         self.session = MCSession(
             peer: myEventPeer.peerID,
             securityIdentity: nil,
-            encryptionPreference: .none)
+            encryptionPreference: .required)
         
         self.advertiser = MCNearbyServiceAdvertiser(
             peer: self.session.myPeerID,
@@ -79,7 +80,11 @@ class DMEventMultipeerService: NSObject {
     }
     
     func latestConnectedPeer() -> Observable<DMEventPeer> {
-        return latestConnection.asObservable()
+        return latestConnection.asObservable().skip(1)
+    }
+    
+    func latestDisconnectedPeer() -> Observable<DMEventPeer> {
+        return latestDisconnection.asObservable().skip(1)
     }
     
     func advertisingErrors() -> Observable<MCError> {
@@ -235,25 +240,25 @@ extension DMEventMultipeerService: MCNearbyServiceAdvertiserDelegate {
 extension DMEventMultipeerService: MCSessionDelegate {
 
     public func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
+        if state != .connecting {
+            var eventPeerConnections: [DMEventPeer] = []
+            
+            nearbyPeers.value.forEach { eventPeer in
+                eventPeer.isConnected = state == .connected
+                if session.connectedPeers.index(of: eventPeer.peerID) != .none {
+                    eventPeerConnections.append(eventPeer)
+                }
+            }
+            
+            connections.value = eventPeerConnections
+        }
+        
         if state == .connected {
             let filtered = nearbyPeers.value.filter { $0.peerID == peerID }
             guard let matchingNearbyPeer = filtered.first else {
                 return
             }
             latestConnection.onNext(matchingNearbyPeer)
-        }
-        
-        if state != .connecting {
-            var eventPeerConnections: [DMEventPeer] = []
-            
-            nearbyPeers.value.forEach({ eventPeer in
-                if session.connectedPeers.index(of: eventPeer.peerID) != .none {
-                    eventPeerConnections.append(eventPeer)
-                    eventPeer.isConnected = state == .connected
-                }
-            })
-            
-            connections.value = eventPeerConnections
         }
     }
     

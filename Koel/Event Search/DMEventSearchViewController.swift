@@ -19,7 +19,7 @@ class DMEventSearchViewController: UIViewController, BindableType {
     
     private var bag = DisposeBag()
     
-    //MARK: - UI
+    //MARK: UI
     private let tableView = UITableView()
     
     required init(withViewModel viewModel: DMEventSearchViewModel) {

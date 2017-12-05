@@ -21,7 +21,7 @@ class DMEventSearchViewModel: ViewModelType {
     
     let sceneCoordinator: SceneCoordinatorType
 
-    private var eventHost = Variable<DMEventPeer?>(.none)
+    private var eventHost = Variable<DMEventPeer>(DMEventPeer.empty)
 
     var incommingInvitations: Observable<(DMEventPeer, (Bool) -> ())> {
         return multipeerEventService
@@ -43,10 +43,10 @@ class DMEventSearchViewModel: ViewModelType {
         return multipeerEventService.latestConnectedPeer().share()
     }
     
-    private lazy var pushManagement: Action<Void, Void> = {
+    private lazy var pushManagement: Action<DMEventPeer, Void> = {
         return Action(
-            workFactory: { [unowned self] in
-                let managementModel = DMEventManagementViewModel(withMultipeerService: self.multipeerEventService)
+            workFactory: { [unowned self] host in
+                let managementModel = DMEventManagementViewModel(withMultipeerService: self.multipeerEventService, withHost: host)
                 let managementScene = Scene.management(managementModel)
                 return self.sceneCoordinator.transition(to: managementScene, type: .root)
             }
@@ -71,7 +71,6 @@ class DMEventSearchViewModel: ViewModelType {
             .disposed(by: disposeBag)
         
         host
-            .map { _ in }
             .observeOn(MainScheduler.instance)
             .subscribe(pushManagement.inputs)
             .disposed(by: disposeBag)
