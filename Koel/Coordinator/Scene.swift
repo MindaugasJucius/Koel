@@ -11,7 +11,7 @@ import UIKit
 
 enum Scene {
     case rootNavigation
-    case create(DMEventCreationViewModel)
+    case create(DMEventInvitationsViewModel)
     case search(DMEventSearchViewModel)
     case selectFlow(DMFlowSelectionViewModel)
     case management(DMEventManagementViewModel)
@@ -23,13 +23,17 @@ extension Scene {
         case .management(let viewModel):
             let eventManagementVC = DMEventManagementViewController(withViewModel: viewModel)
             eventManagementVC.setupForViewModel()
-            return eventManagementVC
+
+            let navigationController = UINavigationController(rootViewController: eventManagementVC)
+            navigationController.navigationBar.prefersLargeTitles = true
+            
+            return navigationController
         case .rootNavigation:
             let navigationController = UINavigationController()
             navigationController.navigationBar.prefersLargeTitles = true
             return navigationController
         case .create(let viewModel):
-            let eventCreationVC = DMEventCreationViewController(withViewModel: viewModel)
+            let eventCreationVC = DMEventInvitationsViewController(withViewModel: viewModel)
             eventCreationVC.setupForViewModel()
             return eventCreationVC
         case .search(let viewModel):

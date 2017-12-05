@@ -72,7 +72,6 @@ class SceneCoordinator: NSObject, SceneCoordinatorType {
             
             let selector = #selector(UINavigationControllerDelegate.navigationController(_:didShow:animated:))
             
-            print(navigationController.rx.delegate)
             let observable = navigationController.rx.delegate
                 .sentMessage(selector)
                 .map { parameters in return parameters[1] as! UIViewController }

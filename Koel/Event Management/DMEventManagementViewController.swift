@@ -26,7 +26,7 @@ class DMEventManagementViewController: UIViewController, BindableType {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
-        
+        title = "participate"
     }
     
     func bindViewModel() {

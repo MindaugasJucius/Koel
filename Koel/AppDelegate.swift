@@ -30,6 +30,38 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         
         return true
     }
+    
+    // resign active | participant
+    // persist host
+    // persist current song list (persist on retrieving songs)
+    
+    // resign active | host
+    // persist participants list
+    // persist current song list (with currently playing song id) (persist on retrieving songs)
+    
+    // enter foreground | participant
+    // retrieve host if available
+        // try to connect ->
+            // success: show event management
+            // failure: show flow selection
+    
+    // enter foreground | host
+    // retrieve participants list
+        // try to connect to each one of them ->
+            // send song list
+            // send currently playing song id
+
+    func applicationWillEnterForeground(_ application: UIApplication) {
+        print("applicationWillEnterForeground")
+    }
+    
+    func applicationWillResignActive(_ application: UIApplication) {
+        print("will resign active")
+    }
+    
+    func applicationWillTerminate(_ application: UIApplication) {
+        print("application will terminate")
+    }
 
 }
 

@@ -1,5 +1,5 @@
 //
-//  DMEventCreationViewController.swift
+//  DMEventInvitationsViewModel.swift
 //  Koel
 //
 //  Created by Mindaugas Jucius on 01/12/2017.
@@ -12,16 +12,16 @@ import Action
 import RxSwift
 import RxDataSources
 
-class DMEventCreationViewController: UIViewController, BindableType {
+class DMEventInvitationsViewController: UIViewController, BindableType {
         
-    var viewModel: DMEventCreationViewModel
+    var viewModel: DMEventInvitationsViewModel
     
-    private let tableViewDataSource = DMEventCreationViewController.dataSource()
+    private let tableViewDataSource = DMEventInvitationsViewController.dataSource()
     private let tableView = UITableView()
     
     private var bag = DisposeBag()
     
-    required init(withViewModel viewModel: DMEventCreationViewModel) {
+    required init(withViewModel viewModel: DMEventInvitationsViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
@@ -81,7 +81,7 @@ class DMEventCreationViewController: UIViewController, BindableType {
     }
 }
 
-extension DMEventCreationViewController {
+extension DMEventInvitationsViewController {
     
     static func dataSource() -> RxTableViewSectionedAnimatedDataSource<EventPeerSection> {
         return RxTableViewSectionedAnimatedDataSource<EventPeerSection>(

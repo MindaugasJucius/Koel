@@ -1,5 +1,5 @@
 //
-//  DMEventCreationViewModel.swift
+//  DMEventInvitationsViewModel.swift
 //  Koel
 //
 //  Created by Mindaugas Jucius on 30/11/2017.
@@ -10,7 +10,7 @@ import MultipeerConnectivity
 import RxSwift
 import Action
 
-struct DMEventCreationViewModel: ViewModelType {
+struct DMEventInvitationsViewModel: ViewModelType {
 
     private let multipeerEventService = DMEventMultipeerService(withDisplayName: UIDevice.current.name, asEventHost: true)
     let sceneCoordinator: SceneCoordinatorType
@@ -26,8 +26,8 @@ struct DMEventCreationViewModel: ViewModelType {
                 let notConnectedPeers = results.filter { !$0.isConnected }
                 
                 return [
-                    EventPeerSection(model: "Connected", items: connectedPeers),
-                    EventPeerSection(model: "Not connected", items: notConnectedPeers)
+                    EventPeerSection(model: "Joined", items: connectedPeers),
+                    EventPeerSection(model: "Nearby", items: notConnectedPeers)
                 ]
         }
     }

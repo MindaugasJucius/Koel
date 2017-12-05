@@ -48,7 +48,7 @@ class DMEventSearchViewModel: ViewModelType {
             workFactory: { [unowned self] in
                 let managementModel = DMEventManagementViewModel(withMultipeerService: self.multipeerEventService)
                 let managementScene = Scene.management(managementModel)
-                return self.sceneCoordinator.transition(to: managementScene, type: .push)
+                return self.sceneCoordinator.transition(to: managementScene, type: .root)
             }
         )
     }()

@@ -14,7 +14,6 @@ struct DMEventManagementViewModel {
     
     init(withMultipeerService multipeerService: DMEventMultipeerService) {
         self.multipeerService = multipeerService
-        print(self.multipeerService)
     }
     
 }
