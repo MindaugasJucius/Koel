@@ -8,10 +8,9 @@
 
 import UIKit
 import CloudKit
-import UserNotifications
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var window: UIWindow? = UIWindow(frame: UIScreen.main.bounds)
     
@@ -52,11 +51,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             // send currently playing song id
 
     func applicationWillEnterForeground(_ application: UIApplication) {
-        print("applicationWillEnterForeground")
     }
     
     func applicationWillResignActive(_ application: UIApplication) {
         print("will resign active")
+    }
+    
+    func applicationDidBecomeActive(_ application: UIApplication) {
+        NotificationCenter.default.post(name: Notifications.didBecomeActive, object: nil)
     }
     
     func applicationWillTerminate(_ application: UIApplication) {

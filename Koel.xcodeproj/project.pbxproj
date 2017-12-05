@@ -35,6 +35,7 @@
 		5F81861A1FD3FA6800477C71 /* SceneCoordinatorType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F8186191FD3FA6800477C71 /* SceneCoordinatorType.swift */; };
 		5F81861C1FD3FAB000477C71 /* SceneCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F81861B1FD3FAB000477C71 /* SceneCoordinator.swift */; };
 		5F81861E1FD3FADB00477C71 /* UINavigationController+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F81861D1FD3FADB00477C71 /* UINavigationController+Rx.swift */; };
+		5FA42B5C1FD6E6F600578EF5 /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FA42B5B1FD6E6F600578EF5 /* Notifications.swift */; };
 		5FDEB6BA1F99235500070930 /* DMInitialLoadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FDEB6B81F99235500070930 /* DMInitialLoadingViewController.swift */; };
 		5FDEB6BB1F99235500070930 /* DMInitialLoadingViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5FDEB6B91F99235500070930 /* DMInitialLoadingViewController.xib */; };
 /* End PBXBuildFile section */
@@ -84,6 +85,7 @@
 		5F8186191FD3FA6800477C71 /* SceneCoordinatorType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneCoordinatorType.swift; sourceTree = "<group>"; };
 		5F81861B1FD3FAB000477C71 /* SceneCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneCoordinator.swift; sourceTree = "<group>"; };
 		5F81861D1FD3FADB00477C71 /* UINavigationController+Rx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UINavigationController+Rx.swift"; sourceTree = "<group>"; };
+		5FA42B5B1FD6E6F600578EF5 /* Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
 		5FDEB6B81F99235500070930 /* DMInitialLoadingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMInitialLoadingViewController.swift; sourceTree = "<group>"; };
 		5FDEB6B91F99235500070930 /* DMInitialLoadingViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DMInitialLoadingViewController.xib; sourceTree = "<group>"; };
 		859C054680781DDB43D6FFC3 /* Pods_Koel.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Koel.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -158,6 +160,7 @@
 				5F01EC1B1F8FD89600E47E6A /* Model */,
 				5F01EC171F8FD2A600E47E6A /* Koel.entitlements */,
 				5F01EBF71F8FD28400E47E6A /* AppDelegate.swift */,
+				5FA42B5B1FD6E6F600578EF5 /* Notifications.swift */,
 				5F01EBFE1F8FD28400E47E6A /* Assets.xcassets */,
 				5F01EC001F8FD28400E47E6A /* LaunchScreen.storyboard */,
 				5F01EC031F8FD28400E47E6A /* Info.plist */,
@@ -501,6 +504,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5FA42B5C1FD6E6F600578EF5 /* Notifications.swift in Sources */,
 				5F8186121FBB6EDB00477C71 /* DMKoelLogoView.swift in Sources */,
 				5F81861E1FD3FADB00477C71 /* UINavigationController+Rx.swift in Sources */,
 				5F5445951FD594460059A975 /* DMEventManagementViewModel.swift in Sources */,

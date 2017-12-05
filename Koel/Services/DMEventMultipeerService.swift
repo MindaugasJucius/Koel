@@ -12,9 +12,19 @@ import RxSwift
 fileprivate let IdentityCacheKey = "IdentityCacheKey"
 fileprivate let EventServiceType = "song-event"
 
+struct MultipeerEventContexts {
+    
+    enum ContextKeys: String {
+        case reconnect = "reconnect"
+        case isHost = "isHost"
+    }
+    
+    static let hostDiscovery = [ContextKeys.isHost.rawValue: "true"]
+    static let participantReconnect = [ContextKeys.reconnect.rawValue: "true"]
+}
+
 class DMEventMultipeerService: NSObject {
 
-    static let HostDiscoveryInfoDict = [Peer.isHost.rawValue: "true"]
     
     private let myEventPeer: DMEventPeer
     private let asEventHost: Bool
@@ -49,7 +59,7 @@ class DMEventMultipeerService: NSObject {
         
         self.advertiser = MCNearbyServiceAdvertiser(
             peer: self.session.myPeerID,
-            discoveryInfo: eventHost ? DMEventMultipeerService.HostDiscoveryInfoDict : nil,
+            discoveryInfo: eventHost ? MultipeerEventContexts.hostDiscovery : nil,
             serviceType: EventServiceType)
         
         self.browser = MCNearbyServiceBrowser(

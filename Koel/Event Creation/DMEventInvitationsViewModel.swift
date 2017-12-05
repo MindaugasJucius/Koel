@@ -12,6 +12,8 @@ import Action
 
 struct DMEventInvitationsViewModel: ViewModelType {
 
+    private let disposeBag = DisposeBag()
+    
     private let multipeerEventService = DMEventMultipeerService(withDisplayName: UIDevice.current.name, asEventHost: true)
     let sceneCoordinator: SceneCoordinatorType
     
@@ -41,20 +43,48 @@ struct DMEventInvitationsViewModel: ViewModelType {
     }
     
     //MARK: - Actions
-    
-    var incommingParticipantInvitations: Observable<(DMEventPeer, (Bool) -> ())> {
+
+    private var incommingInvitations: Observable<(DMEventPeer, (Bool) -> (), Bool)> {
         return multipeerEventService
             .incomingPeerInvitations()
             .map { (client, context, handler) in
-                let eventPeer = DMEventPeer.init(withContext: context as? [String : String], peerID: client)
-                return (eventPeer, handler)
-        }
+
+                guard let contextDictionary = context else {
+                    return (DMEventPeer.init(withContext: nil, peerID: client), handler, false)
+                }
+
+                let isReconnect = contextDictionary[MultipeerEventContexts.ContextKeys.reconnect.rawValue] != nil
+                let eventPeer = DMEventPeer.init(withContext: contextDictionary as? [String : String], peerID: client)
+                
+                return (eventPeer, handler, isReconnect)
+            }
+            .share()
+    }
+    
+    var incommingParticipantInvitations: Observable<(DMEventPeer, (Bool) -> ())> {
+        return incommingInvitations
+            .filter{ (_, _, reconnect) in
+                return !reconnect
+            }
+            .map { (client, handler, _) in
+                return (client, handler)
+            }
+    }
+    
+    private var incommingParticipantReconnectInvitations: Observable<(Bool) -> ()> {
+        return incommingInvitations
+            .filter{ (_, _, reconnect) in
+                return reconnect
+            }
+            .map { (_, handler, _) in
+                return handler
+            }
     }
     
     lazy var inviteAction: Action<(DMEventPeer), Void> = { this in
         return Action(
             workFactory: { (eventPeer: DMEventPeer) in
-                let hostContext = DMEventMultipeerService.HostDiscoveryInfoDict
+                let hostContext = MultipeerEventContexts.hostDiscovery
                 return this.multipeerEventService.connect(eventPeer.peerID, context: hostContext)
             }
         )
@@ -62,6 +92,10 @@ struct DMEventInvitationsViewModel: ViewModelType {
     
     init(withSceneCoordinator sceneCoordinator: SceneCoordinatorType) {
         self.sceneCoordinator = sceneCoordinator
+        incommingParticipantReconnectInvitations.subscribe(onNext: { handler in
+                handler(true)
+            }
+        ).disposed(by: disposeBag)
     }
     
     func onStartAdvertising(){
