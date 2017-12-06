@@ -268,7 +268,7 @@ extension DMEventMultipeerService: MCSessionDelegate {
                     eventPeerConnections.append(eventPeer)
                 }
             }
-            
+            print("CURRxENT CONNECTIONS \(eventPeerConnections.map { $0.peerDeviceDisplayName })")
             connections.value = eventPeerConnections
         }
         

@@ -47,7 +47,7 @@ struct DMEventParticipantViewModel {
     
     private var didEnterBackgroundNotificationHandler: (Notification) -> () {
         return { (notification: Notification) in
-            guard notification.name == Notifications.willResignActive else {
+            guard notification.name == Notifications.didEnterBackground else {
                 return
             }
             self.multipeerService.disconnect()
@@ -86,7 +86,10 @@ struct DMEventParticipantViewModel {
         hostNearby
             .filter { $0 }
             .withLatestFrom(hostDisconnectedObservable)
-            .filter { $0 }
+            .filter { hostDisconnected in
+                print("is host disconnected \(hostDisconnected)")
+                return hostDisconnected
+            }
             .map { _ in host }
             .subscribe(requestReconnect.inputs)
             .disposed(by: disposeBag)

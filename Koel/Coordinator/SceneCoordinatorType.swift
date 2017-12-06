@@ -22,6 +22,8 @@ enum SceneTransitionType {
 protocol SceneCoordinatorType {
     init(window: UIWindow)
     
+    var currentViewController: UIViewController { get }
+    
     /// transition to another scene
     @discardableResult
     func transition(to scene: Scene, type: SceneTransitionType) -> Observable<Void>

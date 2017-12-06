@@ -43,11 +43,13 @@ struct DMEventManagementViewModel: ViewModelType {
             .map { results in
                 
                 let connectedPeers = results.filter { $0.isConnected }
-                let notConnectedPeers = results.filter { !$0.isConnected }
+                let nearbyPeers = results.filter { !$0.isConnected }
+                
+                print(results.map { return "CONNECTION OBSERVABLES RESULTS \($0.peerDeviceDisplayName) \($0.isConnected)" })
                 
                 return [
                     EventPeerSection(model: "Joined", items: connectedPeers),
-                    EventPeerSection(model: "Nearby", items: notConnectedPeers)
+                    EventPeerSection(model: "Nearby", items: nearbyPeers)
                 ]
             }
             .observeOn(MainScheduler.instance)
@@ -83,17 +85,21 @@ struct DMEventManagementViewModel: ViewModelType {
         multipeerService.startBrowsing()
         multipeerService.startAdvertising()
         
-//        viewModel.incommingParticipantInvitations
-//            .subscribe(onNext: { invitation in
-//                let alert = UIAlertController(title: "Connection request", message: "\(invitation.0.peerDeviceDisplayName) wants to join your party", preferredStyle: .alert)
-//                let connectAction = UIAlertAction(title: "Yes", style: UIAlertActionStyle.default, handler: { action in
-//                    let invitationHandler = invitation.1
-//                    invitationHandler(true)
-//                })
-//                alert.addAction(connectAction)
-//                self.present(alert, animated: true, completion: nil)
-//            })
-//            .disposed(by: bag)
+        incommingParticipantInvitations
+            .subscribe(onNext: { invitation in
+                let alert = UIAlertController(title: "Connection request", message: "\(invitation.0.peerDeviceDisplayName) wants to join your party", preferredStyle: .alert)
+                let connectAction = UIAlertAction(title: "Yes", style: UIAlertActionStyle.default, handler: { action in
+                    let invitationHandler = invitation.1
+                    invitationHandler(true)
+                })
+                alert.addAction(connectAction)
+                sceneCoordinator.currentViewController.present(
+                    alert,
+                    animated: true,
+                    completion: nil
+                )
+            })
+            .disposed(by: disposeBag)
         
 //        viewModel.latestConnectedPeer
 //            .subscribe(onNext: { [unowned self] eventPeer in

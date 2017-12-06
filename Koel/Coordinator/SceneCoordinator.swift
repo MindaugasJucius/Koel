@@ -17,7 +17,7 @@ class SceneCoordinator: NSObject, SceneCoordinatorType {
     private let navigationControllerStackObserver = PublishSubject<UIViewController>()
     
     fileprivate var window: UIWindow
-    fileprivate var currentViewController: UIViewController
+    var currentViewController: UIViewController
     
     required init(window: UIWindow) {
         self.window = window
