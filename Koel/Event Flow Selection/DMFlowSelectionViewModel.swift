@@ -20,7 +20,10 @@ struct DMFlowSelectionViewModel {
     func onCreateEvent() -> CocoaAction {
         return CocoaAction { _ in
             let manageEventViewModel = DMEventManagementViewModel(withSceneCoordinator: self.sceneCoordinator)
-            return self.sceneCoordinator.transition(to: Scene.manage(manageEventViewModel), type: .root)
+            return self.sceneCoordinator.transition(
+                to: Scene.manage(manageEventViewModel),
+                type: .rootWithNavigationVC
+            )
         }
     }
     
@@ -29,7 +32,10 @@ struct DMFlowSelectionViewModel {
             let searchEventViewModel = DMEventSearchViewModel(withSceneCoordinator: self.sceneCoordinator)
             searchEventViewModel.onStartAdvertising()
             searchEventViewModel.onStartBrowsing()
-            return self.sceneCoordinator.transition(to: Scene.search(searchEventViewModel), type: .push)
+            return self.sceneCoordinator.transition(
+                to: Scene.search(searchEventViewModel),
+                type: .rootWithNavigationVC
+            )
         }
     }
     

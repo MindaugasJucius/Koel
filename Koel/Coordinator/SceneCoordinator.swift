@@ -63,7 +63,10 @@ class SceneCoordinator: NSObject, SceneCoordinatorType {
             currentViewController = SceneCoordinator.actualViewController(for: viewController)
             window.rootViewController = viewController
             subject.onCompleted()
-            
+        case .rootWithNavigationVC:
+            currentViewController = SceneCoordinator.actualViewController(for: viewController)
+            window.rootViewController = navigationController(withRoot: currentViewController)
+            subject.onCompleted()
         case .push:
 
             guard let navigationController = navigationControllerInStack() else {
@@ -126,5 +129,11 @@ class SceneCoordinator: NSObject, SceneCoordinatorType {
         return subject.asObservable()
     }
 
+    
+    private func navigationController(withRoot root: UIViewController) -> UINavigationController {
+        let navigationController = UINavigationController(rootViewController: root)
+        navigationController.navigationBar.prefersLargeTitles = true
+        return navigationController
+    }
     
 }

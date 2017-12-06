@@ -12,17 +12,5 @@ import Action
 protocol ViewModelType {
     
     var sceneCoordinator: SceneCoordinatorType { get }
-    
-    init(withSceneCoordinator sceneCoordinator: SceneCoordinatorType)
-    
-}
 
-extension ViewModelType {
-    
-    func popController() -> CocoaAction {
-        return CocoaAction {
-            return self.sceneCoordinator.pop(animated: true)
-        }
-    }
-    
 }

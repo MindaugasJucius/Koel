@@ -14,6 +14,7 @@ enum SceneTransitionType {
     // interactive transitions and even child view controllers!
     
     case root       // make view controller the root view controller
+    case rootWithNavigationVC
     case push       // push view controller to navigation stack
     case modal      // present view controller modally
 }

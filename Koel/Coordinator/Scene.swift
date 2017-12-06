@@ -15,7 +15,7 @@ enum Scene {
 
     //MARK: Host
     case invite(DMEventInvitationsViewModel)
-    case manage(DMEventManagementViewModel)
+    indirect case manage(DMEventManagementViewModel)
 
     //MARK: Participant
     case search(DMEventSearchViewModel)
@@ -25,11 +25,13 @@ enum Scene {
 extension Scene {
     func viewController() -> UIViewController {
         switch self {
+        //MARK: General
         case .selectFlow(let viewModel):
             let flowSelectionVC = DMFlowSelectionViewController(withViewModel: viewModel)
             flowSelectionVC.setupForViewModel()
             return flowSelectionVC
-            
+        
+        //MARK: Participant
         case .search(let viewModel):
             let eventSearchVC = DMEventSearchViewController(withViewModel: viewModel)
             eventSearchVC.setupForViewModel()
@@ -39,11 +41,11 @@ extension Scene {
             eventParticipationVC.setupForViewModel()
             return eventParticipationVC
             
+        //MARK: Host
         case .invite(let viewModel):
             let eventCreationVC = DMEventInvitationsViewController(withViewModel: viewModel)
             eventCreationVC.setupForViewModel()
             return eventCreationVC
-            
         case .manage(let viewModel):
             let managementVC = DMEventManagementViewController(withViewModel: viewModel)
             managementVC.setupForViewModel()
