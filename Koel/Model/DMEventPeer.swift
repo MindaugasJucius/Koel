@@ -42,7 +42,7 @@ class DMEventPeer: NSObject, NSCoding {
     convenience init(withContext context: [String: String]?, peerID: MCPeerID)
     {
         guard let contextDict = context else {
-            self.init(fullName: .none, peerID: peerID)
+            self.init(peerID: peerID)
             return
         }
         let fullName = contextDict[Peer.fullName.rawValue]

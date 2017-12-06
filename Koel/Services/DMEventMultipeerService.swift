@@ -36,7 +36,7 @@ class DMEventMultipeerService: NSObject {
     private let incomingInvitations: PublishSubject<(MCPeerID, [String: Any]?, (Bool, MCSession?) -> Void)> = PublishSubject()
     
     private let nearbyPeers: Variable<[DMEventPeer]> = Variable([])
-    private let nearbyHostPeers: Variable<[DMEventPeer]> = Variable([])
+    private let nearbyHostPeers = PublishSubject<[DMEventPeer]>()
     
     private let connections = Variable<[DMEventPeer]>([])
     
@@ -102,7 +102,7 @@ class DMEventMultipeerService: NSObject {
     }
     
     func browsingErrors() -> Observable<MCError> {
-        return advertisingConnectionErrors.asObservable()
+        return browsingConnectionErrors.asObservable()
     }
     
     func nearbyFoundPeers() -> Observable<[DMEventPeer]> {
@@ -204,24 +204,31 @@ class DMEventMultipeerService: NSObject {
 extension DMEventMultipeerService: MCNearbyServiceBrowserDelegate {
     
     func browser(_ browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String : String]?) {
-        var result: [DMEventPeer] = []
+        var result = nearbyPeers.value
         let eventPeer = DMEventPeer.init(withContext: info, peerID: peerID)
-
+        print("foundPeer \(peerID.displayName) isHost \(eventPeer.isHost)")
+        
+        //jeigu toks peer buvo, ir dar karta rado (pvz)
         if nearbyPeers.value.map({ $0.peerID }).index(of: peerID) == .none {
             result = nearbyPeers.value + [eventPeer]
         }
-                
-        self.nearbyPeers.value = result
-        self.nearbyHostPeers.value = result.filter { $0.isHost }
+
+        print("nearby peers \(result.map { $0.peerDeviceDisplayName })")
+        nearbyPeers.value = result
+        nearbyHostPeers.onNext(result.filter { $0.isHost })
     }
     
     func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {
+        print("browser lostPeer \(peerID.displayName)")
         nearbyPeers.value = nearbyPeers.value.filter { existingNearbyPeer in
             return existingNearbyPeer.peerID != peerID
         }
+        
+        //nearbyHostPeers.onNext(nearbyPeers.value.filter { $0.isHost })
     }
     
     func browser(_ browser: MCNearbyServiceBrowser, didNotStartBrowsingForPeers error: Error) {
+        print("didNotStartBrowsingForPeers because of an error \(error.localizedDescription)")
         let mcError = MCError(_nsError: error as NSError)
         browsingConnectionErrors.onNext(mcError)
     }
@@ -231,17 +238,18 @@ extension DMEventMultipeerService: MCNearbyServiceBrowserDelegate {
 extension DMEventMultipeerService: MCNearbyServiceAdvertiserDelegate {
     
     func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didNotStartAdvertisingPeer error: Error) {
+        print("didNotStartAdvertisingPeer because of an error \(error.localizedDescription)")
         let mcError = MCError(_nsError: error as NSError)
         advertisingConnectionErrors.onNext(mcError)
     }
     
     func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didReceiveInvitationFromPeer peerID: MCPeerID, withContext context: Data?, invitationHandler: @escaping (Bool, MCSession?) -> Void) {
-        
         guard let context = context, let json = try? JSONSerialization.jsonObject(with: context) else {
+            print("didReceiveInvitationFromPeer \(peerID.displayName) with no info")
             incomingInvitations.onNext((peerID, nil, invitationHandler))
             return
         }
-
+        print("didReceiveInvitationFromPeer \(peerID.displayName) with info \((json as? [String: Any])?.keys)")
         incomingInvitations.onNext((peerID, json as? [String: Any], invitationHandler))
     }
     
@@ -250,6 +258,7 @@ extension DMEventMultipeerService: MCNearbyServiceAdvertiserDelegate {
 extension DMEventMultipeerService: MCSessionDelegate {
 
     public func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
+        print("\(peerID.displayName) changed to state \(state.rawValue)")
         if state != .connecting {
             var eventPeerConnections: [DMEventPeer] = []
             

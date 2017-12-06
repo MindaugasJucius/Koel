@@ -14,6 +14,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var window: UIWindow? = UIWindow(frame: UIScreen.main.bounds)
     
+    private var backgroundTaskID = UIBackgroundTaskInvalid
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
 
         window?.makeKeyAndVisible()
@@ -26,7 +28,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let flowSelectionCreationScene = Scene.selectFlow(flowSelectionViewModel)
 
         sceneCoordinator.transition(to: flowSelectionCreationScene, type: .push)
-        
+
         return true
     }
     
@@ -49,12 +51,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // try to connect to each one of them ->
             // send song list
             // send currently playing song id
-
+    
     func applicationWillEnterForeground(_ application: UIApplication) {
+        if backgroundTaskID != UIBackgroundTaskInvalid {
+            application.endBackgroundTask(backgroundTaskID)
+        }
     }
     
     func applicationWillResignActive(_ application: UIApplication) {
         print("will resign active")
+        NotificationCenter.default.post(name: Notifications.willResignActive, object: nil)
+    }
+    
+    func applicationDidEnterBackground(_ application: UIApplication) {
+        print("did enter background")
+        NotificationCenter.default.post(name: Notifications.didEnterBackground, object: nil)
     }
     
     func applicationDidBecomeActive(_ application: UIApplication) {

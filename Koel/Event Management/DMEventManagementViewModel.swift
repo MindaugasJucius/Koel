@@ -21,12 +21,14 @@ struct DMEventManagementViewModel {
     
     var hostExists: Observable<Bool> {
         return multipeerService.connectedPeers().map { peers in
+            print("hostExists observable \(peers.map { $0.peerDeviceDisplayName })")
             return peers.filter { $0.peerID == self.host.peerID }.count == 1
         }
     }
     
     private var hostNearby: Observable<Bool> {
         return multipeerService.nearbyFoundHostPeers().map { peers in
+            print("hostNearby observable \(peers.map { $0.peerDeviceDisplayName })")
             return peers.filter { $0.peerID == self.host.peerID }.count == 1
         }
     }
@@ -43,18 +45,25 @@ struct DMEventManagementViewModel {
             }
     }
     
-    private var didBecomeActiveNotificationHandler: (Notification) -> () {
+    private var didEnterBackgroundNotificationHandler: (Notification) -> () {
         return { (notification: Notification) in
-            guard notification.name == Notifications.didBecomeActive else {
+            guard notification.name == Notifications.willResignActive else {
                 return
             }
-            self.hostNearby
-                .filter { $0 }
-                .map { _ in self.host }
-                .subscribe(self.requestReconnect().inputs)
-                .disposed(by: self.disposeBag)
+            self.multipeerService.disconnect()
         }
     }
+    
+    
+    lazy var requestReconnect: Action<(DMEventPeer), Void> = { this in
+        return Action(
+            workFactory: { (eventPeer: DMEventPeer) in
+                print("requesting reconnection for \(eventPeer.peerDeviceDisplayName)")
+                let reconnectContext = MultipeerEventContexts.participantReconnect
+                return this.multipeerService.connect(eventPeer.peerID, context: reconnectContext)
+            }
+        )
+    }(self)
     
     init(withMultipeerService multipeerService: DMEventMultipeerService, withHost host: DMEventPeer) {
         self.multipeerService = multipeerService
@@ -64,7 +73,7 @@ struct DMEventManagementViewModel {
         
         multipeerService.latestConnectedPeer()
             .subscribe(onNext: { host in
-                    print("\(host.peerDeviceDisplayName) connected")
+                    print("latest connected peer - \(host.peerDeviceDisplayName)")
                 }
             )
             .disposed(by: disposeBag)
@@ -76,11 +85,25 @@ struct DMEventManagementViewModel {
             )
             .disposed(by: disposeBag)
         
+        let hostDisconnectedObservable = multipeerService
+            .connectedPeers()
+            .map { connections in
+            return connections.filter { $0.peerID == host.peerID }.count == 0 // true if current host is not connected
+        }
+        
+        hostNearby
+            .filter { $0 }
+            .withLatestFrom(hostDisconnectedObservable)
+            .filter { $0 }
+            .map { _ in host }
+            .subscribe(requestReconnect.inputs)
+            .disposed(by: disposeBag)
+    
         NotificationCenter.default.addObserver(
-            forName: Notifications.didBecomeActive,
+            forName: Notifications.didEnterBackground,
             object: nil,
             queue: nil,
-            using: didBecomeActiveNotificationHandler
+            using: didEnterBackgroundNotificationHandler
         )
     }
     
@@ -91,13 +114,6 @@ struct DMEventManagementViewModel {
         
         let hostData = NSKeyedArchiver.archivedData(withRootObject: host)
         UserDefaults.standard.set(hostData, forKey: HostCacheKey)
-    }
-    
-    func requestReconnect() -> Action<(DMEventPeer), Void> {
-        return Action(workFactory: { (eventPeer: DMEventPeer) in
-                return self.multipeerService.connect(eventPeer.peerID, context: MultipeerEventContexts.participantReconnect)
-            }
-        )
     }
     
 }
