@@ -19,10 +19,8 @@ struct DMFlowSelectionViewModel {
     
     func onCreateEvent() -> CocoaAction {
         return CocoaAction { _ in
-            let createEventViewModel = DMEventInvitationsViewModel(withSceneCoordinator: self.sceneCoordinator)
-            createEventViewModel.onStartBrowsing()
-            createEventViewModel.onStartAdvertising()
-            return self.sceneCoordinator.transition(to: Scene.create(createEventViewModel), type: .push)
+            let manageEventViewModel = DMEventManagementViewModel(withSceneCoordinator: self.sceneCoordinator)
+            return self.sceneCoordinator.transition(to: Scene.manage(manageEventViewModel), type: .root)
         }
     }
     

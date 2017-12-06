@@ -35,6 +35,8 @@
 		5F81861A1FD3FA6800477C71 /* SceneCoordinatorType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F8186191FD3FA6800477C71 /* SceneCoordinatorType.swift */; };
 		5F81861C1FD3FAB000477C71 /* SceneCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F81861B1FD3FAB000477C71 /* SceneCoordinator.swift */; };
 		5F81861E1FD3FADB00477C71 /* UINavigationController+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F81861D1FD3FADB00477C71 /* UINavigationController+Rx.swift */; };
+		5F84FF9A1FD86350003332B4 /* DMEventManagementViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F84FF991FD86350003332B4 /* DMEventManagementViewModel.swift */; };
+		5F84FF9C1FD86367003332B4 /* DMEventManagementViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F84FF9B1FD86367003332B4 /* DMEventManagementViewController.swift */; };
 		5FA42B5C1FD6E6F600578EF5 /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FA42B5B1FD6E6F600578EF5 /* Notifications.swift */; };
 		5FDEB6BA1F99235500070930 /* DMInitialLoadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FDEB6B81F99235500070930 /* DMInitialLoadingViewController.swift */; };
 		5FDEB6BB1F99235500070930 /* DMInitialLoadingViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5FDEB6B91F99235500070930 /* DMInitialLoadingViewController.xib */; };
@@ -85,6 +87,8 @@
 		5F8186191FD3FA6800477C71 /* SceneCoordinatorType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneCoordinatorType.swift; sourceTree = "<group>"; };
 		5F81861B1FD3FAB000477C71 /* SceneCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneCoordinator.swift; sourceTree = "<group>"; };
 		5F81861D1FD3FADB00477C71 /* UINavigationController+Rx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UINavigationController+Rx.swift"; sourceTree = "<group>"; };
+		5F84FF991FD86350003332B4 /* DMEventManagementViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventManagementViewModel.swift; sourceTree = "<group>"; };
+		5F84FF9B1FD86367003332B4 /* DMEventManagementViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventManagementViewController.swift; sourceTree = "<group>"; };
 		5FA42B5B1FD6E6F600578EF5 /* Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
 		5FDEB6B81F99235500070930 /* DMInitialLoadingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMInitialLoadingViewController.swift; sourceTree = "<group>"; };
 		5FDEB6B91F99235500070930 /* DMInitialLoadingViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DMInitialLoadingViewController.xib; sourceTree = "<group>"; };
@@ -268,6 +272,8 @@
 			children = (
 				5F601D3C1FD04851003DE897 /* DMEventInvitationsViewModel.swift */,
 				5F54458C1FD198C40059A975 /* DMEventInvitationsViewController.swift */,
+				5F84FF991FD86350003332B4 /* DMEventManagementViewModel.swift */,
+				5F84FF9B1FD86367003332B4 /* DMEventManagementViewController.swift */,
 			);
 			path = "Event Creation";
 			sourceTree = "<group>";
@@ -504,6 +510,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5F84FF9A1FD86350003332B4 /* DMEventManagementViewModel.swift in Sources */,
 				5FA42B5C1FD6E6F600578EF5 /* Notifications.swift in Sources */,
 				5F8186121FBB6EDB00477C71 /* DMKoelLogoView.swift in Sources */,
 				5F81861E1FD3FADB00477C71 /* UINavigationController+Rx.swift in Sources */,
@@ -528,6 +535,7 @@
 				5F014BD41FB9E20000079009 /* WaveView.swift in Sources */,
 				5F47B8341FD403780053A0A5 /* DMEventSearchViewController.swift in Sources */,
 				5F47B83B1FD4073F0053A0A5 /* ViewModelType.swift in Sources */,
+				5F84FF9C1FD86367003332B4 /* DMEventManagementViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

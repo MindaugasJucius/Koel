@@ -18,16 +18,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
 
+        window?.rootViewController = UIViewController()
         window?.makeKeyAndVisible()
-        let navigationControllerScene = Scene.rootNavigation
-        window?.rootViewController = navigationControllerScene.viewController()
         
         let sceneCoordinator = SceneCoordinator(window: window!)
-
+        
         let flowSelectionViewModel = DMFlowSelectionViewModel(withSceneCoordinator: sceneCoordinator)
-        let flowSelectionCreationScene = Scene.selectFlow(flowSelectionViewModel)
-
-        sceneCoordinator.transition(to: flowSelectionCreationScene, type: .push)
+        let flowSelectionScene = Scene.selectFlow(flowSelectionViewModel)
+        
+        sceneCoordinator.transition(to: flowSelectionScene, type: .root)
 
         return true
     }

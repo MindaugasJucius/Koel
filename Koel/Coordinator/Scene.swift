@@ -10,40 +10,44 @@ import Foundation
 import UIKit
 
 enum Scene {
-    case rootNavigation
-    case create(DMEventInvitationsViewModel)
-    case search(DMEventSearchViewModel)
+    //MARK: Shared
     case selectFlow(DMFlowSelectionViewModel)
-    case management(DMEventParticipantViewModel)
+
+    //MARK: Host
+    case invite(DMEventInvitationsViewModel)
+    case manage(DMEventManagementViewModel)
+
+    //MARK: Participant
+    case search(DMEventSearchViewModel)
+    case participation(DMEventParticipantViewModel)
 }
 
 extension Scene {
     func viewController() -> UIViewController {
         switch self {
-        case .management(let viewModel):
-            let eventManagementVC = DMEventParticipationViewController(withViewModel: viewModel)
-            eventManagementVC.setupForViewModel()
-
-            let navigationController = UINavigationController(rootViewController: eventManagementVC)
-            navigationController.navigationBar.prefersLargeTitles = true
-            
-            return navigationController
-        case .rootNavigation:
-            let navigationController = UINavigationController()
-            navigationController.navigationBar.prefersLargeTitles = true
-            return navigationController
-        case .create(let viewModel):
-            let eventCreationVC = DMEventInvitationsViewController(withViewModel: viewModel)
-            eventCreationVC.setupForViewModel()
-            return eventCreationVC
-        case .search(let viewModel):
-            let eventSearchVC = DMEventSearchViewController(withViewModel: viewModel)
-            eventSearchVC.setupForViewModel()
-            return eventSearchVC
         case .selectFlow(let viewModel):
             let flowSelectionVC = DMFlowSelectionViewController(withViewModel: viewModel)
             flowSelectionVC.setupForViewModel()
             return flowSelectionVC
+            
+        case .search(let viewModel):
+            let eventSearchVC = DMEventSearchViewController(withViewModel: viewModel)
+            eventSearchVC.setupForViewModel()
+            return eventSearchVC
+        case .participation(let viewModel):
+            let eventParticipationVC = DMEventParticipationViewController(withViewModel: viewModel)
+            eventParticipationVC.setupForViewModel()
+            return eventParticipationVC
+            
+        case .invite(let viewModel):
+            let eventCreationVC = DMEventInvitationsViewController(withViewModel: viewModel)
+            eventCreationVC.setupForViewModel()
+            return eventCreationVC
+            
+        case .manage(let viewModel):
+            let managementVC = DMEventManagementViewController(withViewModel: viewModel)
+            managementVC.setupForViewModel()
+            return managementVC
         }
     }
 }
