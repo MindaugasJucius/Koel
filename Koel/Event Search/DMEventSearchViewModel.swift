@@ -46,7 +46,7 @@ class DMEventSearchViewModel: ViewModelType {
     private lazy var pushManagement: Action<DMEventPeer, Void> = {
         return Action(
             workFactory: { [unowned self] host in
-                let managementModel = DMEventManagementViewModel(withMultipeerService: self.multipeerEventService, withHost: host)
+                let managementModel = DMEventParticipantViewModel(withMultipeerService: self.multipeerEventService, withHost: host)
                 let managementScene = Scene.management(managementModel)
                 return self.sceneCoordinator.transition(to: managementScene, type: .root)
             }

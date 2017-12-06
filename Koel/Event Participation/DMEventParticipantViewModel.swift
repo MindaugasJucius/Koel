@@ -12,7 +12,7 @@ import Action
 
 private let HostCacheKey = "HostCacheKey"
 
-struct DMEventManagementViewModel {
+struct DMEventParticipantViewModel {
     
     private let disposeBag = DisposeBag()
     
@@ -54,7 +54,6 @@ struct DMEventManagementViewModel {
         }
     }
     
-    
     lazy var requestReconnect: Action<(DMEventPeer), Void> = { this in
         return Action(
             workFactory: { (eventPeer: DMEventPeer) in
@@ -70,13 +69,6 @@ struct DMEventManagementViewModel {
         self.host = host
         
         store(host: host)
-        
-        multipeerService.latestConnectedPeer()
-            .subscribe(onNext: { host in
-                    print("latest connected peer - \(host.peerDeviceDisplayName)")
-                }
-            )
-            .disposed(by: disposeBag)
 
         incommingHostReconnectInvitations
             .subscribe(onNext: { handler in

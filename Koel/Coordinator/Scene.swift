@@ -14,14 +14,14 @@ enum Scene {
     case create(DMEventInvitationsViewModel)
     case search(DMEventSearchViewModel)
     case selectFlow(DMFlowSelectionViewModel)
-    case management(DMEventManagementViewModel)
+    case management(DMEventParticipantViewModel)
 }
 
 extension Scene {
     func viewController() -> UIViewController {
         switch self {
         case .management(let viewModel):
-            let eventManagementVC = DMEventManagementViewController(withViewModel: viewModel)
+            let eventManagementVC = DMEventParticipationViewController(withViewModel: viewModel)
             eventManagementVC.setupForViewModel()
 
             let navigationController = UINavigationController(rootViewController: eventManagementVC)

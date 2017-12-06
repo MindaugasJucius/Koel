@@ -31,11 +31,8 @@ struct DMEventInvitationsViewModel: ViewModelType {
                     EventPeerSection(model: "Joined", items: connectedPeers),
                     EventPeerSection(model: "Nearby", items: notConnectedPeers)
                 ]
-        }
-    }
-    
-    var connectedPeers: Observable<[DMEventPeer]> {
-        return multipeerEventService.connectedPeers()
+            }
+            .observeOn(MainScheduler.instance)
     }
     
     var latestConnectedPeer: Observable<DMEventPeer> {
