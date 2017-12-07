@@ -224,7 +224,7 @@ extension DMEventMultipeerService: MCNearbyServiceBrowserDelegate {
             return existingNearbyPeer.peerID != peerID
         }
         
-        //nearbyHostPeers.onNext(nearbyPeers.value.filter { $0.isHost })
+        nearbyHostPeers.onNext(nearbyPeers.value.filter { $0.isHost })
     }
     
     func browser(_ browser: MCNearbyServiceBrowser, didNotStartBrowsingForPeers error: Error) {
