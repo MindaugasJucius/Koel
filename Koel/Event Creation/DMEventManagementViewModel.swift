@@ -10,13 +10,15 @@ import Foundation
 import Action
 import RxSwift
 
-struct DMEventManagementViewModel: ViewModelType {
+class DMEventManagementViewModel: ViewModelType {
     
     private let disposeBag = DisposeBag()
     
     let sceneCoordinator: SceneCoordinatorType
+    
     private let multipeerService: DMEventMultipeerService
     private let peers = BehaviorSubject<[EventPeerSection]>(value: [EventPeerSection(model: "", items: [])])
+    private var backgroundTaskID = UIBackgroundTaskInvalid
     
     private var incommingInvitations: Observable<(DMEventPeer, (Bool) -> (), Bool)> {
         return multipeerService
@@ -79,11 +81,30 @@ struct DMEventManagementViewModel: ViewModelType {
     }
     
     private var didEnterBackgroundNotificationHandler: (Notification) -> () {
-        return { (notification: Notification) in
+        return { [unowned self] (notification: Notification) in
             guard notification.name == Notifications.didEnterBackground else {
                 return
             }
-            self.multipeerService.disconnect()
+            
+            self.backgroundTaskID = UIApplication.shared.beginBackgroundTask(expirationHandler: {
+                    self.multipeerService.disconnect()
+                    UIApplication.shared.endBackgroundTask(self.backgroundTaskID)
+                    self.backgroundTaskID = UIBackgroundTaskInvalid
+                    print("background task expired")
+                }
+            )
+        }
+    }
+    
+    private var willEnterForegroundNotificationHandler: (Notification) -> () {
+        return { [unowned self] (notification: Notification) in
+            guard notification.name == Notifications.willEnterForeground else {
+                return
+            }
+            if self.backgroundTaskID != UIBackgroundTaskInvalid {
+                UIApplication.shared.endBackgroundTask(self.backgroundTaskID)
+                self.backgroundTaskID = UIBackgroundTaskInvalid
+            }
         }
     }
     
@@ -137,6 +158,13 @@ struct DMEventManagementViewModel: ViewModelType {
             queue: nil,
             using: didEnterBackgroundNotificationHandler
         )
+        
+        NotificationCenter.default.addObserver(
+            forName: Notifications.willEnterForeground,
+            object: nil,
+            queue: nil,
+            using: willEnterForegroundNotificationHandler
+        )
     }
     
     private func onInvitesClose() -> CocoaAction {
@@ -146,7 +174,7 @@ struct DMEventManagementViewModel: ViewModelType {
     }
     
     func onInvite() -> CocoaAction {
-        return CocoaAction { _ in
+        return CocoaAction { [unowned self] _ in
             let invitationsViewModel = DMEventInvitationsViewModel(
                 withSceneCoordinator: self.sceneCoordinator,
                 multipeerService: self.multipeerService,

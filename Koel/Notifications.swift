@@ -13,4 +13,5 @@ struct Notifications {
     static let didBecomeActive = Notification.Name("didBecomeActive")
     static let willResignActive = Notification.Name("willResignActive")
     static let didEnterBackground = Notification.Name("didEnterBackground")
+    static let willEnterForeground = Notification.Name("willEnterForeground")
 }

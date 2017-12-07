@@ -52,9 +52,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // send currently playing song id
     
     func applicationWillEnterForeground(_ application: UIApplication) {
-        if backgroundTaskID != UIBackgroundTaskInvalid {
-            application.endBackgroundTask(backgroundTaskID)
-        }
+        NotificationCenter.default.post(name: Notifications.willEnterForeground, object: nil)
     }
     
     func applicationWillResignActive(_ application: UIApplication) {
