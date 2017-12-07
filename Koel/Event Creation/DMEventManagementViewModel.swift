@@ -47,7 +47,8 @@ struct DMEventManagementViewModel: ViewModelType {
                 let connectedPeers = peersWithoutHosts.filter { $0.isConnected }
                 let nearbyPeers = peersWithoutHosts.filter { !$0.isConnected }
                 
-                print(results.map { return "CONNECTION OBSERVABLES RESULTS \($0.peerDeviceDisplayName) \($0.isConnected)" })
+                print("CONNECTION OBSERVABLES RESULTS:")
+                print(results.map { return "\($0.peerDeviceDisplayName) \($0.isConnected)" })
                 
                 return [
                     EventPeerSection(model: "Joined", items: connectedPeers),

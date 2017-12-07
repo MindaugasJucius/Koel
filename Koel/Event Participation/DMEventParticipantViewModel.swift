@@ -21,8 +21,9 @@ struct DMEventParticipantViewModel {
     
     var hostExists: Observable<Bool> {
         return multipeerService.connectedPeers().map { peers in
-            print("hostExists observable \(peers.map { $0.peerDeviceDisplayName })")
-            return peers.filter { $0.peerID == self.host.peerID }.count == 1
+            let hostExists = peers.filter { $0.peerID == self.host.peerID }.count == 1
+            print("hostExists observable \(hostExists)")
+            return hostExists
         }
     }
     

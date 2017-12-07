@@ -30,8 +30,6 @@ struct DMFlowSelectionViewModel {
     func onSearchEvent() -> CocoaAction {
         return CocoaAction { _ in
             let searchEventViewModel = DMEventSearchViewModel(withSceneCoordinator: self.sceneCoordinator)
-            searchEventViewModel.onStartAdvertising()
-            searchEventViewModel.onStartBrowsing()
             return self.sceneCoordinator.transition(
                 to: Scene.search(searchEventViewModel),
                 type: .rootWithNavigationVC

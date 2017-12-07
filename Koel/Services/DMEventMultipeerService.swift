@@ -90,11 +90,11 @@ class DMEventMultipeerService: NSObject {
     }
     
     func latestConnectedPeer() -> Observable<DMEventPeer> {
-        return latestConnection.asObservable().skip(1)
+        return latestConnection.asObservable()
     }
     
     func latestDisconnectedPeer() -> Observable<DMEventPeer> {
-        return latestDisconnection.asObservable().skip(1)
+        return latestDisconnection.asObservable()
     }
     
     func advertisingErrors() -> Observable<MCError> {
@@ -265,7 +265,7 @@ extension DMEventMultipeerService: MCSessionDelegate {
             }
             
             matchingPeer.isConnected = state == .connected
-            let currentConnection = connections.value.filter({ $0.peerID == peerID }).first
+            let currentConnection = connections.value.filter { $0.peerID == peerID }.first
             
             if state == .connected {
                 latestConnection.onNext(matchingPeer)

@@ -48,7 +48,6 @@ class DMEventParticipationViewController: UIViewController, BindableType {
     func bindViewModel() {
         viewModel
             .hostExists
-            .startWith(true)
             .map { $0 ? "host exists" : "host disconnected" }
             .bind(to: label.rx.text)
             .disposed(by: disposeBag)

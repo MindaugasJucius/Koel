@@ -21,8 +21,6 @@ class DMEventSearchViewModel: ViewModelType {
     
     let sceneCoordinator: SceneCoordinatorType
 
-    private var eventHost = Variable<DMEventPeer>(DMEventPeer.empty)
-
     var incommingInvitations: Observable<(DMEventPeer, (Bool) -> ())> {
         return multipeerEventService
             .incomingPeerInvitations()
@@ -40,11 +38,11 @@ class DMEventSearchViewModel: ViewModelType {
     }
     
     var host: Observable<DMEventPeer> {
-        return multipeerEventService.latestConnectedPeer().share()
+        return multipeerEventService.latestConnectedPeer()
     }
     
     private lazy var pushManagement: Action<DMEventPeer, Void> = {
-        return Action(
+        return Action (
             workFactory: { [unowned self] host in
                 let participationModel = DMEventParticipantViewModel(withMultipeerService: self.multipeerEventService, withHost: host)
                 let participationScene = Scene.participation(participationModel)
@@ -54,7 +52,7 @@ class DMEventSearchViewModel: ViewModelType {
     }()
     
     lazy var requestAccess: Action<(DMEventPeer), Void> = { this in
-        return Action(
+        return Action (
             workFactory: { (eventPeer: DMEventPeer) in
                 return this.multipeerEventService.connect(eventPeer.peerID, context: nil)
             }
@@ -64,23 +62,12 @@ class DMEventSearchViewModel: ViewModelType {
     required init(withSceneCoordinator sceneCoordinator: SceneCoordinatorType) {
         self.sceneCoordinator = sceneCoordinator
         
-        host
-            .subscribe(onNext: { [unowned self] eventPeer in
-                self.eventHost.value = eventPeer
-            })
-            .disposed(by: disposeBag)
+        multipeerEventService.startAdvertising()
+        multipeerEventService.startBrowsing()
         
         host
             .observeOn(MainScheduler.instance)
             .subscribe(pushManagement.inputs)
             .disposed(by: disposeBag)
-    }
-    
-    func onStartAdvertising() {
-        self.multipeerEventService.startAdvertising()
-    }
-    
-    func onStartBrowsing() {
-        self.multipeerEventService.startBrowsing()
     }
 }
