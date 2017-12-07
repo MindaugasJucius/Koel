@@ -12,11 +12,11 @@ import Action
 
 private let HostCacheKey = "HostCacheKey"
 
-struct DMEventParticipantViewModel {
+struct DMEventParticipantViewModel: MultipeerViewModelType {
     
     private let disposeBag = DisposeBag()
     
-    private let multipeerService: DMEventMultipeerService
+    let multipeerService: DMEventMultipeerService
     private let host: DMEventPeer
     
     var hostExists: Observable<Bool> {

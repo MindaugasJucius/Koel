@@ -11,10 +11,10 @@ import Action
 import RxSwift
 import MultipeerConnectivity
 
-class DMEventSearchViewModel: ViewModelType {
+class DMEventSearchViewModel: ViewModelType, MultipeerViewModelType {
     
     private let disposeBag = DisposeBag()
-    private let multipeerEventService = DMEventMultipeerService(
+    let multipeerService = DMEventMultipeerService(
         withDisplayName: UIDevice.current.name,
         asEventHost: false
     )
@@ -22,7 +22,7 @@ class DMEventSearchViewModel: ViewModelType {
     let sceneCoordinator: SceneCoordinatorType
 
     var incommingInvitations: Observable<(DMEventPeer, (Bool) -> ())> {
-        return multipeerEventService
+        return multipeerService
             .incomingPeerInvitations()
             .map { (client, context, handler) in
                 let eventPeer = DMEventPeer.init(withContext: context as? [String : String], peerID: client)
@@ -34,17 +34,17 @@ class DMEventSearchViewModel: ViewModelType {
     }
     
     var hosts: Observable<[DMEventPeer]> {
-        return multipeerEventService.nearbyFoundHostPeers()
+        return multipeerService.nearbyFoundHostPeers()
     }
     
     var host: Observable<DMEventPeer> {
-        return multipeerEventService.latestConnectedPeer()
+        return multipeerService.latestConnectedPeer()
     }
     
     private lazy var pushManagement: Action<DMEventPeer, Void> = {
         return Action (
             workFactory: { [unowned self] host in
-                let participationModel = DMEventParticipantViewModel(withMultipeerService: self.multipeerEventService, withHost: host)
+                let participationModel = DMEventParticipantViewModel(withMultipeerService: self.multipeerService, withHost: host)
                 let participationScene = Scene.participation(participationModel)
                 return self.sceneCoordinator.transition(to: participationScene, type: .root)
             }
@@ -54,7 +54,7 @@ class DMEventSearchViewModel: ViewModelType {
     lazy var requestAccess: Action<(DMEventPeer), Void> = { this in
         return Action (
             workFactory: { (eventPeer: DMEventPeer) in
-                return this.multipeerEventService.connect(eventPeer.peerID, context: nil)
+                return this.multipeerService.connect(eventPeer.peerID, context: nil)
             }
         )
     }(self)
@@ -62,8 +62,8 @@ class DMEventSearchViewModel: ViewModelType {
     required init(withSceneCoordinator sceneCoordinator: SceneCoordinatorType) {
         self.sceneCoordinator = sceneCoordinator
         
-        multipeerEventService.startAdvertising()
-        multipeerEventService.startBrowsing()
+        multipeerService.startAdvertising()
+        multipeerService.startBrowsing()
         
         host
             .observeOn(MainScheduler.instance)

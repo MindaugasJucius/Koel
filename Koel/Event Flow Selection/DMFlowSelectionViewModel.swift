@@ -9,9 +9,9 @@
 import Action
 import RxSwift
 
-struct DMFlowSelectionViewModel {
+struct DMFlowSelectionViewModel: ViewModelType {
     
-    private let sceneCoordinator: SceneCoordinatorType
+    let sceneCoordinator: SceneCoordinatorType
     
     init(withSceneCoordinator sceneCoordinator: SceneCoordinatorType) {
         self.sceneCoordinator = sceneCoordinator

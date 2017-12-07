@@ -31,22 +31,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return true
     }
     
-    // resign active | participant
-    // persist host
-    // persist current song list (persist on retrieving songs)
+    // participant
     
-    // resign active | host
-    // persist participants list
-    // persist current song list (with currently playing song id) (persist on retrieving songs)
+    // enter background
+    // disconnect from session
     
-    // enter foreground | participant
+    // enter foreground
     // retrieve host if available
         // try to connect ->
             // success: show event management
             // failure: show flow selection
     
-    // enter foreground | host
-    // retrieve participants list
+    // host
+    
+    // persist on retrieving songs
+    
+    // enter background
+    // extend multipeer lifecycle with background tasks (about 180s)
+    // disconnect on task expiration
+    
+    // enter foreground
+    // wait for reconnections from participants
         // try to connect to each one of them ->
             // send song list
             // send currently playing song id
