@@ -42,8 +42,10 @@ struct DMEventManagementViewModel: ViewModelType {
             .merge()
             .map { results in
                 
-                let connectedPeers = results.filter { $0.isConnected }
-                let nearbyPeers = results.filter { !$0.isConnected }
+                let peersWithoutHosts = results.filter { !$0.isHost }
+                
+                let connectedPeers = peersWithoutHosts.filter { $0.isConnected }
+                let nearbyPeers = peersWithoutHosts.filter { !$0.isConnected }
                 
                 print(results.map { return "CONNECTION OBSERVABLES RESULTS \($0.peerDeviceDisplayName) \($0.isConnected)" })
                 
