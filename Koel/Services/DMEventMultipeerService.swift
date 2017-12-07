@@ -40,8 +40,8 @@ class DMEventMultipeerService: NSObject {
     
     private let connections = Variable<[DMEventPeer]>([])
     
-    private let latestConnection = BehaviorSubject<DMEventPeer>(value: DMEventPeer.empty)
-    private let latestDisconnection = BehaviorSubject<DMEventPeer>(value: DMEventPeer.empty)
+    private let latestConnection = PublishSubject<DMEventPeer>()
+    private let latestDisconnection = PublishSubject<DMEventPeer>()
     
     private let advertisingConnectionErrors: PublishSubject<MCError> = PublishSubject()
     private let browsingConnectionErrors: PublishSubject<MCError> = PublishSubject()
@@ -260,24 +260,24 @@ extension DMEventMultipeerService: MCSessionDelegate {
     public func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
         print("\(peerID.displayName) changed to state \(state.rawValue)")
         if state != .connecting {
-            var eventPeerConnections: [DMEventPeer] = []
-            
-            nearbyPeers.value.forEach { eventPeer in
-                eventPeer.isConnected = state == .connected
-                if session.connectedPeers.index(of: eventPeer.peerID) != .none {
-                    eventPeerConnections.append(eventPeer)
-                }
-            }
-            print("CURRxENT CONNECTIONS \(eventPeerConnections.map { $0.peerDeviceDisplayName })")
-            connections.value = eventPeerConnections
-        }
-        
-        if state == .connected {
-            let filtered = nearbyPeers.value.filter { $0.peerID == peerID }
-            guard let matchingNearbyPeer = filtered.first else {
+            guard let matchingPeer = nearbyPeers.value.filter({ $0.peerID == peerID }).first else {
                 return
             }
-            latestConnection.onNext(matchingNearbyPeer)
+            
+            matchingPeer.isConnected = state == .connected
+            let currentConnection = connections.value.filter({ $0.peerID == peerID }).first
+            
+            if state == .connected {
+                latestConnection.onNext(matchingPeer)
+                if currentConnection == .none {
+                    connections.value = connections.value + [matchingPeer]
+                }
+                
+            } else if let currentlyConnected = currentConnection {
+                connections.value = connections.value.filter {  $0.peerID != currentlyConnected.peerID }
+            }
+            
+            print("CURRxENT CONNECTIONS \(connections.value.map { $0.peerDeviceDisplayName })")
         }
     }
     

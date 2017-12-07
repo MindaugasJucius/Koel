@@ -75,6 +75,15 @@ struct DMEventManagementViewModel: ViewModelType {
         }
     }
     
+    private var didEnterBackgroundNotificationHandler: (Notification) -> () {
+        return { (notification: Notification) in
+            guard notification.name == Notifications.didEnterBackground else {
+                return
+            }
+            self.multipeerService.disconnect()
+        }
+    }
+    
     init(withSceneCoordinator sceneCoordinator: SceneCoordinatorType) {
         self.sceneCoordinator = sceneCoordinator
         self.multipeerService = DMEventMultipeerService(
@@ -118,6 +127,13 @@ struct DMEventManagementViewModel: ViewModelType {
                 handler(true)
             })
             .disposed(by: disposeBag)
+        
+        NotificationCenter.default.addObserver(
+            forName: Notifications.didEnterBackground,
+            object: nil,
+            queue: nil,
+            using: didEnterBackgroundNotificationHandler
+        )
     }
     
     private func onInvitesClose() -> CocoaAction {
