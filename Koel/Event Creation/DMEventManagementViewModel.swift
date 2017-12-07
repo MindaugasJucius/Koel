@@ -10,15 +10,15 @@ import Foundation
 import Action
 import RxSwift
 
-class DMEventManagementViewModel: ViewModelType {
+class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
     
     private let disposeBag = DisposeBag()
     
     let sceneCoordinator: SceneCoordinatorType
     
-    private let multipeerService: DMEventMultipeerService
+    let multipeerService: DMEventMultipeerService
     private let peers = BehaviorSubject<[EventPeerSection]>(value: [EventPeerSection(model: "", items: [])])
-    private var backgroundTaskID = UIBackgroundTaskInvalid
+    var backgroundTaskID = UIBackgroundTaskInvalid
     
     private var incommingInvitations: Observable<(DMEventPeer, (Bool) -> (), Bool)> {
         return multipeerService
@@ -80,34 +80,6 @@ class DMEventManagementViewModel: ViewModelType {
         }
     }
     
-    private var didEnterBackgroundNotificationHandler: (Notification) -> () {
-        return { [unowned self] (notification: Notification) in
-            guard notification.name == Notifications.didEnterBackground else {
-                return
-            }
-            
-            self.backgroundTaskID = UIApplication.shared.beginBackgroundTask(expirationHandler: {
-                    self.multipeerService.disconnect()
-                    UIApplication.shared.endBackgroundTask(self.backgroundTaskID)
-                    self.backgroundTaskID = UIBackgroundTaskInvalid
-                    print("background task expired")
-                }
-            )
-        }
-    }
-    
-    private var willEnterForegroundNotificationHandler: (Notification) -> () {
-        return { [unowned self] (notification: Notification) in
-            guard notification.name == Notifications.willEnterForeground else {
-                return
-            }
-            if self.backgroundTaskID != UIBackgroundTaskInvalid {
-                UIApplication.shared.endBackgroundTask(self.backgroundTaskID)
-                self.backgroundTaskID = UIBackgroundTaskInvalid
-            }
-        }
-    }
-    
     init(withSceneCoordinator sceneCoordinator: SceneCoordinatorType) {
         self.sceneCoordinator = sceneCoordinator
         self.multipeerService = DMEventMultipeerService(
@@ -133,14 +105,6 @@ class DMEventManagementViewModel: ViewModelType {
                 )
             })
             .disposed(by: disposeBag)
-        
-//        viewModel.latestConnectedPeer
-//            .subscribe(onNext: { [unowned self] eventPeer in
-//                let alert = UIAlertController(title: "New connection", message: "connected to \(eventPeer.peerDeviceDisplayName)", preferredStyle: .alert)
-//                alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
-//                self.present(alert, animated: true, completion: nil)
-//            })
-//            .disposed(by: bag)
         
         allPeersSectioned
             .subscribe(peers.asObserver())
