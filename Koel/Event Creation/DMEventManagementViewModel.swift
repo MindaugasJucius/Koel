@@ -17,10 +17,43 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
     private let peers = BehaviorSubject<[EventPeerSection]>(value: [EventPeerSection(model: "", items: [])])
     
     let sceneCoordinator: SceneCoordinatorType
-    let songPersistanceService: DMEventSongPersistenceServiceType
+    let songPersistenceService: DMEventSongPersistenceServiceType
     let multipeerService: DMEventMultipeerService
 
     var backgroundTaskID = UIBackgroundTaskInvalid
+    
+    init(withSceneCoordinator sceneCoordinator: SceneCoordinatorType, songPersistenceService: DMEventSongPersistenceServiceType) {
+        
+        self.sceneCoordinator = sceneCoordinator
+        self.songPersistenceService = songPersistenceService
+        
+        self.multipeerService = DMEventMultipeerService(
+            withDisplayName: UIDevice.current.name,
+            asEventHost: true
+        )
+        
+        multipeerService.startBrowsing()
+        multipeerService.startAdvertising()
+        
+        NotificationCenter.default.addObserver(
+            forName: Notifications.didEnterBackground,
+            object: nil,
+            queue: nil,
+            using: didEnterBackgroundNotificationHandler
+        )
+        
+        NotificationCenter.default.addObserver(
+            forName: Notifications.willEnterForeground,
+            object: nil,
+            queue: nil,
+            using: willEnterForegroundNotificationHandler
+        )
+        
+        setupConnectionObservables()
+        setupSongPersistenceObservables()
+    }
+    
+    // MARK: - Connection observables
     
     private var incommingInvitations: Observable<(DMEventPeer, (Bool) -> (), Bool)> {
         return multipeerService
@@ -62,7 +95,7 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
             .observeOn(MainScheduler.instance)
     }
     
-    var incommingParticipantInvitations: Observable<(DMEventPeer, (Bool) -> ())> {
+    private var incommingParticipantInvitations: Observable<(DMEventPeer, (Bool) -> ())> {
         return incommingInvitations
             .filter{ (_, _, reconnect) in
                 return !reconnect
@@ -82,48 +115,22 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
         }
     }
     
-    init(withSceneCoordinator sceneCoordinator: SceneCoordinatorType, songPersistanceService: DMEventSongPersistenceServiceType) {
-        self.sceneCoordinator = sceneCoordinator
-        self.songPersistanceService = songPersistanceService
-        self.multipeerService = DMEventMultipeerService(
-            withDisplayName: UIDevice.current.name,
-            asEventHost: true
-        )
-        
-        multipeerService.startBrowsing()
-        multipeerService.startAdvertising()
-        
-        NotificationCenter.default.addObserver(
-            forName: Notifications.didEnterBackground,
-            object: nil,
-            queue: nil,
-            using: didEnterBackgroundNotificationHandler
-        )
-        
-        NotificationCenter.default.addObserver(
-            forName: Notifications.willEnterForeground,
-            object: nil,
-            queue: nil,
-            using: willEnterForegroundNotificationHandler
-        )
-        
+    private func setupConnectionObservables() {
         incommingParticipantInvitations
-            .subscribe(onNext: { invitation in
+            .subscribe(onNext: { [unowned self] invitation in
                 let alert = UIAlertController(title: "Connection request", message: "\(invitation.0.peerDeviceDisplayName) wants to join your party", preferredStyle: .alert)
                 let connectAction = UIAlertAction(title: "Yes", style: UIAlertActionStyle.default, handler: { action in
                     let invitationHandler = invitation.1
                     invitationHandler(true)
                 })
                 alert.addAction(connectAction)
-                sceneCoordinator.currentViewController.present(
+                self.sceneCoordinator.currentViewController.present(
                     alert,
                     animated: true,
                     completion: nil
                 )
             })
             .disposed(by: disposeBag)
-        
-        
         
         allPeersSectioned
             .subscribe(peers.asObserver())
@@ -134,7 +141,15 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
                 handler(true)
             })
             .disposed(by: disposeBag)
+        
+        onSongCreate.errors.subscribe(
+            onNext: { actionError in
+                print("actionError \(actionError.localizedDescription)")
+            }
+        ).disposed(by: disposeBag)
     }
+    
+    // MARK: - Connection bindables
     
     private func onInvitesClose() -> CocoaAction {
         return CocoaAction {
@@ -144,18 +159,67 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
     
     func onInvite() -> CocoaAction {
         return CocoaAction { [unowned self] _ in
-
+            
             let invitationsViewModel = DMEventInvitationsViewModel(
                 withSceneCoordinator: self.sceneCoordinator,
                 multipeerService: self.multipeerService,
                 peers: self.peers,
                 onClose: self.onInvitesClose()
             )
-
+            
             return self.sceneCoordinator.transition(
                 to: Scene.invite(invitationsViewModel),
                 type: .modal
             )
         }
     }
+    
+    // MARK: - Song persistence observables
+    
+    var songsSectioned: Observable<[SongSection]> {
+        return songPersistenceService.songs()
+            .map { results in
+                
+                let queuedSongs = results
+                    .filter("played == nil")
+                    .sorted(byKeyPath: "added", ascending: false)
+                
+                let playedSongs = results
+                    .filter("played != nil")
+                    .sorted(byKeyPath: "played", ascending: false)
+
+                
+                return [
+                    SongSection(model: "queued", items: queuedSongs.toArray()),
+                    SongSection(model: "played", items: playedSongs.toArray())
+                ]
+            }
+            .observeOn(MainScheduler.instance)
+    }
+    
+    private func setupSongPersistenceObservables() {
+        songPersistenceService.songs()
+            .do(onNext: { results in
+                    print("persisted songs count\(results.count)")
+                }
+            )
+            .subscribe()
+            .disposed(by: disposeBag)
+    }
+    
+    // MARK: - Connection bindables
+    
+    lazy var playedAction: Action<DMEventSong, Void> = {
+        return Action(workFactory: { [unowned self] (song: DMEventSong) -> Observable<Void> in
+            return self.songPersistenceService.played(song: song).map { _ in }
+        })
+    }()
+    
+    lazy var onSongCreate: CocoaAction = {
+        return CocoaAction { [unowned self] in
+            return self.songPersistenceService
+                .createSong(title: "songy")
+                .map { _ in }
+        }
+    }()
 }

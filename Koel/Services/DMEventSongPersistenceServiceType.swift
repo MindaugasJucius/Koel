@@ -22,6 +22,9 @@ protocol DMEventSongPersistenceServiceType {
     @discardableResult
     func createSong(title: String) -> Observable<DMEventSong>
     
+    @discardableResult
+    func played(song: DMEventSong) -> Observable<DMEventSong>
+    
     func songs() -> Observable<Results<DMEventSong>>
     
 }

@@ -10,6 +10,8 @@ import Foundation
 import RealmSwift
 import RxDataSources
 
+typealias SongSection = AnimatableSectionModel<String, DMEventSong>
+
 @objcMembers
 class DMEventSong: Object {
     

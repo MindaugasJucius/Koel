@@ -21,7 +21,7 @@ struct DMFlowSelectionViewModel: ViewModelType {
         return CocoaAction { _ in
             let manageEventViewModel = DMEventManagementViewModel(
                 withSceneCoordinator: self.sceneCoordinator,
-                songPersistanceService: DMEventSongPersistenceService()
+                songPersistenceService: DMEventSongPersistenceService()
             )
             return self.sceneCoordinator.transition(
                 to: Scene.manage(manageEventViewModel),

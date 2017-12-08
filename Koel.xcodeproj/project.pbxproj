@@ -215,8 +215,8 @@
 			isa = PBXGroup;
 			children = (
 				5F84FFA81FDAF69E003332B4 /* DMEventSongPersistenceServiceType.swift */,
-				5F601D3A1FD043DC003DE897 /* DMEventMultipeerService.swift */,
 				5F84FFA61FDAF0B8003332B4 /* DMEventSongPersistenceService.swift */,
+				5F601D3A1FD043DC003DE897 /* DMEventMultipeerService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
