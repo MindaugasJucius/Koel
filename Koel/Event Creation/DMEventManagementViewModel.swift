@@ -14,10 +14,12 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
     
     private let disposeBag = DisposeBag()
     
-    let sceneCoordinator: SceneCoordinatorType
-    
-    let multipeerService: DMEventMultipeerService
     private let peers = BehaviorSubject<[EventPeerSection]>(value: [EventPeerSection(model: "", items: [])])
+    
+    let sceneCoordinator: SceneCoordinatorType
+    let songPersistanceService: DMEventSongPersistenceServiceType
+    let multipeerService: DMEventMultipeerService
+
     var backgroundTaskID = UIBackgroundTaskInvalid
     
     private var incommingInvitations: Observable<(DMEventPeer, (Bool) -> (), Bool)> {
@@ -80,8 +82,9 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
         }
     }
     
-    init(withSceneCoordinator sceneCoordinator: SceneCoordinatorType) {
+    init(withSceneCoordinator sceneCoordinator: SceneCoordinatorType, songPersistanceService: DMEventSongPersistenceServiceType) {
         self.sceneCoordinator = sceneCoordinator
+        self.songPersistanceService = songPersistanceService
         self.multipeerService = DMEventMultipeerService(
             withDisplayName: UIDevice.current.name,
             asEventHost: true
@@ -89,6 +92,20 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
         
         multipeerService.startBrowsing()
         multipeerService.startAdvertising()
+        
+        NotificationCenter.default.addObserver(
+            forName: Notifications.didEnterBackground,
+            object: nil,
+            queue: nil,
+            using: didEnterBackgroundNotificationHandler
+        )
+        
+        NotificationCenter.default.addObserver(
+            forName: Notifications.willEnterForeground,
+            object: nil,
+            queue: nil,
+            using: willEnterForegroundNotificationHandler
+        )
         
         incommingParticipantInvitations
             .subscribe(onNext: { invitation in
@@ -106,6 +123,8 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
             })
             .disposed(by: disposeBag)
         
+        
+        
         allPeersSectioned
             .subscribe(peers.asObserver())
             .disposed(by: disposeBag)
@@ -115,20 +134,6 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
                 handler(true)
             })
             .disposed(by: disposeBag)
-        
-        NotificationCenter.default.addObserver(
-            forName: Notifications.didEnterBackground,
-            object: nil,
-            queue: nil,
-            using: didEnterBackgroundNotificationHandler
-        )
-        
-        NotificationCenter.default.addObserver(
-            forName: Notifications.willEnterForeground,
-            object: nil,
-            queue: nil,
-            using: willEnterForegroundNotificationHandler
-        )
     }
     
     private func onInvitesClose() -> CocoaAction {
@@ -139,6 +144,7 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
     
     func onInvite() -> CocoaAction {
         return CocoaAction { [unowned self] _ in
+
             let invitationsViewModel = DMEventInvitationsViewModel(
                 withSceneCoordinator: self.sceneCoordinator,
                 multipeerService: self.multipeerService,

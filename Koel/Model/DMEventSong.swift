@@ -1,0 +1,32 @@
+//
+//  DMEventSong.swift
+//  Koel
+//
+//  Created by Mindaugas Jucius on 08/12/2017.
+//  Copyright © 2017 Mindaugas Jucius. All rights reserved.
+//
+
+import Foundation
+import RealmSwift
+import RxDataSources
+
+@objcMembers
+class DMEventSong: Object {
+    
+    dynamic var id: Int = 0
+    dynamic var title: String = ""
+    
+    dynamic var added: Date = Date()
+    dynamic var played: Date? = nil
+    
+    override class func primaryKey() -> String? {
+        return "id"
+    }
+    
+}
+
+extension DMEventSong: IdentifiableType {
+    var identity: Int {
+        return self.isInvalidated ? 0 : id
+    }
+}
