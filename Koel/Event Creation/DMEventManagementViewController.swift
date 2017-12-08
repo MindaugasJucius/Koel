@@ -23,7 +23,7 @@ class DMEventManagementViewController: UIViewController, BindableType {
     private let tableView: UITableView = {
         let tableView = UITableView()
         tableView.translatesAutoresizingMaskIntoConstraints = false
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        tableView.register(DMEventSongTableViewCell.self, forCellReuseIdentifier: "cell")
         return tableView
     }()
     
@@ -113,11 +113,17 @@ extension DMEventManagementViewController {
             animationConfiguration: AnimationConfiguration(insertAnimation: .top, reloadAnimation: .fade, deleteAnimation: .left),
             configureCell: { (dataSource, tableView, indexPath, element) -> UITableViewCell in
                 let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-                if let playedDate = element.played {
-                    cell.textLabel?.text = "\(element.title) played \(playedDate)"
-                } else {
-                    cell.textLabel?.text = "\(element.title) added \(element.added)"
+                
+                guard let songCell = cell as? DMEventSongTableViewCell else {
+                    return cell
                 }
+                
+                songCell.configure(withSong: element)
+//                if let playedDate = element.played {
+//                    cell.textLabel?.text = "\(element.title) played \(playedDate)"
+//                } else {
+//                    cell.textLabel?.text = "\(element.title) added \(element.added)"
+//                }
                 
                 return cell
             },

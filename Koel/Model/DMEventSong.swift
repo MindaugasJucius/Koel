@@ -32,3 +32,8 @@ extension DMEventSong: IdentifiableType {
         return self.isInvalidated ? 0 : id
     }
 }
+
+//func == (lhs: DMEventSong, rhs: DMEventSong) -> Bool {
+//    return lhs.title == rhs.title && lhs.added == lhs.added && lhs.played == lhs.played
+//}
+
