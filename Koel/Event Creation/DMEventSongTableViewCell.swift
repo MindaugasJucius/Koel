@@ -79,6 +79,12 @@ class DMEventSongTableViewCell: UITableViewCell {
             .bind(to: titleLabel.rx.text)
             .disposed(by: disposeBag)
         
+        playedObservable
+            .filterNil()
+            .map { _ in false }
+            .bind(to: upvoteButton.rx.isEnabled)
+            .disposed(by: disposeBag)
+        
         song.rx.observe(Int.self, "upvoteCount")
             .filterNil()
             .map { String($0) }
@@ -89,6 +95,7 @@ class DMEventSongTableViewCell: UITableViewCell {
     }
     
     override func prepareForReuse() {
+        upvoteButton.rx.action = nil
         disposeBag = DisposeBag()
         super.prepareForReuse()
     }

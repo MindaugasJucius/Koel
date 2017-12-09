@@ -9,6 +9,7 @@
 import Foundation
 import Action
 import RxSwift
+import RealmSwift
 
 class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
     
@@ -180,14 +181,18 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
         return songPersistenceService.songs()
             .map { results in
                 
+                let songSortDescriptors = [
+                    SortDescriptor(keyPath: "upvoteCount", ascending: false),
+                    SortDescriptor(keyPath: "added", ascending: true)
+                ]
+                
                 let queuedSongs = results
                     .filter("played == nil")
-                    .sorted(byKeyPath: "added", ascending: true)
+                    .sorted(by: songSortDescriptors)
                 
                 let playedSongs = results
                     .filter("played != nil")
                     .sorted(byKeyPath: "played", ascending: false)
-
                 
                 return [
                     SongSection(model: "queued", items: queuedSongs.toArray()),

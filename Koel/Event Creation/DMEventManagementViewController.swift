@@ -123,11 +123,6 @@ extension DMEventManagementViewController {
                     withSong: element,
                     upvoteAction: viewModel.onUpvote(song: element)
                 )
-//                if let playedDate = element.played {
-//                    cell.textLabel?.text = "\(element.title) played \(playedDate)"
-//                } else {
-//                    cell.textLabel?.text = "\(element.title) added \(element.added)"
-//                }
                 
                 return cell
             },
