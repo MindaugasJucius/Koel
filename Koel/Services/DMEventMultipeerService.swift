@@ -25,8 +25,7 @@ struct MultipeerEventContexts {
 
 class DMEventMultipeerService: NSObject {
 
-    
-    private let myEventPeer: DMEventPeer
+    private(set) var myEventPeer: DMEventPeer
     private let asEventHost: Bool
     
     private let advertiser: MCNearbyServiceAdvertiser

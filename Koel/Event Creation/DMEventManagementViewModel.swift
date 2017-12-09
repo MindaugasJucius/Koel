@@ -228,11 +228,20 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
         }
     }()
     
-    func onUpvote(song: DMEventSong) -> CocoaAction {
-        return CocoaAction {
-            return self.songPersistenceService
-                .upvote(song: song)
-                .map { _ in }
+    func observable() -> Observable<Bool> {
+        return Observable<Int>.timer(0.0, period: 5.0, scheduler: MainScheduler.instance).flatMap { int -> Observable<Bool> in
+            return Observable.just(int % 2 == 0)
         }
+    }
+    
+    func onUpvote(song: DMEventSong) -> CocoaAction {
+        return CocoaAction(
+            enabledIf: Observable.just(!song.upvoteesIDs.contains(multipeerService.myEventPeer.identity)),
+            workFactory: { [unowned self] in
+                return self.songPersistenceService
+                    .upvote(song: song, forUserID: self.multipeerService.myEventPeer.identity)
+                    .map { _ in }
+            }
+        )
     }
 }

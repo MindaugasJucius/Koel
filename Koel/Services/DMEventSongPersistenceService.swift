@@ -51,9 +51,10 @@ struct DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
     }
     
     @discardableResult
-    func upvote(song: DMEventSong) -> Observable<DMEventSong> {
+    func upvote(song: DMEventSong, forUserID userID: String) -> Observable<DMEventSong> {
         let result = withRealm("upvoting") { realm -> Observable<DMEventSong> in
             try realm.write {
+                song.upvoteesIDs.append(userID)
                 song.upvoteCount = song.upvoteCount + 1
             }
             return .just(song)

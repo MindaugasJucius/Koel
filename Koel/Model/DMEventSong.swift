@@ -8,22 +8,31 @@
 
 import Foundation
 import RealmSwift
+import Realm
 import RxDataSources
+import RxSwift
 
 typealias SongSection = AnimatableSectionModel<String, DMEventSong>
 
 @objcMembers
 class DMEventSong: Object {
     
+    private var notificationToken: NotificationToken? = nil
+    
     dynamic var id: Int = 0
     dynamic var title: String = ""
-    dynamic var upvoteCount = 0
-    
     dynamic var added: Date = Date()
     dynamic var played: Date? = nil
+    dynamic var upvoteCount: Int = 0 // can only observe value changes which are fetched from a Realm
     
+    let upvoteesIDs = List<String>()
+
     override class func primaryKey() -> String? {
         return "id"
+    }
+    
+    deinit {
+        notificationToken?.invalidate()
     }
     
 }
@@ -33,8 +42,3 @@ extension DMEventSong: IdentifiableType {
         return self.isInvalidated ? 0 : id
     }
 }
-
-//func == (lhs: DMEventSong, rhs: DMEventSong) -> Bool {
-//    return lhs.title == rhs.title && lhs.added == lhs.added && lhs.played == lhs.played
-//}
-

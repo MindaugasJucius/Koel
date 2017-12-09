@@ -10,6 +10,7 @@ import UIKit
 import RxSwift
 import RxCocoa
 import RxOptional
+import RealmSwift
 import Action
 
 class DMEventSongTableViewCell: UITableViewCell {
@@ -56,7 +57,7 @@ class DMEventSongTableViewCell: UITableViewCell {
     
     func configure(withSong song: DMEventSong, upvoteAction: CocoaAction) {
         let playedObservable = song.rx.observe(Date.self, "played")
-            .startWith(nil)
+            .share(replay: 1, scope: SubjectLifetimeScope.whileConnected)
         
         let addedObservable = song.rx.observe(Date.self, "added")
             .startWith(song.added)
@@ -79,19 +80,26 @@ class DMEventSongTableViewCell: UITableViewCell {
             .bind(to: titleLabel.rx.text)
             .disposed(by: disposeBag)
         
-        playedObservable
+        upvoteButton.rx.action = upvoteAction
+        
+        let playedUpvoteCountEnabled = playedObservable
             .filterNil()
             .map { _ in false }
-            .bind(to: upvoteButton.rx.isEnabled)
-            .disposed(by: disposeBag)
+
+        let tappedUpvoteCountEnabled = upvoteButton.rx.controlEvent(.touchUpInside)
+            .asObservable()
+            .map { false }
+
+        playedUpvoteCountEnabled
+        .amb(tappedUpvoteCountEnabled)
+        .bind(to: upvoteButton.rx.isEnabled)
+        .disposed(by: disposeBag)
         
         song.rx.observe(Int.self, "upvoteCount")
             .filterNil()
             .map { String($0) }
             .bind(to: upvoteButton.rx.title(for: .normal))
             .disposed(by: disposeBag)
-        
-        upvoteButton.rx.action = upvoteAction
     }
     
     override func prepareForReuse() {
