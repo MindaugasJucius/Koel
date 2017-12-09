@@ -45,6 +45,7 @@ class DMEventSongTableViewCell: UITableViewCell {
         contentView.addSubview(upvoteButton)
         let buttonConstraints = [
             contentView.rightAnchor.constraint(equalTo: upvoteButton.rightAnchor, constant: 5),
+            upvoteButton.leftAnchor.constraint(equalTo: titleLabel.rightAnchor, constant: 5),
             upvoteButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
         ]
         
@@ -90,8 +91,7 @@ class DMEventSongTableViewCell: UITableViewCell {
             .asObservable()
             .map { false }
 
-        playedUpvoteCountEnabled
-        .amb(tappedUpvoteCountEnabled)
+        playedUpvoteCountEnabled.amb(tappedUpvoteCountEnabled)
         .bind(to: upvoteButton.rx.isEnabled)
         .disposed(by: disposeBag)
         
