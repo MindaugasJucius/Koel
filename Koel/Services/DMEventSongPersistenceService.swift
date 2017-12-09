@@ -38,8 +38,8 @@ struct DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
     }
     
     @discardableResult
-    func played(song: DMEventSong) -> Observable<DMEventSong> {
-        let result = withRealm("toggling") { realm -> Observable<DMEventSong> in
+    func markAsPlayed(song: DMEventSong) -> Observable<DMEventSong> {
+        let result = withRealm("marking as played") { realm -> Observable<DMEventSong> in
             try realm.write {
                 if song.played == nil {
                     song.played = Date()
@@ -48,6 +48,17 @@ struct DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
             return .just(song)
         }
         return result ?? .error(DMEventSongPersistenceServiceError.toggleFailed(song))
+    }
+    
+    @discardableResult
+    func upvote(song: DMEventSong) -> Observable<DMEventSong> {
+        let result = withRealm("upvoting") { realm -> Observable<DMEventSong> in
+            try realm.write {
+                song.upvoteCount = song.upvoteCount + 1
+            }
+            return .just(song)
+        }
+        return result ?? .error(DMEventSongPersistenceServiceError.upvoteFailed(song))
     }
     
     func songs() -> Observable<Results<DMEventSong>> {

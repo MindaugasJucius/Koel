@@ -17,6 +17,7 @@ class DMEventSong: Object {
     
     dynamic var id: Int = 0
     dynamic var title: String = ""
+    dynamic var upvoteCount = 0
     
     dynamic var added: Date = Date()
     dynamic var played: Date? = nil

@@ -182,7 +182,7 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
                 
                 let queuedSongs = results
                     .filter("played == nil")
-                    .sorted(byKeyPath: "added", ascending: false)
+                    .sorted(byKeyPath: "added", ascending: true)
                 
                 let playedSongs = results
                     .filter("played != nil")
@@ -211,7 +211,7 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
     
     lazy var playedAction: Action<DMEventSong, Void> = {
         return Action(workFactory: { [unowned self] (song: DMEventSong) -> Observable<Void> in
-            return self.songPersistenceService.played(song: song).map { _ in }
+            return self.songPersistenceService.markAsPlayed(song: song).map { _ in }
         })
     }()
     
@@ -222,4 +222,12 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
                 .map { _ in }
         }
     }()
+    
+    func onUpvote(song: DMEventSong) -> CocoaAction {
+        return CocoaAction {
+            return self.songPersistenceService
+                .upvote(song: song)
+                .map { _ in }
+        }
+    }
 }

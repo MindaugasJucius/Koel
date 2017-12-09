@@ -10,15 +10,53 @@ import UIKit
 import RxSwift
 import RxCocoa
 import RxOptional
+import Action
 
 class DMEventSongTableViewCell: UITableViewCell {
 
     private var disposeBag = DisposeBag()
     
-    func configure(withSong song: DMEventSong) {
-        textLabel?.text = ""
-
-        let playedObservable = song.rx.observe(Date.self, "played").startWith(nil)
+    private let titleLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private var upvoteButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 20)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
+    override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        
+        contentView.addSubview(titleLabel)
+        let labelConstraints = [
+            titleLabel.leftAnchor.constraintEqualToSystemSpacingAfter(contentView.leftAnchor, multiplier: 0),
+            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 15),
+            contentView.bottomAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 15)
+        ]
+        
+        NSLayoutConstraint.activate(labelConstraints)
+        
+        contentView.addSubview(upvoteButton)
+        let buttonConstraints = [
+            contentView.rightAnchor.constraint(equalTo: upvoteButton.rightAnchor, constant: 5),
+            upvoteButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
+        ]
+        
+        NSLayoutConstraint.activate(buttonConstraints)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    func configure(withSong song: DMEventSong, upvoteAction: CocoaAction) {
+        let playedObservable = song.rx.observe(Date.self, "played")
+            .startWith(nil)
         
         let addedObservable = song.rx.observe(Date.self, "added")
             .startWith(song.added)
@@ -38,8 +76,16 @@ class DMEventSongTableViewCell: UITableViewCell {
                     }
                 }
             )
-            .bind(to: textLabel!.rx.text)
+            .bind(to: titleLabel.rx.text)
             .disposed(by: disposeBag)
+        
+        song.rx.observe(Int.self, "upvoteCount")
+            .filterNil()
+            .map { String($0) }
+            .bind(to: upvoteButton.rx.title(for: .normal))
+            .disposed(by: disposeBag)
+        
+        upvoteButton.rx.action = upvoteAction
     }
     
     override func prepareForReuse() {

@@ -16,7 +16,7 @@ class DMEventManagementViewController: UIViewController, BindableType {
     typealias ViewModelType = DMEventManagementViewModel
 
     private let disposeBag = DisposeBag()
-    private let tableViewDataSource = DMEventManagementViewController.dataSource()
+    private let tableViewDataSource: RxTableViewSectionedAnimatedDataSource<SongSection>
     
     var viewModel: DMEventManagementViewModel
     
@@ -45,6 +45,7 @@ class DMEventManagementViewController: UIViewController, BindableType {
     
     required init(withViewModel viewModel: DMEventManagementViewModel) {
         self.viewModel = viewModel
+        self.tableViewDataSource = DMEventManagementViewController.dataSource(withViewModel: viewModel)
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -108,7 +109,7 @@ class DMEventManagementViewController: UIViewController, BindableType {
 
 extension DMEventManagementViewController {
     
-    static func dataSource() -> RxTableViewSectionedAnimatedDataSource<SongSection> {
+    static func dataSource(withViewModel viewModel: DMEventManagementViewModel) -> RxTableViewSectionedAnimatedDataSource<SongSection> {
         return RxTableViewSectionedAnimatedDataSource<SongSection>(
             animationConfiguration: AnimationConfiguration(insertAnimation: .top, reloadAnimation: .fade, deleteAnimation: .left),
             configureCell: { (dataSource, tableView, indexPath, element) -> UITableViewCell in
@@ -118,7 +119,10 @@ extension DMEventManagementViewController {
                     return cell
                 }
                 
-                songCell.configure(withSong: element)
+                songCell.configure(
+                    withSong: element,
+                    upvoteAction: viewModel.onUpvote(song: element)
+                )
 //                if let playedDate = element.played {
 //                    cell.textLabel?.text = "\(element.title) played \(playedDate)"
 //                } else {

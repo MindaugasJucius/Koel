@@ -15,6 +15,7 @@ enum DMEventSongPersistenceServiceError: Error {
     case updateFailed(DMEventSong)
     case deletionFailed(DMEventSong)
     case toggleFailed(DMEventSong)
+    case upvoteFailed(DMEventSong)
 }
 
 protocol DMEventSongPersistenceServiceType {
@@ -23,7 +24,10 @@ protocol DMEventSongPersistenceServiceType {
     func createSong(title: String) -> Observable<DMEventSong>
     
     @discardableResult
-    func played(song: DMEventSong) -> Observable<DMEventSong>
+    func markAsPlayed(song: DMEventSong) -> Observable<DMEventSong>
+
+    @discardableResult
+    func upvote(song: DMEventSong) -> Observable<DMEventSong>
     
     func songs() -> Observable<Results<DMEventSong>>
     
