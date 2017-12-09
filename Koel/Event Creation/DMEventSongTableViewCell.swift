@@ -9,6 +9,7 @@
 import UIKit
 import RxSwift
 import RxCocoa
+import RxOptional
 
 class DMEventSongTableViewCell: UITableViewCell {
 
@@ -18,20 +19,25 @@ class DMEventSongTableViewCell: UITableViewCell {
         textLabel?.text = ""
 
         let playedObservable = song.rx.observe(Date.self, "played").startWith(nil)
-        let addedObservable = song.rx.observe(Date.self, "added").startWith(song.added)
-        let titleObservable = song.rx.observe(String.self, "title").startWith(song.title)
+        
+        let addedObservable = song.rx.observe(Date.self, "added")
+            .startWith(song.added)
+            .filterNil()
+        
+        let titleObservable = song.rx.observe(String.self, "title")
+            .startWith(song.title)
+            .filterNil()
 
         Observable.combineLatest(
             playedObservable, addedObservable, titleObservable,
             resultSelector: { played, added, title in
-                
-                if let playedDate = played {
-                    return "\(title!) played at \(playedDate)"
-                } else {
-                    return "\(title!) added at \(added!)"
+                    if let playedDate = played {
+                        return "\(title) played at \(playedDate)"
+                    } else {
+                        return "\(title) added at \(added)"
+                    }
                 }
-            }
-        )
+            )
             .bind(to: textLabel!.rx.text)
             .disposed(by: disposeBag)
     }

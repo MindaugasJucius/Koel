@@ -9,6 +9,7 @@ target 'Koel' do
     pod 'RxDataSources'
     pod 'RealmSwift'
     pod 'RxRealm'
+    pod 'RxOptional'
     pod 'Action'
     pod 'SCSiriWaveformView'
   # Pods for Koel
