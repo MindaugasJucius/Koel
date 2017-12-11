@@ -12,25 +12,14 @@ import RxSwift
 fileprivate let IdentityCacheKey = "IdentityCacheKey"
 fileprivate let EventServiceType = "song-event"
 
-struct MultipeerEventContexts {
-    
-    enum ContextKeys: String {
-        case reconnect = "reconnect"
-        case isHost = "isHost"
-    }
-    
-    static let hostDiscovery = [ContextKeys.isHost.rawValue: "true"]
-    static let participantReconnect = [ContextKeys.reconnect.rawValue: "true"]
-}
-
 class DMEventMultipeerService: NSObject {
 
     private(set) var myEventPeer: DMEventPeer
-    private let asEventHost: Bool
     
     private let advertiser: MCNearbyServiceAdvertiser
     private let browser: MCNearbyServiceBrowser
     private let session: MCSession
+    private let peerPersistenceService: DMEventPeerPersistenceServiceType
     
     private let incomingInvitations: PublishSubject<(MCPeerID, [String: Any]?, (Bool, MCSession?) -> Void)> = PublishSubject()
     
@@ -47,18 +36,27 @@ class DMEventMultipeerService: NSObject {
     
     private let receivedData: PublishSubject<(MCPeerID, Data)> = PublishSubject()
     
-    init(withDisplayName displayName: String, asEventHost eventHost: Bool) {
-        self.myEventPeer = DMEventMultipeerService.retrieveIdentity(withDisplayName: displayName, asHost: eventHost)
-        self.asEventHost = eventHost
+    init(withDisplayName displayName: String, asEventHost eventHost: Bool, peerPersistenceService: DMEventPeerPersistenceService = DMEventPeerPersistenceService()) {
+        self.peerPersistenceService = peerPersistenceService
+        
+        self.myEventPeer = DMEventMultipeerService.retrieveSelfPeer(
+            withPeerPersistenceService: peerPersistenceService,
+            withDisplayName: "gagaga",
+            asHost: eventHost
+        )
+
+        guard let peerID = self.myEventPeer.peerID else {
+            fatalError("no peer id")
+        }
         
         self.session = MCSession(
-            peer: myEventPeer.peerID,
+            peer: peerID,
             securityIdentity: nil,
             encryptionPreference: .required)
         
         self.advertiser = MCNearbyServiceAdvertiser(
             peer: self.session.myPeerID,
-            discoveryInfo: eventHost ? MultipeerEventContexts.hostDiscovery : nil,
+            discoveryInfo: eventHost ? DMEventPeerPersistenceContexts.hostDiscovery : nil,
             serviceType: EventServiceType)
         
         self.browser = MCNearbyServiceBrowser(
@@ -143,33 +141,49 @@ class DMEventMultipeerService: NSObject {
         return .just(browser.stopBrowsingForPeers())
     }
     
-    func connect(_ peer: MCPeerID, context: [String: Any]?, timeout: TimeInterval = 60) -> Observable<Void> {
+    func connect(_ peer: MCPeerID?, context: [String: Any]?, timeout: TimeInterval = 60) -> Observable<Void> {
+        
+        guard let peerID = peer else {
+            fatalError("peerID is nil")
+        }
+        
         guard let context = context,
             let data = try? JSONSerialization.data(withJSONObject: context, options: JSONSerialization.WritingOptions()) else {
-            return .just(browser.invitePeer(peer, to: self.session, withContext: nil, timeout: timeout))
+            return .just(browser.invitePeer(peerID, to: self.session, withContext: nil, timeout: timeout))
         }
     
-        return .just(browser.invitePeer(peer, to: self.session, withContext: data, timeout: timeout))
+        return .just(browser.invitePeer(peerID, to: self.session, withContext: data, timeout: timeout))
     }
     
     /// Retrieve DMEventPeer from UserDefaults if one exists, or create and store a new one
     ///
     /// - Parameter displayName: string to display to browsers
     /// - Returns: identity
-    private static func retrieveIdentity(withDisplayName displayName: String, asHost host: Bool) -> DMEventPeer {
-        if let data = UserDefaults.standard.data(forKey: IdentityCacheKey),
-            let eventPeer = NSKeyedUnarchiver.unarchiveObject(with: data) as? DMEventPeer,
-            eventPeer.peerDeviceDisplayName == displayName {
-            return eventPeer
+//    private static func retrieveIdentity(withDisplayName displayName: String, asHost host: Bool) -> DMEventPeer {
+//        if let data = UserDefaults.standard.data(forKey: IdentityCacheKey),
+//            let eventPeer = NSKeyedUnarchiver.unarchiveObject(with: data) as? DMEventPeer,
+//            eventPeer.peerDeviceDisplayName == displayName {
+//            return eventPeer
+//        }
+//
+//        let peerID = MCPeerID(displayName: displayName)
+//        let identity = DMEventPeer.init(peerID: peerID, isHost: host)
+//
+//        let identityData = NSKeyedArchiver.archivedData(withRootObject: identity)
+//        UserDefaults.standard.set(identityData, forKey: IdentityCacheKey)
+//
+//        return identity
+//    }
+    
+    static func retrieveSelfPeer(withPeerPersistenceService persistenceService: DMEventPeerPersistenceServiceType,
+                                 withDisplayName displayName: String,
+                                 asHost host: Bool) -> DMEventPeer {
+        let selfPeer = DMEventPeer.peer(withDisplayName: displayName, storeAsSelf: true, storeAsHost: host)
+        guard let storedSelfPeer = persistenceService.retrieveSelf() else {
+            return try! persistenceService.store(peer: selfPeer)
         }
-        
-        let peerID = MCPeerID(displayName: displayName)
-        let identity = DMEventPeer.init(peerID: peerID, isHost: host)
-        
-        let identityData = NSKeyedArchiver.archivedData(withRootObject: identity)
-        UserDefaults.standard.set(identityData, forKey: IdentityCacheKey)
-        
-        return identity
+
+        return storedSelfPeer
     }
     
     //MARK: - Sending
@@ -204,15 +218,23 @@ extension DMEventMultipeerService: MCNearbyServiceBrowserDelegate {
     
     func browser(_ browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String : String]?) {
         var result = nearbyPeers.value
-        let eventPeer = DMEventPeer.init(withContext: info, peerID: peerID)
-        print("foundPeer \(peerID.displayName) isHost \(eventPeer.isHost)")
-        
-        //jeigu toks peer buvo, ir dar karta rado (pvz)
-        if nearbyPeers.value.map({ $0.peerID }).index(of: peerID) == .none {
-            result = nearbyPeers.value + [eventPeer]
+
+        var peer = DMEventPeer.peer(withPeerID: peerID, context: info)
+        do {
+            let eventPeer = try peerPersistenceService.store(peer: peer)
+            peer = eventPeer
+        } catch let err {
+            print(err.localizedDescription)
         }
 
-        print("nearby peers \(result.map { $0.peerDeviceDisplayName })")
+        print("foundPeer \(peerID.displayName) isHost \(peer.isHost)")
+        
+        //jeigu toks peer buvo, ir dar karta rado (pvz)
+        if nearbyPeers.value.flatMap({ $0.peerID }).index(of: peerID) == .none {
+            result = nearbyPeers.value + [peer]
+        }
+
+        print("nearby peers \(result.map { $0.peerID?.displayName })")
         nearbyPeers.value = result
         nearbyHostPeers.onNext(result.filter { $0.isHost })
     }
@@ -276,7 +298,7 @@ extension DMEventMultipeerService: MCSessionDelegate {
                 connections.value = connections.value.filter {  $0.peerID != currentlyConnected.peerID }
             }
             
-            print("CURRxENT CONNECTIONS \(connections.value.map { $0.peerDeviceDisplayName })")
+            print("CURRxENT CONNECTIONS \(connections.value.map { $0.peerID?.displayName })")
         }
     }
     

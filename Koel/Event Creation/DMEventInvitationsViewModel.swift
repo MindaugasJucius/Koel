@@ -30,7 +30,7 @@ struct DMEventInvitationsViewModel: ViewModelType, MultipeerViewModelType {
     lazy var inviteAction: Action<(DMEventPeer), Void> = { this in
         return Action(
             workFactory: { (eventPeer: DMEventPeer) in
-                let hostContext = MultipeerEventContexts.hostDiscovery
+                let hostContext = DMEventPeerPersistenceContexts.hostDiscovery
                 return this.multipeerService.connect(eventPeer.peerID, context: hostContext)
             }
         )

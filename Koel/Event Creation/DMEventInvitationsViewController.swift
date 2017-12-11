@@ -91,7 +91,7 @@ extension DMEventInvitationsViewController {
             animationConfiguration: AnimationConfiguration(insertAnimation: .top, reloadAnimation: .fade, deleteAnimation: .left),
             configureCell: { (dataSource, tableView, indexPath, element) -> UITableViewCell in
                 let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-                cell.textLabel?.text = element.peerDeviceDisplayName
+                cell.textLabel?.text = element.peerID?.displayName
                 return cell
             },
             titleForHeaderInSection: { dataSource, sectionIndex in

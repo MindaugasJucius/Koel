@@ -17,22 +17,16 @@ typealias SongSection = AnimatableSectionModel<String, DMEventSong>
 @objcMembers
 class DMEventSong: Object {
     
-    private var notificationToken: NotificationToken? = nil
-    
     dynamic var id: Int = 0
     dynamic var title: String = ""
     dynamic var added: Date = Date()
     dynamic var played: Date? = nil
     dynamic var upvoteCount: Int = 0 // can only observe value changes which are fetched from a Realm
     
-    let upvoteesIDs = List<String>()
+    let upvoteesIDs = List<DMEventPeer>()
 
     override class func primaryKey() -> String? {
         return "id"
-    }
-    
-    deinit {
-        notificationToken?.invalidate()
     }
     
 }

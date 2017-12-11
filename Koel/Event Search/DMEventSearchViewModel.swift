@@ -25,7 +25,7 @@ class DMEventSearchViewModel: ViewModelType, MultipeerViewModelType {
         return multipeerService
             .incomingPeerInvitations()
             .map { (client, context, handler) in
-                let eventPeer = DMEventPeer.init(withContext: context as? [String : String], peerID: client)
+                let eventPeer = DMEventPeer.peer(withPeerID: client, context: context as? [String : String])
                 return (eventPeer, handler)
             }
             .filter {

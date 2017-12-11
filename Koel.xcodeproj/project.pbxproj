@@ -43,6 +43,8 @@
 		5F84FFA71FDAF0B8003332B4 /* DMEventSongPersistenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F84FFA61FDAF0B8003332B4 /* DMEventSongPersistenceService.swift */; };
 		5F84FFA91FDAF69E003332B4 /* DMEventSongPersistenceServiceType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F84FFA81FDAF69E003332B4 /* DMEventSongPersistenceServiceType.swift */; };
 		5F84FFAC1FDB33F3003332B4 /* DMEventSongTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F84FFAB1FDB33F3003332B4 /* DMEventSongTableViewCell.swift */; };
+		5F84FFAE1FDC2F3F003332B4 /* DMEventPeerPersistenceServiceType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F84FFAD1FDC2F3F003332B4 /* DMEventPeerPersistenceServiceType.swift */; };
+		5F84FFB01FDC3AB0003332B4 /* DMEventPeerPersistenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F84FFAF1FDC3AB0003332B4 /* DMEventPeerPersistenceService.swift */; };
 		5FA42B5C1FD6E6F600578EF5 /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FA42B5B1FD6E6F600578EF5 /* Notifications.swift */; };
 		5FDEB6BA1F99235500070930 /* DMInitialLoadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FDEB6B81F99235500070930 /* DMInitialLoadingViewController.swift */; };
 		5FDEB6BB1F99235500070930 /* DMInitialLoadingViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5FDEB6B91F99235500070930 /* DMInitialLoadingViewController.xib */; };
@@ -101,6 +103,8 @@
 		5F84FFA61FDAF0B8003332B4 /* DMEventSongPersistenceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventSongPersistenceService.swift; sourceTree = "<group>"; };
 		5F84FFA81FDAF69E003332B4 /* DMEventSongPersistenceServiceType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DMEventSongPersistenceServiceType.swift; sourceTree = "<group>"; };
 		5F84FFAB1FDB33F3003332B4 /* DMEventSongTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventSongTableViewCell.swift; sourceTree = "<group>"; };
+		5F84FFAD1FDC2F3F003332B4 /* DMEventPeerPersistenceServiceType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventPeerPersistenceServiceType.swift; sourceTree = "<group>"; };
+		5F84FFAF1FDC3AB0003332B4 /* DMEventPeerPersistenceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventPeerPersistenceService.swift; sourceTree = "<group>"; };
 		5FA42B5B1FD6E6F600578EF5 /* Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
 		5FDEB6B81F99235500070930 /* DMInitialLoadingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMInitialLoadingViewController.swift; sourceTree = "<group>"; };
 		5FDEB6B91F99235500070930 /* DMInitialLoadingViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DMInitialLoadingViewController.xib; sourceTree = "<group>"; };
@@ -219,6 +223,8 @@
 				5F84FFA81FDAF69E003332B4 /* DMEventSongPersistenceServiceType.swift */,
 				5F84FFA61FDAF0B8003332B4 /* DMEventSongPersistenceService.swift */,
 				5F601D3A1FD043DC003DE897 /* DMEventMultipeerService.swift */,
+				5F84FFAD1FDC2F3F003332B4 /* DMEventPeerPersistenceServiceType.swift */,
+				5F84FFAF1FDC3AB0003332B4 /* DMEventPeerPersistenceService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -554,6 +560,7 @@
 				5F601D3D1FD04851003DE897 /* DMEventInvitationsViewModel.swift in Sources */,
 				5F47B8361FD4064C0053A0A5 /* DMFlowSelectionViewController.swift in Sources */,
 				5F84FFA71FDAF0B8003332B4 /* DMEventSongPersistenceService.swift in Sources */,
+				5F84FFAE1FDC2F3F003332B4 /* DMEventPeerPersistenceServiceType.swift in Sources */,
 				5F84FF9F1FD98477003332B4 /* BackgroundDisconnectType.swift in Sources */,
 				5F47B8391FD406FB0053A0A5 /* DMFlowSelectionViewModel.swift in Sources */,
 				5F58F0311F9CB793006B9B47 /* UIViewController+Extensions.swift in Sources */,
@@ -568,6 +575,7 @@
 				5F81861A1FD3FA6800477C71 /* SceneCoordinatorType.swift in Sources */,
 				5F8186161FD3F62000477C71 /* Scene.swift in Sources */,
 				5FDEB6BA1F99235500070930 /* DMInitialLoadingViewController.swift in Sources */,
+				5F84FFB01FDC3AB0003332B4 /* DMEventPeerPersistenceService.swift in Sources */,
 				5F84FFA91FDAF69E003332B4 /* DMEventSongPersistenceServiceType.swift in Sources */,
 				5F8186141FD2ADA800477C71 /* DMEventPeer.swift in Sources */,
 				5F01EBF81F8FD28400E47E6A /* AppDelegate.swift in Sources */,

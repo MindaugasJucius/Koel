@@ -62,11 +62,15 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
             .map { (client, context, handler) in
                 
                 guard let contextDictionary = context else {
-                    return (DMEventPeer.init(withContext: nil, peerID: client), handler, false)
+                    return (DMEventPeer.peer(withPeerID: client, context: nil), handler, false)
                 }
                 
-                let isReconnect = contextDictionary[MultipeerEventContexts.ContextKeys.reconnect.rawValue] != nil
-                let eventPeer = DMEventPeer.init(withContext: contextDictionary as? [String : String], peerID: client)
+                let reconnectKey = DMEventPeerPersistenceContexts.ContextKeys.reconnect.rawValue
+                let isReconnect = contextDictionary[reconnectKey] != nil
+                let eventPeer = DMEventPeer.peer(
+                    withPeerID: client,
+                    context: contextDictionary as? [String : String]
+                )
                 
                 return (eventPeer, handler, isReconnect)
             }
@@ -86,7 +90,7 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
                 let nearbyPeers = peersWithoutHosts.filter { !$0.isConnected }
                 
                 print("CONNECTION OBSERVABLES RESULTS:")
-                print(results.map { return "\($0.peerDeviceDisplayName) \($0.isConnected)" })
+                print(results.map { return "\(String(describing: $0.peerID?.displayName)) \($0.isConnected)" })
                 
                 return [
                     EventPeerSection(model: "Joined", items: connectedPeers),
@@ -119,7 +123,7 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
     private func setupConnectionObservables() {
         incommingParticipantInvitations
             .subscribe(onNext: { [unowned self] invitation in
-                let alert = UIAlertController(title: "Connection request", message: "\(invitation.0.peerDeviceDisplayName) wants to join your party", preferredStyle: .alert)
+                let alert = UIAlertController(title: "Connection request", message: "\(invitation.0.peerID?.displayName) wants to join your party", preferredStyle: .alert)
                 let connectAction = UIAlertAction(title: "Yes", style: UIAlertActionStyle.default, handler: { action in
                     let invitationHandler = invitation.1
                     invitationHandler(true)
@@ -236,10 +240,10 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
     
     func onUpvote(song: DMEventSong) -> CocoaAction {
         return CocoaAction(
-            enabledIf: Observable.just(!song.upvoteesIDs.contains(multipeerService.myEventPeer.identity)),
+            enabledIf: Observable.just(!song.upvoteesIDs.contains(multipeerService.myEventPeer)),
             workFactory: { [unowned self] in
                 return self.songPersistenceService
-                    .upvote(song: song, forUserID: self.multipeerService.myEventPeer.identity)
+                    .upvote(song: song, forUser: self.multipeerService.myEventPeer)
                     .map { _ in }
             }
         )

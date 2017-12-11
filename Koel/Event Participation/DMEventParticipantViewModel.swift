@@ -29,7 +29,7 @@ struct DMEventParticipantViewModel: MultipeerViewModelType {
     
     private var hostNearby: Observable<Bool> {
         return multipeerService.nearbyFoundHostPeers().map { peers in
-            print("hostNearby observable \(peers.map { $0.peerDeviceDisplayName })")
+            print("hostNearby observable \(peers.map { $0.peerID?.displayName })")
             return peers.filter { $0.peerID == self.host.peerID }.count == 1
         }
     }
@@ -38,7 +38,7 @@ struct DMEventParticipantViewModel: MultipeerViewModelType {
         return multipeerService
             .incomingPeerInvitations()
             .filter { (client, context, handler) in
-                let eventPeer = DMEventPeer.init(withContext: context as? [String : String], peerID: client)
+                let eventPeer = DMEventPeer.peer(withPeerID: client, context: context as? [String : String])
                 return eventPeer.isHost && eventPeer.peerID == self.host.peerID
             }
             .map { (_, _, handler) in
@@ -58,8 +58,8 @@ struct DMEventParticipantViewModel: MultipeerViewModelType {
     lazy var requestReconnect: Action<(DMEventPeer), Void> = { this in
         return Action(
             workFactory: { (eventPeer: DMEventPeer) in
-                print("requesting reconnection for \(eventPeer.peerDeviceDisplayName)")
-                let reconnectContext = MultipeerEventContexts.participantReconnect
+                print("requesting reconnection for \(eventPeer.peerID?.displayName)")
+                let reconnectContext = DMEventPeerPersistenceContexts.participantReconnect
                 return this.multipeerService.connect(eventPeer.peerID, context: reconnectContext)
             }
         )

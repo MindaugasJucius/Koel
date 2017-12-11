@@ -52,7 +52,7 @@ class DMEventSearchViewController: UIViewController, BindableType {
     func bindViewModel() {
         viewModel.incommingInvitations
             .subscribe(onNext: { invitation in
-                let alert = UIAlertController(title: "Connection request", message: "connect to \(invitation.0.peerDeviceDisplayName)?", preferredStyle: .alert)
+                let alert = UIAlertController(title: "Connection request", message: "connect to \(invitation.0.peerID?.displayName)?", preferredStyle: .alert)
                 let connectAction = UIAlertAction(title: "Yes", style: UIAlertActionStyle.default, handler: { action in
                     let invitationHandler = invitation.1
                     invitationHandler(true)
@@ -65,7 +65,7 @@ class DMEventSearchViewController: UIViewController, BindableType {
         viewModel.hosts
             .bind(to: tableView.rx.items) { (tableView: UITableView, index: Int, element: DMEventPeer) in
                 let cell = UITableViewCell(style: .default, reuseIdentifier: "cell")
-                cell.textLabel?.text = element.peerDeviceDisplayName
+                cell.textLabel?.text = element.peerID?.displayName
                 return cell
             }
             .disposed(by: bag)
