@@ -45,6 +45,7 @@
 		5F84FFAC1FDB33F3003332B4 /* DMEventSongTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F84FFAB1FDB33F3003332B4 /* DMEventSongTableViewCell.swift */; };
 		5F84FFAE1FDC2F3F003332B4 /* DMEventPeerPersistenceServiceType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F84FFAD1FDC2F3F003332B4 /* DMEventPeerPersistenceServiceType.swift */; };
 		5F84FFB01FDC3AB0003332B4 /* DMEventPeerPersistenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F84FFAF1FDC3AB0003332B4 /* DMEventPeerPersistenceService.swift */; };
+		5F9C2D231FDED1970067BDC4 /* KoelButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F9C2D221FDED1970067BDC4 /* KoelButton.swift */; };
 		5FA42B5C1FD6E6F600578EF5 /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FA42B5B1FD6E6F600578EF5 /* Notifications.swift */; };
 		5FDEB6BA1F99235500070930 /* DMInitialLoadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FDEB6B81F99235500070930 /* DMInitialLoadingViewController.swift */; };
 		5FDEB6BB1F99235500070930 /* DMInitialLoadingViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5FDEB6B91F99235500070930 /* DMInitialLoadingViewController.xib */; };
@@ -105,6 +106,7 @@
 		5F84FFAB1FDB33F3003332B4 /* DMEventSongTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventSongTableViewCell.swift; sourceTree = "<group>"; };
 		5F84FFAD1FDC2F3F003332B4 /* DMEventPeerPersistenceServiceType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventPeerPersistenceServiceType.swift; sourceTree = "<group>"; };
 		5F84FFAF1FDC3AB0003332B4 /* DMEventPeerPersistenceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventPeerPersistenceService.swift; sourceTree = "<group>"; };
+		5F9C2D221FDED1970067BDC4 /* KoelButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KoelButton.swift; sourceTree = "<group>"; };
 		5FA42B5B1FD6E6F600578EF5 /* Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
 		5FDEB6B81F99235500070930 /* DMInitialLoadingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMInitialLoadingViewController.swift; sourceTree = "<group>"; };
 		5FDEB6B91F99235500070930 /* DMInitialLoadingViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DMInitialLoadingViewController.xib; sourceTree = "<group>"; };
@@ -185,6 +187,7 @@
 				5F01EBFE1F8FD28400E47E6A /* Assets.xcassets */,
 				5F01EC001F8FD28400E47E6A /* LaunchScreen.storyboard */,
 				5F01EC031F8FD28400E47E6A /* Info.plist */,
+				5F9C2D221FDED1970067BDC4 /* KoelButton.swift */,
 			);
 			path = Koel;
 			sourceTree = "<group>";
@@ -551,6 +554,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5F84FF9A1FD86350003332B4 /* DMEventManagementViewModel.swift in Sources */,
+				5F9C2D231FDED1970067BDC4 /* KoelButton.swift in Sources */,
 				5FA42B5C1FD6E6F600578EF5 /* Notifications.swift in Sources */,
 				5F84FFA31FDAEC82003332B4 /* DMEventSong.swift in Sources */,
 				5F8186121FBB6EDB00477C71 /* DMKoelLogoView.swift in Sources */,
