@@ -27,16 +27,11 @@ struct DMEventPeerPersistenceService: DMEventPeerPersistenceServiceType {
     @discardableResult
     func store(peer: DMEventPeer) throws -> DMEventPeer {
         let result = withRealm("creating peer") { realm -> DMEventPeer in
-//            let peer = DMEventPeer()
-//            
-//            let peerID = MCPeerID(displayName: displayName)
-//            
-//            peer.peerIDData = NSKeyedArchiver.archivedData(withRootObject: peerID)
-//            peer.isSelf = storeAsSelf
-//            peer.isHost = storeAsHost
-//            
             try realm.write {
                 peer.id = (realm.objects(DMEventPeer.self).max(ofProperty: "id") ?? 0) + 1
+                if let peerID = peer.peerID {
+                    peer.peerIDData = NSKeyedArchiver.archivedData(withRootObject: peerID)
+                }
                 realm.add(peer)
             }
             return peer
@@ -56,7 +51,6 @@ struct DMEventPeerPersistenceService: DMEventPeerPersistenceServiceType {
     @discardableResult
     func retrieveHost() -> DMEventPeer? {
         let result = withRealm("getting host peer") { realm -> DMEventPeer? in
-            let realm = try Realm()
             let selfPeer = realm.objects(DMEventPeer.self).filter("isHost == YES").first
             return selfPeer
         }
@@ -66,8 +60,14 @@ struct DMEventPeerPersistenceService: DMEventPeerPersistenceServiceType {
     @discardableResult
     func retrieveSelf() -> DMEventPeer? {
         let result = withRealm("getting self peer") { realm -> DMEventPeer? in
-            let realm = try Realm()
             let selfPeer = realm.objects(DMEventPeer.self).filter("isSelf == true").first
+            if let peerIDData = selfPeer?.peerIDData {
+                selfPeer?.peerID = NSKeyedUnarchiver.unarchiveObject(with: peerIDData) as? MCPeerID
+            }
+
+            print(selfPeer?.peerID)
+            print(selfPeer?.peerIDData)
+            print(selfPeer?.isSelf)
             return selfPeer
         }
         return result ?? nil
@@ -75,9 +75,8 @@ struct DMEventPeerPersistenceService: DMEventPeerPersistenceServiceType {
     
     func peers() -> Observable<Results<DMEventPeer>> {
         let result = withRealm("getting all peers") { realm -> Observable<Results<DMEventPeer>> in
-            let realm = try Realm()
-            let songs = realm.objects(DMEventPeer.self).filter("isSelf == NO")
-            return Observable.collection(from: songs)
+            let peers = realm.objects(DMEventPeer.self).filter("isSelf == NO")
+            return Observable.collection(from: peers)
         }
         return result ?? .empty()
     }

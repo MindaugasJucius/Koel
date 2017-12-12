@@ -39,11 +39,16 @@ class DMEventMultipeerService: NSObject {
     init(withDisplayName displayName: String, asEventHost eventHost: Bool, peerPersistenceService: DMEventPeerPersistenceService = DMEventPeerPersistenceService()) {
         self.peerPersistenceService = peerPersistenceService
         
-        self.myEventPeer = DMEventMultipeerService.retrieveSelfPeer(
-            withPeerPersistenceService: peerPersistenceService,
-            withDisplayName: "gagaga",
-            asHost: eventHost
-        )
+        if let selfPeer = DMEventMultipeerService.retrieveSelfPeer(withPeerPersistenceService: peerPersistenceService) {
+            self.myEventPeer = selfPeer
+        } else {
+            let newlyStoredPeer = DMEventMultipeerService.storeSelfPeer(
+                withPeerPersistenceService: peerPersistenceService,
+                withDisplayName: "neenenene", asHost:
+                eventHost
+            )
+            self.myEventPeer = newlyStoredPeer
+        }
 
         guard let peerID = self.myEventPeer.peerID else {
             fatalError("no peer id")
@@ -159,31 +164,21 @@ class DMEventMultipeerService: NSObject {
     ///
     /// - Parameter displayName: string to display to browsers
     /// - Returns: identity
-//    private static func retrieveIdentity(withDisplayName displayName: String, asHost host: Bool) -> DMEventPeer {
-//        if let data = UserDefaults.standard.data(forKey: IdentityCacheKey),
-//            let eventPeer = NSKeyedUnarchiver.unarchiveObject(with: data) as? DMEventPeer,
-//            eventPeer.peerDeviceDisplayName == displayName {
-//            return eventPeer
-//        }
-//
-//        let peerID = MCPeerID(displayName: displayName)
-//        let identity = DMEventPeer.init(peerID: peerID, isHost: host)
-//
-//        let identityData = NSKeyedArchiver.archivedData(withRootObject: identity)
-//        UserDefaults.standard.set(identityData, forKey: IdentityCacheKey)
-//
-//        return identity
-//    }
-    
-    static func retrieveSelfPeer(withPeerPersistenceService persistenceService: DMEventPeerPersistenceServiceType,
-                                 withDisplayName displayName: String,
-                                 asHost host: Bool) -> DMEventPeer {
-        let selfPeer = DMEventPeer.peer(withDisplayName: displayName, storeAsSelf: true, storeAsHost: host)
+    static func retrieveSelfPeer(withPeerPersistenceService persistenceService: DMEventPeerPersistenceServiceType) -> DMEventPeer? {
+        
         guard let storedSelfPeer = persistenceService.retrieveSelf() else {
-            return try! persistenceService.store(peer: selfPeer)
+            return nil
         }
 
         return storedSelfPeer
+    }
+    
+    static func storeSelfPeer(withPeerPersistenceService persistenceService: DMEventPeerPersistenceServiceType,
+                              withDisplayName displayName: String,
+                              asHost host: Bool) -> DMEventPeer {
+        let selfPeer = DMEventPeer.peer(withDisplayName: displayName, storeAsSelf: true, storeAsHost: host)
+        try! persistenceService.store(peer: selfPeer)
+        return selfPeer
     }
     
     //MARK: - Sending

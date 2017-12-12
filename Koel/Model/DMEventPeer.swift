@@ -28,18 +28,9 @@ class DMEventPeer: Object {
     dynamic var isHost: Bool = false
     dynamic var isConnected: Bool = false
     dynamic var isSelf: Bool = false
+    dynamic var peerIDData: Data? = nil
     
-    var peerID: MCPeerID? = nil {
-        didSet {
-            guard let `peerID` = peerID else {
-                return
-            }
-            //peerIDData = NSKeyedArchiver.archivedData(withRootObject: peerID)
-        }
-    }
-    
-    //dynamic var peerIDData: Data? = nil
-    //peerID = NSKeyedUnarchiver.unarchiveObject(with: peerIDData) as? MCPeerID
+    var peerID: MCPeerID? = nil
     
     override static func ignoredProperties() -> [String] {
         return ["peerID"]
@@ -48,62 +39,6 @@ class DMEventPeer: Object {
     override class func primaryKey() -> String? {
         return "id"
     }
-    
-//    var peerID: MCPeerID {
-//        get {
-//            guard let data = peerIDData else { return <#return value#> }
-//            NSKeyedUnarchiver.unarchiveObject(with: peerIDData) as? DMEventPeer
-//        }
-//        set {
-//            peerIDData = NSKeyedArchiver.archivedData(withRootObject: newValue)
-//        }
-//    }
-    
-//    var connected: Bool {
-//        return isSelf ? true : isConnected
-//    }
-    
-//    var peerDeviceDisplayName: String {
-//        return peerID.displayName
-//    }
-    
-//    init(fullName: String? = nil, peerID: MCPeerID, isHost: Bool = false, isConnected: Bool = false) {
-//        self.fullName = fullName
-//        self.peerID = peerID
-//        self.isHost = isHost
-//        self.isConnected = isConnected
-//        self.uuid = UUID.init().uuidString
-//    }
-    
-//    convenience init(withContext context: [String: String]?, peerID: MCPeerID)
-//    {
-//        guard let contextDict = context else {
-//            self.init(peerID: peerID)
-//            return
-//        }
-//        let fullName = contextDict[Peer.fullName.rawValue]
-//        let isHost = contextDict[Peer.isHost.rawValue]
-//        self.init(fullName: fullName, peerID: peerID, isHost: isHost != .none)
-//    }
-    
-//    func encode(with aCoder: NSCoder) {
-//        aCoder.encode(fullName, forKey: Peer.fullName.rawValue)
-//        aCoder.encode(peerID, forKey: Peer.peerID.rawValue)
-//        aCoder.encode(uuid, forKey: Peer.uuid.rawValue)
-//        aCoder.encode(isHost, forKey: Peer.isHost.rawValue)
-//    }
-//
-//    required init?(coder aDecoder: NSCoder) {
-//        self.fullName = aDecoder.decodeObject(forKey: Peer.fullName.rawValue) as? String
-//        guard let peerID = aDecoder.decodeObject(forKey: Peer.peerID.rawValue) as? MCPeerID,
-//            let uuid = aDecoder.decodeObject(forKey: Peer.uuid.rawValue) as? String else {
-//            fatalError("failed to deserialize")
-//        }
-//        self.isConnected = false
-//        self.peerID = peerID
-//        self.uuid = uuid
-//        self.isHost = aDecoder.decodeBool(forKey: Peer.isHost.rawValue)
-//    }
     
 }
 
