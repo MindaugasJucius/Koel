@@ -112,7 +112,6 @@ class DMKoelButton: UIButton {
     private func initialConfiguration() {
         translatesAutoresizingMaskIntoConstraints = false
         titleLabel?.font = UIFont(name: "AvenirNext-Medium", size: 15)
-        setTitle("ADD A SONG", for: .normal)
         setTitleColor(startAppearance.textColor, for: .normal)
         setTitleColor(endAppearance.textColor, for: .highlighted)
         

@@ -55,6 +55,7 @@ class DMFlowSelectionViewController: UIViewController, BindableType {
         
         view.addSubview(koelButton)
         koelButton.addConstraints(inSuperview: view)
+        koelButton.setTitle(UIConstants.strings.addSongButton, for: .normal)
         
         view.backgroundColor = .white
         stackView.addArrangedSubview(createButton)

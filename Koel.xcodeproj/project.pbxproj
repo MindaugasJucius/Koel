@@ -38,6 +38,7 @@
 		5F82620D1FDFFE50001E4423 /* Style.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F82620C1FDFFE50001E4423 /* Style.swift */; };
 		5F82620F1FDFFFE3001E4423 /* Stylesheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F82620E1FDFFFE3001E4423 /* Stylesheet.swift */; };
 		5F8262111FE0035B001E4423 /* UIConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F8262101FE0035B001E4423 /* UIConstants.swift */; };
+		5F8262141FE00815001E4423 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5F8262161FE00815001E4423 /* Localizable.strings */; };
 		5F84FF9A1FD86350003332B4 /* DMEventManagementViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F84FF991FD86350003332B4 /* DMEventManagementViewModel.swift */; };
 		5F84FF9C1FD86367003332B4 /* DMEventManagementViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F84FF9B1FD86367003332B4 /* DMEventManagementViewController.swift */; };
 		5F84FF9F1FD98477003332B4 /* BackgroundDisconnectType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F84FF9E1FD98477003332B4 /* BackgroundDisconnectType.swift */; };
@@ -102,6 +103,7 @@
 		5F82620C1FDFFE50001E4423 /* Style.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Style.swift; sourceTree = "<group>"; };
 		5F82620E1FDFFFE3001E4423 /* Stylesheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stylesheet.swift; sourceTree = "<group>"; };
 		5F8262101FE0035B001E4423 /* UIConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIConstants.swift; sourceTree = "<group>"; };
+		5F8262151FE00815001E4423 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		5F84FF991FD86350003332B4 /* DMEventManagementViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventManagementViewModel.swift; sourceTree = "<group>"; };
 		5F84FF9B1FD86367003332B4 /* DMEventManagementViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventManagementViewController.swift; sourceTree = "<group>"; };
 		5F84FF9E1FD98477003332B4 /* BackgroundDisconnectType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundDisconnectType.swift; sourceTree = "<group>"; };
@@ -188,6 +190,7 @@
 				5FDEB6B11F97C02C00070930 /* Event Creation */,
 				5F01EC1E1F9256CB00E47E6A /* Services */,
 				5F01EC1B1F8FD89600E47E6A /* Model */,
+				5F8262161FE00815001E4423 /* Localizable.strings */,
 				5F01EC171F8FD2A600E47E6A /* Koel.entitlements */,
 				5F01EBF71F8FD28400E47E6A /* AppDelegate.swift */,
 				5FA42B5B1FD6E6F600578EF5 /* Notifications.swift */,
@@ -439,6 +442,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5F01EC021F8FD28400E47E6A /* LaunchScreen.storyboard in Resources */,
+				5F8262141FE00815001E4423 /* Localizable.strings in Resources */,
 				5F01EBFF1F8FD28400E47E6A /* Assets.xcassets in Resources */,
 				5FDEB6BB1F99235500070930 /* DMInitialLoadingViewController.xib in Resources */,
 			);
@@ -644,6 +648,14 @@
 				5F01EC011F8FD28400E47E6A /* Base */,
 			);
 			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		5F8262161FE00815001E4423 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				5F8262151FE00815001E4423 /* en */,
+			);
+			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

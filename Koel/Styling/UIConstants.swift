@@ -22,7 +22,10 @@ struct UIConstants {
             static let gradientStartColor = UIColor.colorWithHexString(hex: "00dbde").cgColor
             static let gradientEndColor = UIColor.colorWithHexString(hex: "fc00ff").cgColor
         }
-        
+    }
+    
+    struct strings {
+        static let addSongButton = NSLocalizedString("ADD_SONG_BUTTON", comment: "")
     }
     
 }
