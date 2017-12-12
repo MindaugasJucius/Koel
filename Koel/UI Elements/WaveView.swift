@@ -6,27 +6,7 @@ import Foundation
 import SCSiriWaveformView
 import UIKit
 
-struct UIConstants {
-
-    struct colors {
-        static let focusLightBlue = UIColor(rgb: 0x00A7E0)
-        static let focusDarkBlue = UIColor(rgb: 0x005DA5)
-        static let focusBlue = UIColor(rgb: 0x00A7E0)
-        static let focusGreen = UIColor(rgb: 0x7ED321)
-        static let focusMaroon = UIColor(rgb: 0xE63D2F)
-        static let focusOrange = UIColor(rgb: 0xF26C23)
-        static let focusRed = UIColor(rgb: 0xE63D2F)
-        static let focusViolet = UIColor(rgb: 0x95368C)
-    }
-
-}
-
 private let ActiveInactiveTransitionStep: CGFloat = 0.05
-private let ColorTransitionStep: Float = 0.002
-private let PrimaryWaveActiveColors = [UIConstants.colors.focusOrange, UIConstants.colors.focusRed, UIConstants.colors.focusViolet, UIConstants.colors.focusLightBlue, UIConstants.colors.focusViolet, UIConstants.colors.focusRed]
-private let PrimaryWaveColorCount = PrimaryWaveActiveColors.count
-private let PrimaryWaveInactiveColor = UIColor.gray
-private let SecondaryWaveColor = UIColor.gray
 private let WaveLevel: CGFloat = 0.8
 private let PrimaryWaveFrequency: CGFloat = 1.2
 private let SecondaryWaveFrequency: CGFloat = 0.8
@@ -47,9 +27,7 @@ class WaveView: UIView {
         backWaveView.backgroundColor = UIColor.clear
         backWaveView.phaseShift = -0.022
         backWaveView.primaryWaveLineWidth = 1
-        //backWaveView.primaryWaveColor = PrimaryWaveInactiveColor
         backWaveView.secondaryWaveLineWidth = 0.5
-        //backWaveView.secondaryWaveColor = UIColor.darkGray
         backWaveView.update(withLevel: 0)
         addSubview(backWaveView)
 
@@ -57,9 +35,7 @@ class WaveView: UIView {
         frontWaveView.backgroundColor = UIColor.clear
         frontWaveView.phaseShift = -0.02
         frontWaveView.primaryWaveLineWidth = 2
-        //frontWaveView.primaryWaveColor = PrimaryWaveInactiveColor
         frontWaveView.secondaryWaveLineWidth = 0.5
-        //frontWaveView.secondaryWaveColor = SecondaryWaveColor
         frontWaveView.update(withLevel: 0)
         addSubview(frontWaveView)
 
@@ -88,23 +64,13 @@ class WaveView: UIView {
     }
 
     @objc func displayLink(_ sender: CADisplayLink) {
-        colorLerp = (colorLerp + ColorTransitionStep).truncatingRemainder(dividingBy: Float(PrimaryWaveColorCount))
-        let colorIndex = Int(colorLerp)
-        let lerp = CGFloat(colorLerp - Float(colorIndex))
-        let fromColor = PrimaryWaveActiveColors[colorIndex]
-        let toColor = PrimaryWaveActiveColors[(colorIndex + 1) % PrimaryWaveColorCount]
-//        let currentColor = fromColor.lerp(toColor: toColor, step: lerp)
-
         if active && waveLevel < WaveLevel {
             waveLevel += ActiveInactiveTransitionStep
-            //frontWaveView.primaryWaveColor = PrimaryWaveInactiveColor.lerp(toColor: currentColor, step: waveLevel / WaveLevel)
+
         } else if !active && waveLevel > 0 {
             waveLevel -= ActiveInactiveTransitionStep
-            //frontWaveView.primaryWaveColor = currentColor.lerp(toColor: PrimaryWaveInactiveColor, step: (WaveLevel - waveLevel) / WaveLevel)
-        } else if active {
-            //frontWaveView.primaryWaveColor = currentColor
         }
-
+        
         backWaveView.update(withLevel: waveLevel - 0.1)
         frontWaveView.update(withLevel: waveLevel)
     }

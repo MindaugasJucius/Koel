@@ -9,13 +9,6 @@
 import UIKit
 
 private let SinusWaveMaxHeight: CGFloat = 200
-private let PrimaryKoelBlue = UIColor.colorWithHexString(hex: "19B5FE")
-
-private let FirstScaleLayerColor = PrimaryKoelBlue.withAlphaComponent(0.4).cgColor
-private let SecondScaleLayerColor = PrimaryKoelBlue.withAlphaComponent(0.6).cgColor
-
-private let GradientStartColor = UIColor.colorWithHexString(hex: "#00dbde").cgColor
-private let GradientEndColor = UIColor.colorWithHexString(hex: "#fc00ff").cgColor
 
 class DMKoelLogoView: UIView {
 
@@ -27,19 +20,22 @@ class DMKoelLogoView: UIView {
     
     let firstScaleLayerContainer: CALayer = {
         let ovalLayer = CALayer()
-        ovalLayer.backgroundColor = FirstScaleLayerColor
+        ovalLayer.backgroundColor = UIConstants.colors.logoView.firstScaleLayerColor
         return ovalLayer
     }()
     
     let secondScaleLayerContainer: CALayer = {
         let ovalLayer = CALayer()
-        ovalLayer.backgroundColor = SecondScaleLayerColor
+        ovalLayer.backgroundColor = UIConstants.colors.logoView.secondScaleLayerColor
         return ovalLayer
     }()
     
     let gradientLayer: CAGradientLayer = {
         let gradientLayer = CAGradientLayer()
-        gradientLayer.colors = [GradientStartColor, GradientEndColor]
+        gradientLayer.colors = [
+                                UIConstants.colors.logoView.gradientStartColor,
+                                UIConstants.colors.logoView.gradientEndColor
+                               ]
         gradientLayer.startPoint = CGPoint(x: 0, y: 0)
         gradientLayer.endPoint = CGPoint(x: 1, y: 1)
         return gradientLayer

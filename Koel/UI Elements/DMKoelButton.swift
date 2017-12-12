@@ -8,8 +8,6 @@
 
 import UIKit
 
-let revolutPink = UIColor(red: 235/255, green: 2/255, blue: 141/255, alpha: 1)
-
 protocol KoelButtonAppearance {
     var transform: CATransform3D { get }
     var shadowOffset: CGSize { get }
@@ -37,10 +35,10 @@ struct KoelButtonStartAppearance: KoelButtonAppearance {
         shadowOffset = CGSize(width: 0, height: 8)
         shadowOpacity = 0.4
         shadowRadius = 5
-        backgroundColor = revolutPink
+        backgroundColor = UIConstants.colors.primaryKoelPink
         textColor = .white
         dimmingViewOpacity = 0
-        shadowColor = revolutPink.cgColor
+        shadowColor = UIConstants.colors.primaryKoelPink.cgColor
     }
 }
 
@@ -59,10 +57,10 @@ struct KoelButtonEndAppearance: KoelButtonAppearance {
         shadowOffset = CGSize(width: 0, height: 6)
         shadowOpacity = 0.5
         shadowRadius = 3
-        backgroundColor = revolutPink
+        backgroundColor = UIConstants.colors.primaryKoelPink
         textColor = .white
         dimmingViewOpacity = 0.5
-        shadowColor = revolutPink.cgColor
+        shadowColor = UIConstants.colors.primaryKoelPink.cgColor
     }
 }
 
@@ -81,17 +79,18 @@ class DMKoelButton: UIButton {
     private lazy var dimmingView: UIView = { this in
         let view = UIView(frame: .zero)
         this.addSubview(view)
-        
         view.layer.cornerRadius = CornerRadius
         view.isUserInteractionEnabled = false
         view.translatesAutoresizingMaskIntoConstraints = false
+        
         let constraints = [
-            view.leftAnchor.constraint(equalTo: this.leftAnchor),
-            view.topAnchor.constraint(equalTo: this.topAnchor),
-            this.rightAnchor.constraint(equalTo: view.rightAnchor),
-            this.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+             view.leftAnchor.constraint(equalTo: this.leftAnchor),
+             view.topAnchor.constraint(equalTo: this.topAnchor),
+             this.rightAnchor.constraint(equalTo: view.rightAnchor),
+             this.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             ]
         NSLayoutConstraint.activate(constraints)
+        
         return view
     }(self)
     
