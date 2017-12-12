@@ -51,6 +51,11 @@ class DMFlowSelectionViewController: UIViewController, BindableType {
         super.viewDidLoad()
         title = "wt u wn do rn?"
         
+        let koelButton = DMKoelButton()
+        
+        view.addSubview(koelButton)
+        koelButton.addConstraints(inSuperview: view)
+        
         view.backgroundColor = .white
         stackView.addArrangedSubview(createButton)
         stackView.addArrangedSubview(searchButton)

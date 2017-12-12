@@ -60,13 +60,18 @@ struct KoelButtonEndAppearance: KoelButtonAppearance {
         shadowOpacity = 0.5
         shadowRadius = 3
         backgroundColor = revolutPink
-        textColor = UIColor.white.withAlphaComponent(0.3)
+        textColor = .white
         dimmingViewOpacity = 0.5
         shadowColor = revolutPink.cgColor
     }
 }
 
-class KoelButton: UIButton {
+private let AnimationDuration = 0.2
+private let CornerRadius: CGFloat = 25
+private let Insets = UIEdgeInsets(top: 0, left: 50, bottom: 25, right: 50)
+private let Height: CGFloat = 50
+
+class DMKoelButton: UIButton {
     
     private var currentAppearance: KoelButtonAppearance
     
@@ -77,9 +82,8 @@ class KoelButton: UIButton {
         let view = UIView(frame: .zero)
         this.addSubview(view)
         
-        view.layer.cornerRadius = 50 / 2
+        view.layer.cornerRadius = CornerRadius
         view.isUserInteractionEnabled = false
-        view.backgroundColor = UIColor.white.withAlphaComponent(0.8)
         view.translatesAutoresizingMaskIntoConstraints = false
         let constraints = [
             view.leftAnchor.constraint(equalTo: this.leftAnchor),
@@ -113,7 +117,7 @@ class KoelButton: UIButton {
         setTitleColor(startAppearance.textColor, for: .normal)
         setTitleColor(endAppearance.textColor, for: .highlighted)
         
-        layer.cornerRadius = 50 / 2
+        layer.cornerRadius = CornerRadius
         layer.masksToBounds = false
         layer.shadowColor = currentAppearance.shadowColor
         
@@ -125,19 +129,19 @@ class KoelButton: UIButton {
     }
     
     @objc func touchUpInside() {
-        animate(toState: startAppearance)
+        animate(toAppearanceState: startAppearance)
     }
     
     @objc func dragExit() {
-        animate(toState: startAppearance)
+        animate(toAppearanceState: startAppearance)
     }
     
     @objc func touchDown() {
-        animate(toState: endAppearance)
+        animate(toAppearanceState: endAppearance)
     }
     
     @objc func dragEnter() {
-        animate(toState: endAppearance)
+        animate(toAppearanceState: endAppearance)
     }
     
     private func configure(withAppearance appearance: KoelButtonAppearance) {
@@ -150,16 +154,18 @@ class KoelButton: UIButton {
     }
     
     func addConstraints(inSuperview superview: UIView) {
+
         let constraints = [
-            leftAnchor.constraint(equalTo: superview.leftAnchor, constant: 50),
-            superview.rightAnchor.constraint(equalTo: rightAnchor, constant: 50),
-            superview.bottomAnchor.constraint(equalTo: bottomAnchor, constant: 25),
-            heightAnchor.constraint(equalToConstant: 50)
+            leftAnchor.constraint(equalTo: superview.safeAreaLayoutGuide.leftAnchor, constant: Insets.left),
+            superview.safeAreaLayoutGuide.rightAnchor.constraint(equalTo: rightAnchor, constant: Insets.right),
+            superview.safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: bottomAnchor, constant: Insets.bottom),
+            heightAnchor.constraint(equalToConstant: Height)
         ]
         NSLayoutConstraint.activate(constraints)
     }
     
-    private func animate(toState appearance: KoelButtonAppearance) {
+    private func animate(toAppearanceState appearance: KoelButtonAppearance) {
+        
         let transformAnimation = CABasicAnimation(keyPath: "transform")
         transformAnimation.fromValue = currentAppearance.transform
         transformAnimation.toValue = appearance.transform
@@ -183,11 +189,11 @@ class KoelButton: UIButton {
         
         let shadowGroup = CAAnimationGroup()
         shadowGroup.animations = [shadowOffsetAnimation, shadowOpacityAnimation, shadowRadiusAnimation]
-        shadowGroup.duration = 0.2
+        shadowGroup.duration = AnimationDuration
         
         let group = CAAnimationGroup()
         group.animations = [transformAnimation, shadowGroup]
-        group.duration = 0.2
+        group.duration = AnimationDuration
         
         layer.add(group, forKey: nil)
         dimmingView.layer.add(dimmingViewOpacityAnimation, forKey: nil)
