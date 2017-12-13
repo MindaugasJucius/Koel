@@ -14,10 +14,19 @@ import MultipeerConnectivity
 
 struct DMEventPeerPersistenceService: DMEventPeerPersistenceServiceType {
     
+    private let realmDispatchQueue = DispatchQueue(
+        label: "peer-realm-persistence-queue",
+        qos: .background,
+        attributes: .concurrent
+    )
+    
     private func withRealm<T>(_ operation: String, action: (Realm) throws -> T) -> T? {
         do {
-            let realm = try Realm()
-            return try action(realm)
+            let result = try self.realmDispatchQueue.sync { () -> T in
+                let realm = try Realm()
+                return try action(realm)
+            }
+            return result
         } catch let err {
             print("Failed \(operation) realm with error: \(err)")
             return nil
@@ -79,6 +88,22 @@ struct DMEventPeerPersistenceService: DMEventPeerPersistenceServiceType {
             return Observable.collection(from: peers)
         }
         return result ?? .empty()
+    }
+    
+    //Retrieved object updates
+    
+    func update(peer: DMEventPeer, toConnectedState isConnected: Bool) throws -> DMEventPeer {
+        let realmObjectRef = ThreadSafeReference(to: peer)
+        let updatedPeer = withRealm("updating peer connectivity state") { realm -> DMEventPeer in
+            guard let fetchedObject = realm.object(ofType: DMEventPeer.self, forPrimaryKey: peer.id) else {
+                throw DMEventPeerPersistenceServiceError.updateFailed(peer)
+            }
+            try realm.write {
+                fetchedObject.isConnected = isConnected
+            }
+            return fetchedObject
+        }
+        return updatedPeer!
     }
     
 }

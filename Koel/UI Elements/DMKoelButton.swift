@@ -82,6 +82,7 @@ class DMKoelButton: UIButton {
         view.layer.cornerRadius = CornerRadius
         view.isUserInteractionEnabled = false
         view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = UIColor.white.withAlphaComponent(0.8)
         
         let constraints = [
              view.leftAnchor.constraint(equalTo: this.leftAnchor),

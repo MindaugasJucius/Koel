@@ -62,7 +62,7 @@ extension DMEventPeer {
     
     static func peer(withPeerID peerID: MCPeerID, context: [String: String]? = nil) -> DMEventPeer {
         guard let contextDict = context else {
-            return DMEventPeer.peer(withPeerID: peerID)
+            return DMEventPeer.peer(withPeerID: peerID, storeAsSelf: false, storeAsHost: false)
         }
         let isHost = contextDict[Peer.isHost.rawValue]
         return DMEventPeer.peer(withPeerID: peerID, storeAsSelf: false, storeAsHost: isHost != .none)

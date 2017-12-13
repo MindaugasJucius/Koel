@@ -41,7 +41,7 @@ class DMEventSearchViewModel: ViewModelType, MultipeerViewModelType {
         return multipeerService.latestConnectedPeer()
     }
     
-    private lazy var pushManagement: Action<DMEventPeer, Void> = {
+    private lazy var pushParticipation: Action<DMEventPeer, Void> = {
         return Action (
             workFactory: { [unowned self] host in
                 let participationModel = DMEventParticipantViewModel(withMultipeerService: self.multipeerService, withHost: host)
@@ -67,7 +67,7 @@ class DMEventSearchViewModel: ViewModelType, MultipeerViewModelType {
         
         host
             .observeOn(MainScheduler.instance)
-            .subscribe(pushManagement.inputs)
+            .subscribe(pushParticipation.inputs)
             .disposed(by: disposeBag)
     }
 }
