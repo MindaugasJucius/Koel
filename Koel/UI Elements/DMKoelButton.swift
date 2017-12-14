@@ -64,7 +64,7 @@ struct KoelButtonEndAppearance: KoelButtonAppearance {
     }
 }
 
-private let AnimationDuration = 0.2
+private let AnimationDuration = 0.15
 private let CornerRadius: CGFloat = 25
 private let Insets = UIEdgeInsets(top: 0, left: 50, bottom: 25, right: 50)
 private let Height: CGFloat = 50
@@ -79,6 +79,7 @@ class DMKoelButton: UIButton {
     private lazy var dimmingView: UIView = { this in
         let view = UIView(frame: .zero)
         this.addSubview(view)
+        view.backgroundColor = UIColor.white.withAlphaComponent(0.8)
         view.layer.cornerRadius = CornerRadius
         view.isUserInteractionEnabled = false
         view.translatesAutoresizingMaskIntoConstraints = false
