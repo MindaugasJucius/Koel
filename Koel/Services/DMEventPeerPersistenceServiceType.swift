@@ -24,6 +24,7 @@ struct DMEventPeerPersistenceContexts {
 
 enum DMEventPeerPersistenceServiceError: Error {
     case peerCreationFailed
+    case fetchingFailed
     case updateFailed(DMEventPeer)
     case deletionFailed(DMEventPeer)
 }
@@ -31,7 +32,7 @@ enum DMEventPeerPersistenceServiceError: Error {
 protocol DMEventPeerPersistenceServiceType {
     
     @discardableResult
-    func store(peer: DMEventPeer) throws -> DMEventPeer
+    func store(peer: DMEventPeer) -> Observable<DMEventPeer>
     
     @discardableResult
     func storePeer(withContext: [String: String]?, peerID: MCPeerID) throws -> DMEventPeer

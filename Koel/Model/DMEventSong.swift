@@ -23,7 +23,7 @@ class DMEventSong: Object {
     dynamic var played: Date? = nil
     dynamic var upvoteCount: Int = 0 // can only observe value changes which are fetched from a Realm
     
-    let upvoteesIDs = List<DMEventPeer>()
+    let upvotees = List<DMEventPeer>()
 
     override class func primaryKey() -> String? {
         return "id"

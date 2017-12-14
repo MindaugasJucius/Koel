@@ -83,7 +83,6 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
                 multipeerService.connectedPeers())
             .merge()
             .map { results in
-                
                 let peersWithoutHosts = results.filter { !$0.isHost }
                 
                 let connectedPeers = peersWithoutHosts.filter { $0.isConnected }
@@ -240,7 +239,7 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
     
     func onUpvote(song: DMEventSong) -> CocoaAction {
         return CocoaAction(
-            enabledIf: Observable.just(!song.upvoteesIDs.contains(multipeerService.myEventPeer)),
+            enabledIf: Observable.just(!song.upvotees.contains(multipeerService.myEventPeer)),
             workFactory: { [unowned self] in
                 return self.songPersistenceService
                     .upvote(song: song, forUser: self.multipeerService.myEventPeer)

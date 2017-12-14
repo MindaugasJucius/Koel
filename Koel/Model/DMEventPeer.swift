@@ -32,6 +32,8 @@ class DMEventPeer: Object {
     
     var peerID: MCPeerID? = nil
     
+    var primaryKeyRef = 0
+    
     override static func ignoredProperties() -> [String] {
         return ["peerID"]
     }

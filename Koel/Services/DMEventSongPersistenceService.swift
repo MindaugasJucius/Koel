@@ -54,7 +54,7 @@ struct DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
     func upvote(song: DMEventSong, forUser user: DMEventPeer) -> Observable<DMEventSong> {
         let result = withRealm("upvoting") { realm -> Observable<DMEventSong> in
             try realm.write {
-                song.upvoteesIDs.append(user)
+                song.upvotees.append(user)
                 song.upvoteCount = song.upvoteCount + 1
             }
             return .just(song)
@@ -64,7 +64,6 @@ struct DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
     
     func songs() -> Observable<Results<DMEventSong>> {
         let result = withRealm("getting all songs") { realm -> Observable<Results<DMEventSong>> in
-            let realm = try Realm()
             let songs = realm.objects(DMEventSong.self)
             return Observable.collection(from: songs)
         }

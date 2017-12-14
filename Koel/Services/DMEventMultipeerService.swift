@@ -16,6 +16,8 @@ class DMEventMultipeerService: NSObject {
 
     private(set) var myEventPeer: DMEventPeer
     
+    private let disposeBag = DisposeBag()
+    
     private let advertiser: MCNearbyServiceAdvertiser
     private let browser: MCNearbyServiceBrowser
     private let session: MCSession
@@ -177,7 +179,7 @@ class DMEventMultipeerService: NSObject {
                               withDisplayName displayName: String,
                               asHost host: Bool) -> DMEventPeer {
         let selfPeer = DMEventPeer.peer(withDisplayName: displayName, storeAsSelf: true, storeAsHost: host)
-        try! persistenceService.store(peer: selfPeer)
+        persistenceService.store(peer: selfPeer)
         return selfPeer
     }
     
@@ -212,26 +214,29 @@ class DMEventMultipeerService: NSObject {
 extension DMEventMultipeerService: MCNearbyServiceBrowserDelegate {
     
     func browser(_ browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String : String]?) {
-        var result = nearbyPeers.value
 
-        var peer = DMEventPeer.peer(withPeerID: peerID, context: info)
-        do {
-            let eventPeer = try peerPersistenceService.store(peer: peer)
-            peer = eventPeer
-        } catch let err {
-            print(err.localizedDescription)
-        }
+        let unmanagedPeer = DMEventPeer.peer(withPeerID: peerID, context: info)
+        peerPersistenceService.store(peer: unmanagedPeer)
+            .subscribe(
+                onNext: { eventPeer in
+                    print("foundPeer \(peerID.displayName) isHost \(eventPeer.isHost)")
+                    var result = self.nearbyPeers.value
 
-        print("foundPeer \(peerID.displayName) isHost \(peer.isHost)")
-        
-        //jeigu toks peer buvo, ir dar karta rado (pvz)
-        if nearbyPeers.value.flatMap({ $0.peerID }).index(of: peerID) == .none {
-            result = nearbyPeers.value + [peer]
-        }
+                    //There might be cases when a peer is discovered twice (for example, after losing them)
+                    if self.nearbyPeers.value.flatMap({ $0.peerID }).index(of: eventPeer) == .none {
+                        result = self.nearbyPeers.value + [eventPeer]
+                    }
+                    
+                    print("nearby peers \(result.map { $0.peerID?.displayName })")
+                    self.nearbyPeers.value = result
+                    self.nearbyHostPeers.onNext(result.filter { $0.isHost })
+                },
+                onError: { error in
+                    print("ERROR WHILE PERSISTING FOUND PEER \(error.localizedDescription)")
+                }
+            )
+            .disposed(by: disposeBag)
 
-        print("nearby peers \(result.map { $0.peerID?.displayName })")
-        nearbyPeers.value = result
-        nearbyHostPeers.onNext(result.filter { $0.isHost })
     }
     
     func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {
@@ -281,8 +286,8 @@ extension DMEventMultipeerService: MCSessionDelegate {
                 return
             }
             
-            //matchingPeer.isConnected = state == .connected
             try! peerPersistenceService.update(peer: matchingPeer, toConnectedState: state == .connected)
+            
             //Is a currently connected peer changing state
             let currentConnection = connections.value.filter { $0.peerID == peerID }.first
             

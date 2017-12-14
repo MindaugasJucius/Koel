@@ -33,24 +33,35 @@ struct DMEventPeerPersistenceService: DMEventPeerPersistenceServiceType {
         }
     }
     
-    @discardableResult
-    func store(peer: DMEventPeer) throws -> DMEventPeer {
-        let result = withRealm("creating peer") { realm -> DMEventPeer in
+    func store(peer: DMEventPeer) -> Observable<DMEventPeer> {
+        let result = withRealm("creating peer") { realm -> ThreadSafeReference<DMEventPeer> in
             try realm.write {
                 peer.id = (realm.objects(DMEventPeer.self).max(ofProperty: "id") ?? 0) + 1
+                peer.primaryKeyRef = peer.id
                 if let peerID = peer.peerID {
                     peer.peerIDData = NSKeyedArchiver.archivedData(withRootObject: peerID)
                 }
                 realm.add(peer)
             }
-            return peer
+
+            return ThreadSafeReference(to: peer)
         }
         
-        guard let storedPeer = result else {
-            throw DMEventPeerPersistenceServiceError.peerCreationFailed
-        }
-        
-        return storedPeer
+        return Observable<DMEventPeer>.create { observer in
+            
+            if let threadSafePeerRef = result {
+                let realm = try! Realm()
+                if let resolvedPeer = realm.resolve(threadSafePeerRef) {
+                    resolvedPeer.peerID = peer.peerID
+                    observer.onNext(resolvedPeer)
+                }
+                observer.onCompleted()
+            } else {
+                observer.onError(DMEventPeerPersistenceServiceError.peerCreationFailed)
+            }
+            
+            return Disposables.create()
+        }.observeOn(MainScheduler.instance)
     }
     
     func storePeer(withContext: [String: String]?, peerID: MCPeerID) throws -> DMEventPeer {
@@ -93,17 +104,20 @@ struct DMEventPeerPersistenceService: DMEventPeerPersistenceServiceType {
     //Retrieved object updates
     
     func update(peer: DMEventPeer, toConnectedState isConnected: Bool) throws -> DMEventPeer {
-        let realmObjectRef = ThreadSafeReference(to: peer)
-        let updatedPeer = withRealm("updating peer connectivity state") { realm -> DMEventPeer in
-            guard let fetchedObject = realm.object(ofType: DMEventPeer.self, forPrimaryKey: peer.id) else {
+        let maybeUpdatedPeer = withRealm("updating peer connectivity state") { realm -> DMEventPeer in
+            guard let fetchedObject = realm.object(ofType: DMEventPeer.self, forPrimaryKey: peer.primaryKeyRef) else {
                 throw DMEventPeerPersistenceServiceError.updateFailed(peer)
             }
+            
             try realm.write {
                 fetchedObject.isConnected = isConnected
             }
             return fetchedObject
         }
-        return updatedPeer!
+        guard let updatedPeer = maybeUpdatedPeer else {
+            throw DMEventPeerPersistenceServiceError.updateFailed(peer)
+        }
+        return updatedPeer
     }
     
 }
