@@ -218,7 +218,7 @@ extension DMEventMultipeerService: MCNearbyServiceBrowserDelegate {
         let unmanagedPeer = DMEventPeer.peer(withPeerID: peerID, context: info)
         peerPersistenceService.store(peer: unmanagedPeer)
             .subscribe(
-                onNext: { eventPeer in
+                onNext: { [unowned self] eventPeer in
                     print("foundPeer \(peerID.displayName) isHost \(eventPeer.isHost)")
                     var result = self.nearbyPeers.value
 
@@ -281,28 +281,37 @@ extension DMEventMultipeerService: MCSessionDelegate {
     public func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
         print("\(peerID.displayName) changed to state \(state.rawValue)")
         if state != .connecting {
+
             //Does the state changing peer exist in nearby peers
             guard let matchingPeer = nearbyPeers.value.filter({ $0.peerID == peerID }).first else {
                 return
             }
             
-            try! peerPersistenceService.update(peer: matchingPeer, toConnectedState: state == .connected)
-            
-            //Is a currently connected peer changing state
-            let currentConnection = connections.value.filter { $0.peerID == peerID }.first
-            
-            if state == .connected {
-                latestConnection.onNext(matchingPeer)
-                //Emit to connections observable only if this is a new connection
-                if currentConnection == .none {
-                    connections.value = connections.value + [matchingPeer]
-                }
-                
-            } else if let currentlyConnected = currentConnection { // Filter out disconnected peer
-                connections.value = connections.value.filter {  $0.peerID != currentlyConnected.peerID }
-            }
-            
-            print("CURRENT CONNECTIONS \(connections.value.map { $0.peerID?.displayName })")
+            peerPersistenceService.update(peer: matchingPeer, toConnectedState: state == .connected)
+                .subscribe(
+                    onNext: { [unowned self] updatedPeer in
+                        
+                        //Is a currently connected peer changing state
+                        let currentConnection = self.connections.value.filter { $0.peerID == peerID }.first
+                        
+                        if state == .connected {
+                            self.latestConnection.onNext(matchingPeer)
+                            //Emit to connections observable only if this is a new connection
+                            if currentConnection == .none {
+                                self.connections.value = self.connections.value + [matchingPeer]
+                            }
+                            
+                        } else if let currentlyConnected = currentConnection { // Filter out disconnected peer
+                            self.connections.value = self.connections.value.filter {  $0.peerID != currentlyConnected.peerID }
+                        }
+                        
+                        print("CURRENT CONNECTIONS \(self.connections.value.map { $0.peerID?.displayName })")
+                    },
+                    onError: { error in
+                        
+                    }
+            )
+            .disposed(by: disposeBag)
         }
     }
     

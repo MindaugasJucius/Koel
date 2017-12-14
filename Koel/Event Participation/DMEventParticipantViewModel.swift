@@ -10,8 +10,6 @@ import Foundation
 import RxSwift
 import Action
 
-private let HostCacheKey = "HostCacheKey"
-
 struct DMEventParticipantViewModel: MultipeerViewModelType {
     
     private let disposeBag = DisposeBag()
@@ -68,8 +66,6 @@ struct DMEventParticipantViewModel: MultipeerViewModelType {
     init(withMultipeerService multipeerService: DMEventMultipeerService, withHost host: DMEventPeer) {
         self.multipeerService = multipeerService
         self.host = host
-        
-        store(host: host)
 
         incommingHostReconnectInvitations
             .subscribe(onNext: { handler in
@@ -101,15 +97,6 @@ struct DMEventParticipantViewModel: MultipeerViewModelType {
             queue: nil,
             using: didEnterBackgroundNotificationHandler
         )
-    }
-    
-    private func store(host: DMEventPeer) {
-        guard host.isHost else {
-            return
-        }
-        
-        let hostData = NSKeyedArchiver.archivedData(withRootObject: host)
-        UserDefaults.standard.set(hostData, forKey: HostCacheKey)
     }
     
 }

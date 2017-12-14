@@ -44,7 +44,7 @@ protocol DMEventPeerPersistenceServiceType {
     func retrieveSelf() -> DMEventPeer?
     
     @discardableResult
-    func update(peer: DMEventPeer, toConnectedState isConnected: Bool) throws -> DMEventPeer
+    func update(peer: DMEventPeer, toConnectedState isConnected: Bool) -> Observable<DMEventPeer>
 
     func peers() -> Observable<Results<DMEventPeer>>
     
