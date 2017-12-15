@@ -162,9 +162,9 @@ class DMEventMultipeerService: NSObject {
         return .just(browser.invitePeer(peerID, to: self.session, withContext: data, timeout: timeout))
     }
     
-    /// Retrieve DMEventPeer from UserDefaults if one exists, or create and store a new one
+    /// Retrieve DMEventPeer from UserDefaults if one exists
     ///
-    /// - Parameter displayName: string to display to browsers
+    /// - Parameter persistenceService: Service used to manage DMEventPeer objects
     /// - Returns: identity
     static func retrieveSelfPeer(withPeerPersistenceService persistenceService: DMEventPeerPersistenceServiceType) -> DMEventPeer? {
         
@@ -175,6 +175,12 @@ class DMEventMultipeerService: NSObject {
         return storedSelfPeer
     }
     
+    /// Create and store a DMEventPeer to Realm
+    ///
+    /// - Parameter persistenceService: Service used to persist DMEventPeer objects,
+    ///             displayName: string to display to other peers
+    ///             host: store self peer as host
+    /// - Returns: created and stored identity
     static func storeSelfPeer(withPeerPersistenceService persistenceService: DMEventPeerPersistenceServiceType,
                               withDisplayName displayName: String,
                               asHost host: Bool) -> DMEventPeer {
@@ -215,21 +221,23 @@ extension DMEventMultipeerService: MCNearbyServiceBrowserDelegate {
     
     func browser(_ browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String : String]?) {
 
+        //There might be cases when a peer is discovered twice (for example, after losing them)
+        guard self.nearbyPeers.value.flatMap({ $0.peerID }).index(of: peerID) == .none else {
+            return
+        }
+        
         let unmanagedPeer = DMEventPeer.peer(withPeerID: peerID, context: info)
+        print("foundPeer \(peerID.displayName) isHost \(unmanagedPeer.isHost)")
         peerPersistenceService.store(peer: unmanagedPeer)
             .subscribe(
                 onNext: { [unowned self] eventPeer in
                     print("foundPeer \(peerID.displayName) isHost \(eventPeer.isHost)")
-                    var result = self.nearbyPeers.value
+                    let currentNearbyPeers = self.nearbyPeers.value
 
-                    //There might be cases when a peer is discovered twice (for example, after losing them)
-                    if self.nearbyPeers.value.flatMap({ $0.peerID }).index(of: eventPeer) == .none {
-                        result = self.nearbyPeers.value + [eventPeer]
-                    }
+                    self.nearbyPeers.value = currentNearbyPeers + [eventPeer]
                     
-                    print("nearby peers \(result.map { $0.peerID?.displayName })")
-                    self.nearbyPeers.value = result
-                    self.nearbyHostPeers.onNext(result.filter { $0.isHost })
+                    print("nearby peers \(self.nearbyPeers.value.map { $0.peerID?.displayName })")
+                    self.nearbyHostPeers.onNext(self.nearbyPeers.value.filter { $0.isHost })
                 },
                 onError: { error in
                     print("ERROR WHILE PERSISTING FOUND PEER \(error.localizedDescription)")
@@ -241,11 +249,14 @@ extension DMEventMultipeerService: MCNearbyServiceBrowserDelegate {
     
     func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {
         print("browser lostPeer \(peerID.displayName)")
-        nearbyPeers.value = nearbyPeers.value.filter { existingNearbyPeer in
-            return existingNearbyPeer.peerID != peerID
+        guard let matchingPeer = nearbyPeers.value.filter ({ $0.peerID == peerID }).first else {
+            return
         }
         
+        nearbyPeers.value = nearbyPeers.value.filter { $0 != matchingPeer }
         nearbyHostPeers.onNext(nearbyPeers.value.filter { $0.isHost })
+
+        try! peerPersistenceService.delete(peer: matchingPeer)
     }
     
     func browser(_ browser: MCNearbyServiceBrowser, didNotStartBrowsingForPeers error: Error) {

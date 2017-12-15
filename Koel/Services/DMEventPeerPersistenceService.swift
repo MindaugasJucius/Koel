@@ -49,8 +49,17 @@ struct DMEventPeerPersistenceService: DMEventPeerPersistenceServiceType {
         return peerObservable(fromReference: result, fullPeer: peer)
     }
     
-    func storePeer(withContext: [String: String]?, peerID: MCPeerID) throws -> DMEventPeer {
-        return DMEventPeer()
+    func delete(peer: DMEventPeer) throws {
+        _ = withRealm("deleting peer") { realm -> Void in
+            guard let peerToDelete = realm.object(ofType: DMEventPeer.self, forPrimaryKey: peer.primaryKeyRef) else {
+                throw DMEventPeerPersistenceServiceError.deletionFailed(peer)
+            }
+            
+            try realm.write {
+                realm.delete(peerToDelete)
+            }
+            print("deleted peer: \(peer.peerID?.displayName), primarykey: \(peerToDelete.primaryKeyRef)")
+        }
     }
     
     @discardableResult
@@ -105,7 +114,7 @@ struct DMEventPeerPersistenceService: DMEventPeerPersistenceServiceType {
     
     //MARK: - Helpers
     
-    func peerObservable(fromReference reference: ThreadSafeReference<DMEventPeer>?, fullPeer peer: DMEventPeer) -> Observable<DMEventPeer> {
+    private func peerObservable(fromReference reference: ThreadSafeReference<DMEventPeer>?, fullPeer peer: DMEventPeer) -> Observable<DMEventPeer> {
         return Observable<DMEventPeer>.create { observer in
             
             if let threadSafePeerRef = reference {
