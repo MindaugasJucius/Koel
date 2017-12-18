@@ -32,10 +32,10 @@ class DMEventSongTableViewCell: UITableViewCell {
     
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        
+
         contentView.addSubview(titleLabel)
         let labelConstraints = [
-            titleLabel.leftAnchor.constraintEqualToSystemSpacingAfter(contentView.leftAnchor, multiplier: 0),
+            titleLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 15),
             titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 15),
             contentView.bottomAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 15)
         ]

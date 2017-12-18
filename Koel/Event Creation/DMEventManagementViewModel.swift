@@ -92,8 +92,8 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
                 print(results.map { return "\(String(describing: $0.peerID?.displayName)) \($0.isConnected)" })
                 
                 return [
-                    EventPeerSection(model: "Joined", items: connectedPeers),
-                    EventPeerSection(model: "Nearby", items: nearbyPeers)
+                    EventPeerSection(model: UIConstants.strings.joinedPeers, items: connectedPeers),
+                    EventPeerSection(model: UIConstants.strings.nearbyPeers, items: nearbyPeers)
                 ]
             }
             .observeOn(MainScheduler.instance)
@@ -198,8 +198,8 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
                     .sorted(byKeyPath: "played", ascending: false)
                 
                 return [
-                    SongSection(model: "queued", items: queuedSongs.toArray()),
-                    SongSection(model: "played", items: playedSongs.toArray())
+                    SongSection(model: UIConstants.strings.queuedSongs, items: queuedSongs.toArray()),
+                    SongSection(model: UIConstants.strings.playedSongs, items: playedSongs.toArray())
                 ]
             }
             .observeOn(MainScheduler.instance)

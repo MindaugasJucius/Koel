@@ -34,7 +34,7 @@ class DMEventParticipationViewController: UIViewController, BindableType {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
-        title = "participate"
+        title = UIConstants.strings.participateTitle
         
         label.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(label)

@@ -24,7 +24,7 @@ class DMEventInvitationsViewController: UIViewController, BindableType {
     private lazy var doneButton: UIButton = {
         let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle("done", for: .normal)
+        button.setTitle(UIConstants.strings.done, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 25)
         return button
     }()
@@ -40,7 +40,6 @@ class DMEventInvitationsViewController: UIViewController, BindableType {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "invite"
         view.backgroundColor = .white
         
         view.addSubview(tableView)

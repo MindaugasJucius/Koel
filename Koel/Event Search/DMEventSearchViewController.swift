@@ -34,7 +34,7 @@ class DMEventSearchViewController: UIViewController, BindableType {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        title = "search for party hosts"
+        title = UIConstants.strings.searchScreenTitle
 
         view.backgroundColor = .white
         
@@ -42,10 +42,12 @@ class DMEventSearchViewController: UIViewController, BindableType {
         view.addSubview(tableView)
         additionalSafeAreaInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
         
-        let constraints = [tableView.topAnchor.constraint(equalTo: view.topAnchor),
-                           tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
-                           tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
-                           tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)]
+        let constraints = [
+            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            tableView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
+            tableView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        ]
         NSLayoutConstraint.activate(constraints)
     }
 

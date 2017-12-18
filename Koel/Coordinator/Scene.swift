@@ -15,7 +15,7 @@ enum Scene {
 
     //MARK: Host
     case invite(DMEventInvitationsViewModel)
-    indirect case manage(DMEventManagementViewModel)
+    case manage(DMEventManagementViewModel)
 
     //MARK: Participant
     case search(DMEventSearchViewModel)

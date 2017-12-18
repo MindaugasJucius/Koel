@@ -45,7 +45,7 @@ class SceneCoordinator: NSObject, SceneCoordinatorType {
         }
     }
     
-    func navigationControllerInStack() -> UINavigationController? {
+    private func navigationControllerInStack() -> UINavigationController? {
         if let currentNavigationController = currentViewController as? UINavigationController {
             return currentNavigationController
         } else if let currentVCsParent = currentViewController.navigationController {
@@ -132,7 +132,7 @@ class SceneCoordinator: NSObject, SceneCoordinatorType {
     
     private func navigationController(withRoot root: UIViewController) -> UINavigationController {
         let navigationController = UINavigationController(rootViewController: root)
-        navigationController.navigationBar.prefersLargeTitles = true
+        navigationController.navigationBar.apply(DefaultStylesheet.navigationBarStyle)
         return navigationController
     }
     

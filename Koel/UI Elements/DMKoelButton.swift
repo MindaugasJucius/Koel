@@ -35,10 +35,10 @@ struct KoelButtonStartAppearance: KoelButtonAppearance {
         shadowOffset = CGSize(width: 0, height: 8)
         shadowOpacity = 0.4
         shadowRadius = 5
-        backgroundColor = UIConstants.colors.primaryKoelPink
+        backgroundColor = UIConstants.colors.koelPink
         textColor = .white
         dimmingViewOpacity = 0
-        shadowColor = UIConstants.colors.primaryKoelPink.cgColor
+        shadowColor = UIConstants.colors.koelPink.cgColor
     }
 }
 
@@ -57,10 +57,10 @@ struct KoelButtonEndAppearance: KoelButtonAppearance {
         shadowOffset = CGSize(width: 0, height: 6)
         shadowOpacity = 0.5
         shadowRadius = 3
-        backgroundColor = UIConstants.colors.primaryKoelPink
+        backgroundColor = UIConstants.colors.koelPink
         textColor = .white
         dimmingViewOpacity = 0.5
-        shadowColor = UIConstants.colors.primaryKoelPink.cgColor
+        shadowColor = UIConstants.colors.koelPink.cgColor
     }
 }
 

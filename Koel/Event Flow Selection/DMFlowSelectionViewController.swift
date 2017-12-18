@@ -26,14 +26,14 @@ class DMFlowSelectionViewController: UIViewController, BindableType {
     
     private var createButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("create", for: .normal)
+        button.setTitle(UIConstants.strings.createEvent, for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
     private var searchButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("search", for: .normal)
+        button.setTitle(UIConstants.strings.searchNearby, for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
@@ -49,13 +49,12 @@ class DMFlowSelectionViewController: UIViewController, BindableType {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "wt u wn do rn?"
         
         let koelButton = DMKoelButton()
         
         view.addSubview(koelButton)
         koelButton.addConstraints(inSuperview: view)
-        koelButton.setTitle(UIConstants.strings.addSongButton, for: .normal)
+        koelButton.setTitle(UIConstants.strings.addSong, for: .normal)
         
         view.backgroundColor = .white
         stackView.addArrangedSubview(createButton)
