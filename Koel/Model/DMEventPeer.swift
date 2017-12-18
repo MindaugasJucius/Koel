@@ -28,7 +28,7 @@ class DMEventPeer: Object {
     dynamic var isHost: Bool = false
     dynamic var isConnected: Bool = false
     dynamic var isSelf: Bool = false
-    dynamic var peerIDData: Data? = nil
+    dynamic var peerIDData = Data()
     
     var peerID: MCPeerID? = nil
     

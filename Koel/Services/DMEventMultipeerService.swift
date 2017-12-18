@@ -222,22 +222,22 @@ extension DMEventMultipeerService: MCNearbyServiceBrowserDelegate {
     func browser(_ browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String : String]?) {
 
         //There might be cases when a peer is discovered twice (for example, after losing them)
-        guard self.nearbyPeers.value.flatMap({ $0.peerID }).index(of: peerID) == .none else {
+        guard nearbyPeers.value.flatMap({ $0.peerID }).index(of: peerID) == .none else {
+            nearbyPeers.value = nearbyPeers.value
+            nearbyHostPeers.onNext(nearbyPeers.value.filter { $0.isHost })
+            
             return
-        }
+        } // reikia repostint jei antra karta ta pati randa, nes po backgroundo radus ta pati nereconnectina jei nepostini
         
         let unmanagedPeer = DMEventPeer.peer(withPeerID: peerID, context: info)
         print("foundPeer \(peerID.displayName) isHost \(unmanagedPeer.isHost)")
         peerPersistenceService.store(peer: unmanagedPeer)
             .subscribe(
                 onNext: { [unowned self] eventPeer in
-                    print("foundPeer \(peerID.displayName) isHost \(eventPeer.isHost)")
-                    let currentNearbyPeers = self.nearbyPeers.value
-
-                    self.nearbyPeers.value = currentNearbyPeers + [eventPeer]
-                    
-                    print("nearby peers \(self.nearbyPeers.value.map { $0.peerID?.displayName })")
+                    self.nearbyPeers.value = self.nearbyPeers.value + [eventPeer]
                     self.nearbyHostPeers.onNext(self.nearbyPeers.value.filter { $0.isHost })
+                    print("foundPeer \(peerID.displayName) isHost \(eventPeer.isHost)")
+                    print("nearby peers \(self.nearbyPeers.value.map { $0.peerID?.displayName })")
                 },
                 onError: { error in
                     print("ERROR WHILE PERSISTING FOUND PEER \(error.localizedDescription)")
@@ -256,7 +256,7 @@ extension DMEventMultipeerService: MCNearbyServiceBrowserDelegate {
         nearbyPeers.value = nearbyPeers.value.filter { $0 != matchingPeer }
         nearbyHostPeers.onNext(nearbyPeers.value.filter { $0.isHost })
 
-        try! peerPersistenceService.delete(peer: matchingPeer)
+        //try! peerPersistenceService.delete(peer: matchingPeer)
     }
     
     func browser(_ browser: MCNearbyServiceBrowser, didNotStartBrowsingForPeers error: Error) {
@@ -293,36 +293,19 @@ extension DMEventMultipeerService: MCSessionDelegate {
         print("\(peerID.displayName) changed to state \(state.rawValue)")
         if state != .connecting {
 
-            //Does the state changing peer exist in nearby peers
-            guard let matchingPeer = nearbyPeers.value.filter({ $0.peerID == peerID }).first else {
-                return
-            }
-            
-            peerPersistenceService.update(peer: matchingPeer, toConnectedState: state == .connected)
-                .subscribe(
-                    onNext: { [unowned self] updatedPeer in
-                        
-                        //Is a currently connected peer changing state
-                        let currentConnection = self.connections.value.filter { $0.peerID == peerID }.first
-                        
-                        if state == .connected {
-                            self.latestConnection.onNext(matchingPeer)
-                            //Emit to connections observable only if this is a new connection
-                            if currentConnection == .none {
-                                self.connections.value = self.connections.value + [matchingPeer]
-                            }
-                            
-                        } else if let currentlyConnected = currentConnection { // Filter out disconnected peer
-                            self.connections.value = self.connections.value.filter {  $0.peerID != currentlyConnected.peerID }
-                        }
-                        
-                        print("CURRENT CONNECTIONS \(self.connections.value.map { $0.peerID?.displayName })")
-                    },
-                    onError: { error in
-                        
-                    }
+            //check if peer was persisted
+            peerPersistenceService.peerExists(withPeerID: peerID).subscribe(
+                onNext: { [unowned self] peer in
+                    print("peer checking successful")
+                    self.performUpdate(forPeer: peer, toConnectedState: state == .connected)
+                },
+                onError: { error in
+                    print("\(error)")
+                }
             )
             .disposed(by: disposeBag)
+            
+            
         }
     }
     
@@ -347,6 +330,37 @@ extension DMEventMultipeerService: MCSessionDelegate {
     func session(_ session: MCSession, didReceiveCertificate certificate: [Any]?, fromPeer peerID: MCPeerID, certificateHandler: @escaping (Bool) -> Void) {
         certificateHandler(true)
     }
+    
+}
+
+extension DMEventMultipeerService {
+    
+    func performUpdate(forPeer peer: DMEventPeer, toConnectedState connected: Bool) {
+        peerPersistenceService.update(peer: peer, toConnectedState: connected)
+        .subscribe(
+            onNext: { [unowned self] updatedPeer in
+                //Is a currently connected peer changing state
+                let currentConnection = self.connections.value.filter { $0.peerID == updatedPeer.peerID }.first
+                
+                if connected {
+                    self.latestConnection.onNext(updatedPeer)
+                    //Emit to connections observable only if this is a new connection
+                    if currentConnection == .none {
+                        self.connections.value = self.connections.value + [updatedPeer]
+                    }
+                } else if let currentlyConnected = currentConnection { // Filter out disconnected peer
+                    self.connections.value = self.connections.value.filter {  $0.peerID != currentlyConnected.peerID }
+                }
+                
+                print("CURRENT CONNECTIONS \(self.connections.value.map { $0.peerID?.displayName })")
+            },
+            onError: { error in
+            
+            }
+        ).disposed(by: disposeBag)
+    }
+    
+
     
 }
 

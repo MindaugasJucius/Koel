@@ -88,7 +88,7 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
                 let connectedPeers = peersWithoutHosts.filter { $0.isConnected }
                 let nearbyPeers = peersWithoutHosts.filter { !$0.isConnected }
                 
-                print("CONNECTION OBSERVABLES RESULTS:")
+                print("sectioned peers OBSERVABLES RESULTS:")
                 print(results.map { return "\(String(describing: $0.peerID?.displayName)) \($0.isConnected)" })
                 
                 return [
