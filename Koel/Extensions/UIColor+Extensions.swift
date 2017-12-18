@@ -20,24 +20,6 @@ extension UIColor {
             alpha: CGFloat(alpha))
     }
     
-    func lerp(toColor: UIColor, step: CGFloat) -> UIColor {
-        var fromR: CGFloat = 0
-        var fromG: CGFloat = 0
-        var fromB: CGFloat = 0
-        getRed(&fromR, green: &fromG, blue: &fromB, alpha: nil)
-        
-        var toR: CGFloat = 0
-        var toG: CGFloat = 0
-        var toB: CGFloat = 0
-        toColor.getRed(&toR, green: &toG, blue: &toB, alpha: nil)
-        
-        let r = fromR + (toR - fromR) * step
-        let g = fromG + (toG - fromG) * step
-        let b = fromB + (toB - fromB) * step
-        
-        return UIColor(red: r, green: g, blue: b, alpha: 1)
-    }
-    
     static func colorWithHexString (hex:String) -> UIColor {
         
         var cString = hex.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines).uppercased()

@@ -2,7 +2,7 @@
 //  Style.swift
 //  Koel
 //
-//  Created by Mindaugas Jucius on 12/12/2017.
+//  Created by Mindaugas Jucius on 18/12/2017.
 //  Copyright © 2017 Mindaugas Jucius. All rights reserved.
 //
 

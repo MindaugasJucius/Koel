@@ -30,7 +30,7 @@ class DMEventManagementViewController: UIViewController, BindableType {
     private lazy var invitationsButton: UIButton = {
         let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle("invite", for: .normal)
+        button.setTitle(UIConstants.strings.invite, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 25)
         return button
     }()
@@ -38,7 +38,7 @@ class DMEventManagementViewController: UIViewController, BindableType {
     private lazy var addButton: UIButton = {
         let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle("add song", for: .normal)
+        button.setTitle(UIConstants.strings.addSong, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 25)
         return button
     }()
@@ -55,11 +55,16 @@ class DMEventManagementViewController: UIViewController, BindableType {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "manage"
-        
-        additionalSafeAreaInsets = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
-        
+        title = UIConstants.strings.managementTitle
         view.backgroundColor = .white
+        view.addSubview(tableView)
+        
+        let tableViewConstraints = [
+            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            tableView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
+            tableView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        ]
         
         view.addSubview(invitationsButton)
         
@@ -73,15 +78,6 @@ class DMEventManagementViewController: UIViewController, BindableType {
         let addButtonConstraints = [
             addButton.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: -20),
             addButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
-        ]
-        
-        view.addSubview(tableView)
-        
-        let tableViewConstraints = [
-            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            tableView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
-            tableView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
-            tableView.bottomAnchor.constraint(equalTo: addButton.topAnchor)
         ]
         
         NSLayoutConstraint.activate(invitationConstraints)

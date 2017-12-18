@@ -1,32 +1,28 @@
 //
-//  Stylesheets.swift
+//  Stylesheet.swift
 //  Koel
 //
-//  Created by Mindaugas Jucius on 12/12/2017.
+//  Created by Mindaugas Jucius on 18/12/2017.
 //  Copyright © 2017 Mindaugas Jucius. All rights reserved.
 //
 
 import UIKit
 
-enum FlowSelectionStylesheet {
-
-    static let buttonStart = Style<UIButton> { buttonToStyle in
+enum DefaultStylesheet {
+    
+    static let navigationBarStyle = Style<UINavigationBar> {
+        let gradientColors = [UIConstants.colors.koelPurple, UIConstants.colors.koelSkyBlue]
+        let titleAttributes = [NSAttributedStringKey.foregroundColor: UIColor.white]
+        let gradientLayer = CAGradientLayer(frame: $0.bounds, colorsForNavigationBar: gradientColors)
+        if let gradientImage = gradientLayer.createImage() {
+            $0.barTintColor = UIColor(patternImage: gradientImage)
+        }
         
-    }
-    
-    static let buttonEnd = Style<UIButton> { buttonToStyle in
-        
-    }
-    
-    static let title = Style<UILabel> {
-        $0.font = .systemFont(ofSize: 12)
-        $0.textColor = .red
-        $0.numberOfLines = 2
-    }
-    
-    static let image = Style<UIImageView> {
-        $0.contentMode = .center
-        $0.backgroundColor = .darkGray
+        $0.prefersLargeTitles = true
+        $0.largeTitleTextAttributes = titleAttributes
+        $0.titleTextAttributes = titleAttributes
+        $0.barStyle = .black
     }
 
 }
+
