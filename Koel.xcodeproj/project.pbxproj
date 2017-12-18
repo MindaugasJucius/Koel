@@ -35,8 +35,6 @@
 		5F81861A1FD3FA6800477C71 /* SceneCoordinatorType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F8186191FD3FA6800477C71 /* SceneCoordinatorType.swift */; };
 		5F81861C1FD3FAB000477C71 /* SceneCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F81861B1FD3FAB000477C71 /* SceneCoordinator.swift */; };
 		5F81861E1FD3FADB00477C71 /* UINavigationController+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F81861D1FD3FADB00477C71 /* UINavigationController+Rx.swift */; };
-		5F82620D1FDFFE50001E4423 /* Style.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F82620C1FDFFE50001E4423 /* Style.swift */; };
-		5F82620F1FDFFFE3001E4423 /* Stylesheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F82620E1FDFFFE3001E4423 /* Stylesheet.swift */; };
 		5F8262111FE0035B001E4423 /* UIConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F8262101FE0035B001E4423 /* UIConstants.swift */; };
 		5F8262141FE00815001E4423 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5F8262161FE00815001E4423 /* Localizable.strings */; };
 		5F84FF9A1FD86350003332B4 /* DMEventManagementViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F84FF991FD86350003332B4 /* DMEventManagementViewModel.swift */; };
@@ -100,8 +98,6 @@
 		5F8186191FD3FA6800477C71 /* SceneCoordinatorType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneCoordinatorType.swift; sourceTree = "<group>"; };
 		5F81861B1FD3FAB000477C71 /* SceneCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneCoordinator.swift; sourceTree = "<group>"; };
 		5F81861D1FD3FADB00477C71 /* UINavigationController+Rx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UINavigationController+Rx.swift"; sourceTree = "<group>"; };
-		5F82620C1FDFFE50001E4423 /* Style.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Style.swift; sourceTree = "<group>"; };
-		5F82620E1FDFFFE3001E4423 /* Stylesheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stylesheet.swift; sourceTree = "<group>"; };
 		5F8262101FE0035B001E4423 /* UIConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIConstants.swift; sourceTree = "<group>"; };
 		5F8262151FE00815001E4423 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		5F84FF991FD86350003332B4 /* DMEventManagementViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventManagementViewModel.swift; sourceTree = "<group>"; };
@@ -282,8 +278,6 @@
 		5F82620B1FDFFE39001E4423 /* Styling */ = {
 			isa = PBXGroup;
 			children = (
-				5F82620C1FDFFE50001E4423 /* Style.swift */,
-				5F82620E1FDFFFE3001E4423 /* Stylesheet.swift */,
 				5F8262101FE0035B001E4423 /* UIConstants.swift */,
 			);
 			path = Styling;
@@ -589,7 +583,6 @@
 				5F8186121FBB6EDB00477C71 /* DMKoelLogoView.swift in Sources */,
 				5F81861E1FD3FADB00477C71 /* UINavigationController+Rx.swift in Sources */,
 				5F5445951FD594460059A975 /* DMEventParticipantViewModel.swift in Sources */,
-				5F82620D1FDFFE50001E4423 /* Style.swift in Sources */,
 				5F84FFAC1FDB33F3003332B4 /* DMEventSongTableViewCell.swift in Sources */,
 				5F601D3D1FD04851003DE897 /* DMEventInvitationsViewModel.swift in Sources */,
 				5F47B8361FD4064C0053A0A5 /* DMFlowSelectionViewController.swift in Sources */,
@@ -607,7 +600,6 @@
 				5F014BD61FB9E29700079009 /* UIColor+Extensions.swift in Sources */,
 				5F81861C1FD3FAB000477C71 /* SceneCoordinator.swift in Sources */,
 				5F8186181FD3F7F200477C71 /* BindableType.swift in Sources */,
-				5F82620F1FDFFFE3001E4423 /* Stylesheet.swift in Sources */,
 				5F81861A1FD3FA6800477C71 /* SceneCoordinatorType.swift in Sources */,
 				5F8186161FD3F62000477C71 /* Scene.swift in Sources */,
 				5FDEB6BA1F99235500070930 /* DMInitialLoadingViewController.swift in Sources */,
