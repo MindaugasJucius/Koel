@@ -359,8 +359,5 @@ extension DMEventMultipeerService {
             }
         ).disposed(by: disposeBag)
     }
-    
-
-    
 }
 

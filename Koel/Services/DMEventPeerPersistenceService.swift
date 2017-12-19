@@ -46,7 +46,7 @@ struct DMEventPeerPersistenceService: DMEventPeerPersistenceServiceType {
             return ThreadSafeReference(to: peer)
         }
         
-        return objectObservable(fromReference: result, peerID: peer.peerID, errorOnFailure: .peerCreationFailed).filterNil()
+        return peerOnMainScheduler(fromReference: result, peerID: peer.peerID, errorOnFailure: .peerCreationFailed)
     }
     
     func delete(peer: DMEventPeer) throws {
@@ -62,7 +62,7 @@ struct DMEventPeerPersistenceService: DMEventPeerPersistenceServiceType {
         }
     }
     
-    func peerExists(withPeerID peerID: MCPeerID) -> Observable<DMEventPeer?> {
+    func peerExists(withPeerID peerID: MCPeerID) -> Observable<DMEventPeer> {
         let threadSafeReference = withRealm("checking if peer exists") { realm -> ThreadSafeReference<DMEventPeer>? in
             let allPeers = realm.objects(DMEventPeer.self).toArray()
             for peer in allPeers {
@@ -76,15 +76,10 @@ struct DMEventPeerPersistenceService: DMEventPeerPersistenceServiceType {
             return nil
         }
         
-//        guard let threadSafeReference = result else {
-//            return Observable.empty()
-//        }
-
-        return objectObservable(
-            fromReference: threadSafeReference!,
-            peerID: peerID,
-            errorOnFailure: .existenceCheckFailed
-        )
+        guard let reference = threadSafeReference else {
+            return Observable.empty()
+        }
+        return peerOnMainScheduler(fromReference: reference, peerID: peerID, errorOnFailure: .existenceCheckFailed)
     }
     
     @discardableResult
@@ -103,10 +98,6 @@ struct DMEventPeerPersistenceService: DMEventPeerPersistenceServiceType {
             if let peerIDData = selfPeer?.peerIDData {
                 selfPeer?.peerID = NSKeyedUnarchiver.unarchiveObject(with: peerIDData) as? MCPeerID
             }
-
-            print(selfPeer?.peerID)
-            print(selfPeer?.peerIDData)
-            print(selfPeer?.isSelf)
             return selfPeer
         }
         return result ?? nil
@@ -131,36 +122,26 @@ struct DMEventPeerPersistenceService: DMEventPeerPersistenceServiceType {
             try realm.write {
                 retrievedPeer.isConnected = isConnected
             }
+            
             return ThreadSafeReference(to: retrievedPeer)
         }
         
-        return objectObservable(fromReference: result, peerID: peer.peerID, errorOnFailure: .updateFailed(peer)).filterNil()
+        return peerOnMainScheduler(fromReference: result, peerID: peer.peerID, errorOnFailure: .updateFailed(peer))
     }
     
-    //MARK: - Helpers
+}
+
+// MARK: - Helpers
+extension DMEventPeerPersistenceService {
     
-    private func objectObservable<T: Object>(fromReference reference: ThreadSafeReference<T>?, peerID: MCPeerID?, errorOnFailure: DMEventPeerPersistenceServiceError) -> Observable<T?> {
-        return Observable<T?>.create { observer in
-            
-            if let threadSafePeerRef = reference {
-                do {
-                    let realm = try Realm()
-                    if let resolvedPeer = realm.resolve(threadSafePeerRef) {
-//                        resolvedPeer.peerID = peerID
-//                        resolvedPeer.primaryKeyRef = resolvedPeer.id
-                        observer.onNext(resolvedPeer)
-                    } else {
-                        observer.onNext(nil)
-                    }
-                } catch {
-                    observer.onError(errorOnFailure)
-                }
-            } else {
-                observer.onNext(nil)
+    func peerOnMainScheduler(fromReference reference: ThreadSafeReference<DMEventPeer>?, peerID: MCPeerID?,
+                             errorOnFailure: DMEventPeerPersistenceServiceError) -> Observable<DMEventPeer> {
+        return Realm.objectOnMainSchedulerObservable(fromReference: reference, errorOnFailure: errorOnFailure)
+            .map { resolvedPeer in
+                resolvedPeer.peerID = peerID
+                resolvedPeer.primaryKeyRef = resolvedPeer.id
+                return resolvedPeer
             }
-            observer.onCompleted()
-            return Disposables.create()
-        }.observeOn(MainScheduler.instance)
     }
     
 }

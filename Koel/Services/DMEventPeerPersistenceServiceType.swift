@@ -37,7 +37,7 @@ protocol DMEventPeerPersistenceServiceType {
 
     func delete(peer: DMEventPeer) throws
 
-    func peerExists(withPeerID peerID: MCPeerID) -> Observable<DMEventPeer?>
+    func peerExists(withPeerID peerID: MCPeerID) -> Observable<DMEventPeer>
     
     @discardableResult
     func retrieveHost() -> DMEventPeer?
