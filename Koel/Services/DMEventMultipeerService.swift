@@ -220,11 +220,10 @@ class DMEventMultipeerService: NSObject {
 extension DMEventMultipeerService: MCNearbyServiceBrowserDelegate {
     
     func browser(_ browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String : String]?) {
-
-        let unmanagedPeer = DMEventPeer.peer(withPeerID: peerID, context: info)
         peerPersistenceService.peerExists(withPeerID: peerID)
             .catchOnNil { [unowned self] () -> Observable<DMEventPeer> in
                 print("storing peer: \(peerID.displayName)")
+                let unmanagedPeer = DMEventPeer.peer(withPeerID: peerID, context: info)
                 return self.peerPersistenceService.store(peer: unmanagedPeer)
             }
             .subscribe(
@@ -253,8 +252,6 @@ extension DMEventMultipeerService: MCNearbyServiceBrowserDelegate {
         
         nearbyPeers.value = nearbyPeers.value.filter { $0 != matchingPeer }
         nearbyHostPeers.onNext(nearbyPeers.value.filter { $0.isHost })
-
-        //try! peerPersistenceService.delete(peer: matchingPeer)
     }
     
     func browser(_ browser: MCNearbyServiceBrowser, didNotStartBrowsingForPeers error: Error) {
@@ -292,7 +289,6 @@ extension DMEventMultipeerService: MCSessionDelegate {
         if state != .connecting {
             peerPersistenceService.peerExists(withPeerID: peerID).subscribe(
                 onNext: { [unowned self] peer in
-                    print("peer existence checking for state change successful - peer \(peerID.displayName) \(peer != nil ? "exists" : "doesn't exist")")
                     guard let `peer` = peer else {
                         return
                     }

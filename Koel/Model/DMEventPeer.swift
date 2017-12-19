@@ -21,7 +21,7 @@ enum Peer: String {
 typealias EventPeerSection = AnimatableSectionModel<String, DMEventPeer>
 
 @objcMembers
-class DMEventPeer: Object {
+class DMEventPeer: Object, Codable {
     
     dynamic var id: Int = 0
     dynamic var fullName: String? = nil

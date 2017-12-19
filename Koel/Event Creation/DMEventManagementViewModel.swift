@@ -225,17 +225,14 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
     
     lazy var onSongCreate: CocoaAction = {
         return CocoaAction { [unowned self] in
+            let song = DMEventSong()
+            song.title = "songy"
+            song.addedBy = self.multipeerService.myEventPeer
             return self.songPersistenceService
-                .createSong(title: "songy")
+                .store(song: song)
                 .map { _ in }
         }
     }()
-    
-    func observable() -> Observable<Bool> {
-        return Observable<Int>.timer(0.0, period: 5.0, scheduler: MainScheduler.instance).flatMap { int -> Observable<Bool> in
-            return Observable.just(int % 2 == 0)
-        }
-    }
     
     func onUpvote(song: DMEventSong) -> CocoaAction {
         return CocoaAction(

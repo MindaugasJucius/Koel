@@ -24,10 +24,8 @@ struct DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
     }
 
     @discardableResult
-    func createSong(title: String) -> Observable<DMEventSong> {
+    func store(song: DMEventSong) -> Observable<DMEventSong> {
         let result = withRealm("creating") { realm -> Observable<DMEventSong> in
-            let song = DMEventSong()
-            song.title = title
             try realm.write {
                 song.id = (realm.objects(DMEventSong.self).max(ofProperty: "id") ?? 0) + 1
                 realm.add(song)
