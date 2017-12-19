@@ -221,30 +221,28 @@ extension DMEventMultipeerService: MCNearbyServiceBrowserDelegate {
     
     func browser(_ browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String : String]?) {
 
-        //There might be cases when a peer is discovered twice (for example, after losing them)
-        guard nearbyPeers.value.flatMap({ $0.peerID }).index(of: peerID) == .none else {
-            nearbyPeers.value = nearbyPeers.value
-            nearbyHostPeers.onNext(nearbyPeers.value.filter { $0.isHost })
-            
-            return
-        } // reikia repostint jei antra karta ta pati randa, nes po backgroundo radus ta pati nereconnectina jei nepostini
-        
         let unmanagedPeer = DMEventPeer.peer(withPeerID: peerID, context: info)
-        print("foundPeer \(peerID.displayName) isHost \(unmanagedPeer.isHost)")
-        peerPersistenceService.store(peer: unmanagedPeer)
+        peerPersistenceService.peerExists(withPeerID: peerID)
+            .catchOnNil { [unowned self] () -> Observable<DMEventPeer> in
+                print("storing peer: \(peerID.displayName)")
+                return self.peerPersistenceService.store(peer: unmanagedPeer)
+            }
             .subscribe(
-                onNext: { [unowned self] eventPeer in
-                    self.nearbyPeers.value = self.nearbyPeers.value + [eventPeer]
+                onNext: { [unowned self] peer in
+                    if !self.nearbyPeers.value.contains(peer) {
+                        self.nearbyPeers.value = self.nearbyPeers.value + [peer]
+                    } else {
+                        self.nearbyPeers.value = self.nearbyPeers.value
+                    }
                     self.nearbyHostPeers.onNext(self.nearbyPeers.value.filter { $0.isHost })
-                    print("foundPeer \(peerID.displayName) isHost \(eventPeer.isHost)")
+                    print("foundPeer \(peerID.displayName) isHost \(peer.isHost)")
                     print("nearby peers \(self.nearbyPeers.value.map { $0.peerID?.displayName })")
                 },
                 onError: { error in
-                    print("ERROR WHILE PERSISTING FOUND PEER \(error.localizedDescription)")
+                    print("error on found peer \(error.localizedDescription)")
                 }
             )
             .disposed(by: disposeBag)
-
     }
     
     func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {
@@ -292,26 +290,24 @@ extension DMEventMultipeerService: MCSessionDelegate {
     public func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
         print("\(peerID.displayName) changed to state \(state.rawValue)")
         if state != .connecting {
-
-            //check if peer was persisted
             peerPersistenceService.peerExists(withPeerID: peerID).subscribe(
                 onNext: { [unowned self] peer in
-                    print("peer checking successful")
+                    print("peer existence checking for state change successful - peer \(peerID.displayName) \(peer != nil ? "exists" : "doesn't exist")")
+                    guard let `peer` = peer else {
+                        return
+                    }
                     self.performUpdate(forPeer: peer, toConnectedState: state == .connected)
                 },
                 onError: { error in
-                    print("\(error)")
+                    print("peer state change failed - \(error)")
                 }
             )
             .disposed(by: disposeBag)
-            
-            
         }
     }
     
     public func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
         let string = String(data: data, encoding: .utf8)
-        print("msg \(string)")
         receivedData.on(.next((peerID, data)))
     }
     

@@ -62,7 +62,7 @@ struct DMEventPeerPersistenceService: DMEventPeerPersistenceServiceType {
         }
     }
     
-    func peerExists(withPeerID peerID: MCPeerID) -> Observable<DMEventPeer> {
+    func peerExists(withPeerID peerID: MCPeerID) -> Observable<DMEventPeer?> {
         let threadSafeReference = withRealm("checking if peer exists") { realm -> ThreadSafeReference<DMEventPeer>? in
             let allPeers = realm.objects(DMEventPeer.self).toArray()
             for peer in allPeers {
@@ -76,10 +76,15 @@ struct DMEventPeerPersistenceService: DMEventPeerPersistenceServiceType {
             return nil
         }
         
-        guard let reference = threadSafeReference else {
-            return Observable.empty()
+        return Realm.optionalObjectOnMainSchedulerObservable(fromReference: threadSafeReference!, errorOnFailure: .existenceCheckFailed)
+            .map { optionalPeer -> DMEventPeer? in
+                guard let peer = optionalPeer else {
+                    return optionalPeer
+                }
+                peer.peerID = peerID
+                peer.primaryKeyRef = peer.id
+                return peer
         }
-        return peerOnMainScheduler(fromReference: reference, peerID: peerID, errorOnFailure: .existenceCheckFailed)
     }
     
     @discardableResult
