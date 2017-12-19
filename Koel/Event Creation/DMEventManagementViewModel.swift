@@ -10,6 +10,7 @@ import Foundation
 import Action
 import RxSwift
 import RealmSwift
+import MultipeerConnectivity
 
 class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
     
@@ -215,6 +216,24 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
             .disposed(by: disposeBag)
     }
     
+    private func share(song: DMEventSong) {
+        multipeerService.connectedPeers()
+            .map { peers in
+                return (peers.flatMap { $0.peerID }, song)
+            }
+            .subscribe(shareAction.inputs)
+            .disposed(by: disposeBag)
+    }
+    
+    private lazy var shareAction: Action<([MCPeerID], DMEventSong), Void> = {
+        return Action(workFactory: { [unowned self] (peers: [MCPeerID], song: DMEventSong) -> Observable<Void> in
+            let encoder = JSONEncoder()
+            let data = try! encoder.encode(song)
+
+            return self.multipeerService.send(toPeers: peers, data: data, mode: MCSessionSendDataMode.reliable)
+        })
+    }()
+    
     // MARK: - Connection bindables
     
     lazy var playedAction: Action<DMEventSong, Void> = {
@@ -228,8 +247,17 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
             let song = DMEventSong()
             song.title = "songy"
             song.addedBy = self.multipeerService.myEventPeer
+            
             return self.songPersistenceService
                 .store(song: song)
+                .do(
+                    onNext: { [unowned self] persistedSong in
+                        self.share(song: persistedSong)
+                    },
+                    onError: { persistenceError in
+                        
+                    }
+                )
                 .map { _ in }
         }
     }()

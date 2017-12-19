@@ -23,6 +23,14 @@ typealias EventPeerSection = AnimatableSectionModel<String, DMEventPeer>
 @objcMembers
 class DMEventPeer: Object, Codable {
     
+    private enum CodingKeys: String, CodingKey {
+        case fullName
+        case isHost
+        case isConnected
+        case isSelf
+        case peerIDData
+    }
+    
     dynamic var id: Int = 0
     dynamic var fullName: String? = nil
     dynamic var isHost: Bool = false

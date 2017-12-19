@@ -191,12 +191,12 @@ class DMEventMultipeerService: NSObject {
     
     //MARK: - Sending
     
-    func send(toPeer other: MCPeerID,
+    func send(toPeers others: [MCPeerID],
               data: Data,
               mode: MCSessionSendDataMode) -> Observable<Void> {
         return Observable.create { observer in
             do {
-                try self.session.send(data, toPeers: [other], with: mode)
+                try self.session.send(data, toPeers: others, with: mode)
                 observer.on(.next(()))
                 observer.on(.completed)
             } catch let error {
@@ -207,6 +207,12 @@ class DMEventMultipeerService: NSObject {
             // so do nothing on dispose.
             return Disposables.create {}
         }
+    }
+    
+    func send(toPeer other: MCPeerID,
+              data: Data,
+              mode: MCSessionSendDataMode) -> Observable<Void> {
+        return send(toPeers: [other], data: data, mode: mode)
     }
     
     //MARK: - Receiving
@@ -304,6 +310,7 @@ extension DMEventMultipeerService: MCSessionDelegate {
     
     public func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
         let string = String(data: data, encoding: .utf8)
+        print("received song data \(string)")
         receivedData.on(.next((peerID, data)))
     }
     
