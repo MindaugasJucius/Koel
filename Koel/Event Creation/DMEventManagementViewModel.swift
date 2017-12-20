@@ -233,7 +233,8 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
             print(String(data: data, encoding: .utf8)!)
             let decoder = JSONDecoder()
             decoder.dateDecodingStrategy = .iso8601
-            let beer = try! decoder.decode(DMEventSong.self, from: data)
+            let song = try! decoder.decode(DMEventSong.self, from: data)
+            self.songPersistenceService.store(song: song)
             return self.multipeerService.send(toPeers: peers, data: data, mode: MCSessionSendDataMode.reliable)
         })
     }()
@@ -251,7 +252,7 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
             let song = DMEventSong()
             song.title = "songy"
             song.addedBy = self.multipeerService.myEventPeer
-            
+            song.upvotees.append(self.multipeerService.myEventPeer)
             return self.songPersistenceService
                 .store(song: song)
                 .do(

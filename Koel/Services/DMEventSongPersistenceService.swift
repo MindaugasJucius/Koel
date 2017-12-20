@@ -29,9 +29,20 @@ struct DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
         let result = withRealm("creating") { realm -> Observable<DMEventSong> in
             try realm.write {
                 song.id = (realm.objects(DMEventSong.self).max(ofProperty: "id") ?? 0) + 1
+                
+                // Parse peer who added song that's being persisted
                 if let addedPeerUUID = song.addedByUUID {
-                    print(addedPeerUUID)
+                    let uuidPredicate = NSPredicate(format: "uuid = %@", addedPeerUUID)
+                    song.addedBy = realm.objects(DMEventPeer.self).filter(uuidPredicate).first
                 }
+                
+                // Parse peers who upvoted song that's being persisted
+                if let upvoteesUUIDs = song.upvotedByUUIDs {
+                    let uuidPredicate = NSPredicate(format: "uuid IN %@", upvoteesUUIDs)
+                    let upvotees = realm.objects(DMEventPeer.self).filter(uuidPredicate)
+                    song.upvotees.append(objectsIn: upvotees)
+                }
+                
                 realm.add(song)
             }
             return .just(song)
