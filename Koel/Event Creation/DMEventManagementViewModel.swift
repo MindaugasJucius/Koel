@@ -222,14 +222,17 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
                 return (peers.flatMap { $0.peerID }, song)
             }
             .subscribe(shareAction.inputs)
-            .disposed(by: disposeBag)
+            .dispose()
     }
     
     private lazy var shareAction: Action<([MCPeerID], DMEventSong), Void> = {
         return Action(workFactory: { [unowned self] (peers: [MCPeerID], song: DMEventSong) -> Observable<Void> in
             let encoder = JSONEncoder()
+            encoder.dateEncodingStrategy = .iso8601
             let data = try! encoder.encode(song)
-
+            print(String(data: data, encoding: .utf8)!)
+            let decoder = JSONDecoder()
+            let beer = try! decoder.decode(DMEventSong.self, from: data)
             return self.multipeerService.send(toPeers: peers, data: data, mode: MCSessionSendDataMode.reliable)
         })
     }()
