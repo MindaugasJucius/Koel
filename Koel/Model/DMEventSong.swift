@@ -20,8 +20,8 @@ class DMEventSong: Object, Codable {
     private enum CodingKeys: String, CodingKey {
         case title
         case added
-        case addedByPeerID
-        case upvotedByPeerIDs
+        case addedByUUID
+        case upvotedByUUIDs
         case played
         case upvoteCount
     }
@@ -35,15 +35,15 @@ class DMEventSong: Object, Codable {
     
     let upvotees = List<DMEventPeer>()
     
-    var addedByData: Data? = nil
-    var upvotedByData: [Data]? = nil
+    var addedByUUID: String? = nil
+    var upvotedByUUIDs: [String]? = nil
     
     override class func primaryKey() -> String? {
         return "id"
     }
     
     override static func ignoredProperties() -> [String] {
-        return ["peerID", "addedByData", "upvotedByData"]
+        return ["peerID", "addedByUUID", "upvotedByUUIDs"]
     }
     
     func encode(to encoder: Encoder) throws {
@@ -53,13 +53,14 @@ class DMEventSong: Object, Codable {
         try container.encode(title, forKey: .title)
         try container.encode(added, forKey: .added)
         try container.encode(played, forKey: .played)
-        try container.encode(addedBy?.peerIDData, forKey: .addedByPeerID)
+        try container.encode(addedBy?.uuid, forKey: .addedByUUID)
         try container.encode(upvoteCount, forKey: .upvoteCount)
         
-        var upvoteesPeerIDDataArray = container.nestedUnkeyedContainer(forKey: .upvotedByPeerIDs)
-        let upvoteesPeerIDData = upvotees.map { $0.peerIDData }
-        try upvoteesPeerIDData.forEach { peerIDData in
-            try upvoteesPeerIDDataArray.encode(peerIDData)
+        var upvoteesPeerIDDataArray = container.nestedUnkeyedContainer(forKey: .upvotedByUUIDs)
+        try upvotees
+            .map { $0.uuid }
+            .forEach { peerUUID in
+            try upvoteesPeerIDDataArray.encode(peerUUID)
         }
     }
 
@@ -68,15 +69,15 @@ class DMEventSong: Object, Codable {
         let title = try container.decode(String.self, forKey: .title)
         let added = try container.decode(Date.self, forKey: .added)
         let played = try container.decodeIfPresent(Date.self, forKey: .played)
-        let addedByPeerIDData = try container.decodeIfPresent(Data.self, forKey: .addedByPeerID)
+        let addedByUUID = try container.decodeIfPresent(String.self, forKey: .addedByUUID)
         let upvoteCount = try container.decode(Int.self, forKey: .upvoteCount)
         
-        var upvoteesPeerIDDataContainer = try container.nestedUnkeyedContainer(forKey: .upvotedByPeerIDs)
-        var upvoteesPeerIDData: [Data] = []
+        var upvoteesPeerUUIDsContainer = try container.nestedUnkeyedContainer(forKey: .upvotedByUUIDs)
+        var upvoteesPeerUUIDs: [String] = []
         
-        while !upvoteesPeerIDDataContainer.isAtEnd {
-            let upvoteeIDData = try upvoteesPeerIDDataContainer.decode(Data.self)
-            upvoteesPeerIDData.append(upvoteeIDData)
+        while !upvoteesPeerUUIDsContainer.isAtEnd {
+            let upvoteeUUID = try upvoteesPeerUUIDsContainer.decode(String.self)
+            upvoteesPeerUUIDs.append(upvoteeUUID)
         }
         
         super.init()
@@ -85,8 +86,8 @@ class DMEventSong: Object, Codable {
         self.added = added
         self.played = played
         self.upvoteCount = upvoteCount
-        self.upvotedByData = upvoteesPeerIDData
-        self.addedByData = addedByPeerIDData
+        self.upvotedByUUIDs = upvoteesPeerUUIDs
+        self.addedByUUID = addedByUUID
     }
 
     required init(value: Any, schema: RLMSchema) {

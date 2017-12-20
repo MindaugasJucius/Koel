@@ -10,6 +10,7 @@ import Foundation
 import RxSwift
 import RealmSwift
 import RxRealm
+import MultipeerConnectivity
 
 struct DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
     
@@ -28,6 +29,9 @@ struct DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
         let result = withRealm("creating") { realm -> Observable<DMEventSong> in
             try realm.write {
                 song.id = (realm.objects(DMEventSong.self).max(ofProperty: "id") ?? 0) + 1
+                if let addedPeerUUID = song.addedByUUID {
+                    print(addedPeerUUID)
+                }
                 realm.add(song)
             }
             return .just(song)

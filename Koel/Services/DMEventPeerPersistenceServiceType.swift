@@ -14,8 +14,9 @@ import MultipeerConnectivity
 struct DMEventPeerPersistenceContexts {
     
     enum ContextKeys: String {
-        case reconnect = "reconnect"
-        case isHost = "isHost"
+        case reconnect
+        case isHost
+        case uuid
     }
     
     static let hostDiscovery = [ContextKeys.isHost.rawValue: "true"]

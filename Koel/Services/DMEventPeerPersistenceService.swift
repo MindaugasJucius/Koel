@@ -100,8 +100,8 @@ struct DMEventPeerPersistenceService: DMEventPeerPersistenceServiceType {
     func retrieveSelf() -> DMEventPeer? {
         let result = withRealm("getting self peer") { realm -> DMEventPeer? in
             let selfPeer = realm.objects(DMEventPeer.self).filter("isSelf == true").first
-            if let peerIDData = selfPeer?.peerIDData {
-                selfPeer?.peerID = NSKeyedUnarchiver.unarchiveObject(with: peerIDData) as? MCPeerID
+            if let peer = selfPeer {
+                selfPeer?.peerID = NSKeyedUnarchiver.unarchiveObject(with: peer.peerIDData) as? MCPeerID
             }
             return selfPeer
         }
@@ -116,7 +116,7 @@ struct DMEventPeerPersistenceService: DMEventPeerPersistenceServiceType {
         return result ?? .empty()
     }
     
-    //MARK: - Retrieved object updates
+    // MARK: - Retrieved object updates
     
     func update(peer: DMEventPeer, toConnectedState isConnected: Bool) -> Observable<DMEventPeer> {
         let result = withRealm("updating peer connectivity state") { realm -> ThreadSafeReference<DMEventPeer> in

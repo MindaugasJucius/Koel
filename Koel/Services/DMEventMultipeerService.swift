@@ -61,9 +61,20 @@ class DMEventMultipeerService: NSObject {
             securityIdentity: nil,
             encryptionPreference: .required)
         
+        let discoveryInfo: [String:String]
+        let uuidDict = [DMEventPeerPersistenceContexts.ContextKeys.uuid.rawValue: self.myEventPeer.uuid]
+        
+        if eventHost {
+            var dict = DMEventPeerPersistenceContexts.hostDiscovery
+            dict.merge(uuidDict, uniquingKeysWith: { old, new in new })
+            discoveryInfo = dict
+        } else {
+            discoveryInfo = uuidDict
+        }
+        
         self.advertiser = MCNearbyServiceAdvertiser(
             peer: self.session.myPeerID,
-            discoveryInfo: eventHost ? DMEventPeerPersistenceContexts.hostDiscovery : nil,
+            discoveryInfo: discoveryInfo,
             serviceType: EventServiceType)
         
         self.browser = MCNearbyServiceBrowser(

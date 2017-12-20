@@ -11,13 +11,6 @@ import MultipeerConnectivity
 import RxDataSources
 import RealmSwift
 
-enum Peer: String {
-    case fullName
-    case peerID
-    case uuid
-    case isHost
-}
-
 typealias EventPeerSection = AnimatableSectionModel<String, DMEventPeer>
 
 @objcMembers
@@ -37,6 +30,7 @@ class DMEventPeer: Object, Codable {
     dynamic var isConnected: Bool = false
     dynamic var isSelf: Bool = false
     dynamic var peerIDData = Data()
+    dynamic var uuid = NSUUID().uuidString
     
     var peerID: MCPeerID? = nil
     
@@ -62,11 +56,14 @@ extension DMEventPeer {
         )
     }
     
-    static func peer(withPeerID peerID: MCPeerID, storeAsSelf: Bool = false, storeAsHost: Bool = false) -> DMEventPeer {
+    static func peer(withPeerID peerID: MCPeerID, storeAsSelf: Bool = false, storeAsHost: Bool = false, uuid: String? = nil) -> DMEventPeer {
         let peer = DMEventPeer()
         peer.peerID = peerID
         peer.isSelf = storeAsSelf
         peer.isHost = storeAsHost
+        if let `uuid` = uuid {
+            peer.uuid = uuid
+        }
         return peer
     }
     
@@ -74,8 +71,9 @@ extension DMEventPeer {
         guard let contextDict = context else {
             return DMEventPeer.peer(withPeerID: peerID, storeAsSelf: false, storeAsHost: false)
         }
-        let isHost = contextDict[Peer.isHost.rawValue]
-        return DMEventPeer.peer(withPeerID: peerID, storeAsSelf: false, storeAsHost: isHost != .none)
+        let isHost = contextDict[DMEventPeerPersistenceContexts.ContextKeys.isHost.rawValue]
+        let uuid = contextDict[DMEventPeerPersistenceContexts.ContextKeys.uuid.rawValue]
+        return DMEventPeer.peer(withPeerID: peerID, storeAsSelf: false, storeAsHost: isHost != .none, uuid: uuid)
     }
     
 }

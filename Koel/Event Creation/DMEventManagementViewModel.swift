@@ -232,6 +232,7 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
             let data = try! encoder.encode(song)
             print(String(data: data, encoding: .utf8)!)
             let decoder = JSONDecoder()
+            decoder.dateDecodingStrategy = .iso8601
             let beer = try! decoder.decode(DMEventSong.self, from: data)
             return self.multipeerService.send(toPeers: peers, data: data, mode: MCSessionSendDataMode.reliable)
         })
