@@ -21,12 +21,14 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
     let sceneCoordinator: SceneCoordinatorType
     let songPersistenceService: DMEventSongPersistenceServiceType
     let multipeerService: DMEventMultipeerService
+    let songSharingService: DMEventSongSharingServiceType
 
     var backgroundTaskID = UIBackgroundTaskInvalid
     
     init(withSceneCoordinator sceneCoordinator: SceneCoordinatorType, songPersistenceService: DMEventSongPersistenceServiceType) {
         
         self.sceneCoordinator = sceneCoordinator
+        self.songSharingService = DMEventSongSharingService()
         self.songPersistenceService = songPersistenceService
         
         self.multipeerService = DMEventMultipeerService(
@@ -227,15 +229,13 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
     
     private lazy var shareAction: Action<([MCPeerID], DMEventSong), Void> = {
         return Action(workFactory: { [unowned self] (peers: [MCPeerID], song: DMEventSong) -> Observable<Void> in
-            let encoder = JSONEncoder()
-            encoder.dateEncodingStrategy = .iso8601
-            let data = try! encoder.encode(song)
-            print(String(data: data, encoding: .utf8)!)
-            let decoder = JSONDecoder()
-            decoder.dateDecodingStrategy = .iso8601
-            let song = try! decoder.decode(DMEventSong.self, from: data)
-            self.songPersistenceService.store(song: song)
-            return self.multipeerService.send(toPeers: peers, data: data, mode: MCSessionSendDataMode.reliable)
+            do {
+                let songData = try self.songSharingService.encode(song: song)
+                return self.multipeerService.send(toPeers: peers, data: songData, mode: MCSessionSendDataMode.reliable)
+            }
+            catch {
+                return Observable.empty()
+            }
         })
     }()
     

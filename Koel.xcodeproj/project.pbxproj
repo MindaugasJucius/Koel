@@ -25,6 +25,8 @@
 		5F54458E1FD198C40059A975 /* DMEventInvitationsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F54458C1FD198C40059A975 /* DMEventInvitationsViewController.swift */; };
 		5F5445951FD594460059A975 /* DMEventParticipantViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F5445941FD594460059A975 /* DMEventParticipantViewModel.swift */; };
 		5F5445971FD594570059A975 /* DMEventParticipationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F5445961FD594570059A975 /* DMEventParticipationViewController.swift */; };
+		5F548F541FEAB55F007412F1 /* DMEventSongSharingServiceType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F548F531FEAB55F007412F1 /* DMEventSongSharingServiceType.swift */; };
+		5F548F561FEAB577007412F1 /* DMEventSongSharingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F548F551FEAB577007412F1 /* DMEventSongSharingService.swift */; };
 		5F58F0311F9CB793006B9B47 /* UIViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F58F0301F9CB793006B9B47 /* UIViewController+Extensions.swift */; };
 		5F601D3B1FD043DC003DE897 /* DMEventMultipeerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F601D3A1FD043DC003DE897 /* DMEventMultipeerService.swift */; };
 		5F601D3D1FD04851003DE897 /* DMEventInvitationsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F601D3C1FD04851003DE897 /* DMEventInvitationsViewModel.swift */; };
@@ -93,6 +95,8 @@
 		5F54458C1FD198C40059A975 /* DMEventInvitationsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventInvitationsViewController.swift; sourceTree = "<group>"; };
 		5F5445941FD594460059A975 /* DMEventParticipantViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventParticipantViewModel.swift; sourceTree = "<group>"; };
 		5F5445961FD594570059A975 /* DMEventParticipationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventParticipationViewController.swift; sourceTree = "<group>"; };
+		5F548F531FEAB55F007412F1 /* DMEventSongSharingServiceType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventSongSharingServiceType.swift; sourceTree = "<group>"; };
+		5F548F551FEAB577007412F1 /* DMEventSongSharingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventSongSharingService.swift; sourceTree = "<group>"; };
 		5F58F0301F9CB793006B9B47 /* UIViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extensions.swift"; sourceTree = "<group>"; };
 		5F601D3A1FD043DC003DE897 /* DMEventMultipeerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventMultipeerService.swift; sourceTree = "<group>"; };
 		5F601D3C1FD04851003DE897 /* DMEventInvitationsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventInvitationsViewModel.swift; sourceTree = "<group>"; };
@@ -238,8 +242,7 @@
 		5F01EC1E1F9256CB00E47E6A /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				5F84FFA81FDAF69E003332B4 /* DMEventSongPersistenceServiceType.swift */,
-				5F84FFA61FDAF0B8003332B4 /* DMEventSongPersistenceService.swift */,
+				5F548F571FEAB583007412F1 /* Songs */,
 				5F601D3A1FD043DC003DE897 /* DMEventMultipeerService.swift */,
 				5F84FFAD1FDC2F3F003332B4 /* DMEventPeerPersistenceServiceType.swift */,
 				5F84FFAF1FDC3AB0003332B4 /* DMEventPeerPersistenceService.swift */,
@@ -272,6 +275,17 @@
 				5F5445961FD594570059A975 /* DMEventParticipationViewController.swift */,
 			);
 			path = "Event Participation";
+			sourceTree = "<group>";
+		};
+		5F548F571FEAB583007412F1 /* Songs */ = {
+			isa = PBXGroup;
+			children = (
+				5F84FFA81FDAF69E003332B4 /* DMEventSongPersistenceServiceType.swift */,
+				5F84FFA61FDAF0B8003332B4 /* DMEventSongPersistenceService.swift */,
+				5F548F531FEAB55F007412F1 /* DMEventSongSharingServiceType.swift */,
+				5F548F551FEAB577007412F1 /* DMEventSongSharingService.swift */,
+			);
+			path = Songs;
 			sourceTree = "<group>";
 		};
 		5F58F0321F9CB7AE006B9B47 /* Extensions */ = {
@@ -593,6 +607,7 @@
 			files = (
 				5FB2C9381FE7F428001D532F /* CALayer+Extensions.swift in Sources */,
 				5F84FF9A1FD86350003332B4 /* DMEventManagementViewModel.swift in Sources */,
+				5F548F561FEAB577007412F1 /* DMEventSongSharingService.swift in Sources */,
 				5F9C2D231FDED1970067BDC4 /* DMKoelButton.swift in Sources */,
 				5FB2C9421FE92D26001D532F /* Realm+Rx.swift in Sources */,
 				5FA42B5C1FD6E6F600578EF5 /* Notifications.swift in Sources */,
@@ -630,6 +645,7 @@
 				5F014BD41FB9E20000079009 /* WaveView.swift in Sources */,
 				5F47B8341FD403780053A0A5 /* DMEventSearchViewController.swift in Sources */,
 				5FB2C9401FE8075F001D532F /* Stylesheet.swift in Sources */,
+				5F548F541FEAB55F007412F1 /* DMEventSongSharingServiceType.swift in Sources */,
 				5F47B83B1FD4073F0053A0A5 /* ViewModelType.swift in Sources */,
 				5F84FF9C1FD86367003332B4 /* DMEventManagementViewController.swift in Sources */,
 			);

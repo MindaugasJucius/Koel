@@ -15,6 +15,8 @@ struct DMEventParticipantViewModel: MultipeerViewModelType {
     private let disposeBag = DisposeBag()
     
     let multipeerService: DMEventMultipeerService
+    let songSharingService: DMEventSongSharingServiceType
+    
     private let host: DMEventPeer
     
     var hostExists: Observable<Bool> {
@@ -65,6 +67,8 @@ struct DMEventParticipantViewModel: MultipeerViewModelType {
     
     init(withMultipeerService multipeerService: DMEventMultipeerService, withHost host: DMEventPeer) {
         self.multipeerService = multipeerService
+        let songSharingService = DMEventSongSharingService()
+        self.songSharingService = songSharingService
         self.host = host
 
         incommingHostReconnectInvitations
@@ -89,6 +93,19 @@ struct DMEventParticipantViewModel: MultipeerViewModelType {
             }
             .map { _ in host }
             .subscribe(requestReconnect.inputs)
+            .disposed(by: disposeBag)
+        
+        self.multipeerService.receive()
+            .subscribe(
+                onNext: { peerID, data in
+                    do {
+                        let song = try songSharingService.parseSong(fromData: data)
+                        print("retrieved a song: \(song), added uuid: \(song.addedByUUID), upvoted uuids: \(song.upvotedByUUIDs)")
+                    } catch let error {
+                        print("song parsing failed: \(error.localizedDescription)")
+                    }
+                }
+            )
             .disposed(by: disposeBag)
     
         NotificationCenter.default.addObserver(
