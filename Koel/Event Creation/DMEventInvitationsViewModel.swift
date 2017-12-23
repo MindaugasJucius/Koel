@@ -11,7 +11,7 @@ import RxSwift
 import Action
 
 struct DMEventInvitationsViewModel: ViewModelType, MultipeerViewModelType {
-
+    
     private let disposeBag = DisposeBag()
     
     let multipeerService: DMEventMultipeerService

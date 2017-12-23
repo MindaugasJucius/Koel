@@ -60,6 +60,7 @@
 		5FB2C93E1FE8073B001D532F /* Style.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB2C93D1FE8073B001D532F /* Style.swift */; };
 		5FB2C9401FE8075F001D532F /* Stylesheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB2C93F1FE8075F001D532F /* Stylesheet.swift */; };
 		5FB2C9421FE92D26001D532F /* Realm+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB2C9411FE92D25001D532F /* Realm+Rx.swift */; };
+		5FD30C471FEE8ED100861353 /* DMEventSongSharingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FD30C461FEE8ED100861353 /* DMEventSongSharingViewModel.swift */; };
 		5FDEB6BA1F99235500070930 /* DMInitialLoadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FDEB6B81F99235500070930 /* DMInitialLoadingViewController.swift */; };
 		5FDEB6BB1F99235500070930 /* DMInitialLoadingViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5FDEB6B91F99235500070930 /* DMInitialLoadingViewController.xib */; };
 /* End PBXBuildFile section */
@@ -135,6 +136,7 @@
 		5FB2C93D1FE8073B001D532F /* Style.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Style.swift; sourceTree = "<group>"; };
 		5FB2C93F1FE8075F001D532F /* Stylesheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stylesheet.swift; sourceTree = "<group>"; };
 		5FB2C9411FE92D25001D532F /* Realm+Rx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Realm+Rx.swift"; sourceTree = "<group>"; };
+		5FD30C461FEE8ED100861353 /* DMEventSongSharingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventSongSharingViewModel.swift; sourceTree = "<group>"; };
 		5FDEB6B81F99235500070930 /* DMInitialLoadingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMInitialLoadingViewController.swift; sourceTree = "<group>"; };
 		5FDEB6B91F99235500070930 /* DMInitialLoadingViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DMInitialLoadingViewController.xib; sourceTree = "<group>"; };
 		859C054680781DDB43D6FFC3 /* Pods_Koel.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Koel.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -377,6 +379,7 @@
 				5F84FF991FD86350003332B4 /* DMEventManagementViewModel.swift */,
 				5F84FF9B1FD86367003332B4 /* DMEventManagementViewController.swift */,
 				5F84FFAB1FDB33F3003332B4 /* DMEventSongTableViewCell.swift */,
+				5FD30C461FEE8ED100861353 /* DMEventSongSharingViewModel.swift */,
 			);
 			path = "Event Creation";
 			sourceTree = "<group>";
@@ -646,6 +649,7 @@
 				5F01EC231F925EB200E47E6A /* CKRecord+Extensions.swift in Sources */,
 				5F601D3B1FD043DC003DE897 /* DMEventMultipeerService.swift in Sources */,
 				5F54458E1FD198C40059A975 /* DMEventInvitationsViewController.swift in Sources */,
+				5FD30C471FEE8ED100861353 /* DMEventSongSharingViewModel.swift in Sources */,
 				5F84FFA11FD98531003332B4 /* MultipeerViewModelType.swift in Sources */,
 				5F5445971FD594570059A975 /* DMEventParticipationViewController.swift in Sources */,
 				5F37D88A1FF3D0A6002E0ACD /* DMSpotifyService.swift in Sources */,

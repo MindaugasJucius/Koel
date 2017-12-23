@@ -86,19 +86,17 @@ class DMEventManagementViewController: UIViewController, BindableType {
     }
     
     func bindViewModel() {
-        viewModel.songsSectioned
+        viewModel.songSharing.songsSectioned
             .bind(to: tableView.rx.items(dataSource: tableViewDataSource))
             .disposed(by: disposeBag)
         
         tableView.rx
             .modelSelected(DMEventSong.self)
-            .filter { thing in
-                thing.played == .none
-            }
-            .subscribe(viewModel.playedAction.inputs)
+            .filter { $0.played == .none }
+            .subscribe(viewModel.songSharing.onPlayed.inputs)
             .disposed(by: disposeBag)
 
-        addButton.rx.action = viewModel.onSongCreate
+        addButton.rx.action = viewModel.songSharing.onSongCreate()
         invitationsButton.rx.action = viewModel.onInvite()
     }
 }
@@ -117,7 +115,7 @@ extension DMEventManagementViewController {
                 
                 songCell.configure(
                     withSong: element,
-                    upvoteAction: viewModel.onUpvote(song: element)
+                    upvoteAction: viewModel.songSharing.onUpvote(song: element)
                 )
                 
                 return cell

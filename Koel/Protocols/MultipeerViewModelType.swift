@@ -11,5 +11,12 @@ import Foundation
 protocol MultipeerViewModelType {
     
     var multipeerService: DMEventMultipeerService { get }
+
+}
+
+extension MultipeerViewModelType {
     
+    var selfPeer: DMEventPeer {
+        return multipeerService.myEventPeer
+    }
 }

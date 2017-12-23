@@ -19,22 +19,18 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
     private let peers = BehaviorSubject<[EventPeerSection]>(value: [EventPeerSection(model: "", items: [])])
     
     let sceneCoordinator: SceneCoordinatorType
-    let songPersistenceService: DMEventSongPersistenceServiceType
     let multipeerService: DMEventMultipeerService
-    let songSharingService: DMEventSongSharingServiceType
+    let songSharing: DMEventSongSharingViewModelType
 
     var backgroundTaskID = UIBackgroundTaskInvalid
     
-    init(withSceneCoordinator sceneCoordinator: SceneCoordinatorType, songPersistenceService: DMEventSongPersistenceServiceType) {
+    init(withSceneCoordinator sceneCoordinator: SceneCoordinatorType,
+         multipeerService: DMEventMultipeerService,
+         songSharingViewModel: DMEventSongSharingViewModelType) {
         
         self.sceneCoordinator = sceneCoordinator
-        self.songSharingService = DMEventSongSharingService()
-        self.songPersistenceService = songPersistenceService
-        
-        self.multipeerService = DMEventMultipeerService(
-            withDisplayName: UIDevice.current.name,
-            asEventHost: true
-        )
+        self.songSharing = songSharingViewModel
+        self.multipeerService = multipeerService
         
         multipeerService.startBrowsing()
         multipeerService.startAdvertising()
@@ -54,11 +50,11 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
         )
         
         setupConnectionObservables()
-        setupSongPersistenceObservables()
     }
     
     // MARK: - Connection observables
     
+    // MARK: shared
     private var incommingInvitations: Observable<(DMEventPeer, (Bool) -> (), Bool)> {
         return multipeerService
             .incomingPeerInvitations()
@@ -80,6 +76,7 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
             .share()
     }
     
+    // MARK: shared
     private var allPeersSectioned: Observable<[EventPeerSection]> {
         return Observable
             .of(multipeerService.nearbyFoundPeers(),
@@ -148,12 +145,6 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
                 handler(true)
             })
             .disposed(by: disposeBag)
-        
-        onSongCreate.errors.subscribe(
-            onNext: { actionError in
-                print("actionError \(actionError.localizedDescription)")
-            }
-        ).disposed(by: disposeBag)
     }
     
     // MARK: - Connection bindables
@@ -164,6 +155,7 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
         }
     }
     
+    // MARK: - shared/rename
     func onInvite() -> CocoaAction {
         return CocoaAction { [unowned self] _ in
             
@@ -181,100 +173,4 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
         }
     }
     
-    // MARK: - Song persistence observables
-    
-    var songsSectioned: Observable<[SongSection]> {
-        return songPersistenceService.songs()
-            .map { results in
-                
-                let songSortDescriptors = [
-                    SortDescriptor(keyPath: "upvoteCount", ascending: false),
-                    SortDescriptor(keyPath: "added", ascending: true)
-                ]
-                
-                let queuedSongs = results
-                    .filter("played == nil")
-                    .sorted(by: songSortDescriptors)
-                
-                let playedSongs = results
-                    .filter("played != nil")
-                    .sorted(byKeyPath: "played", ascending: false)
-                
-                return [
-                    SongSection(model: UIConstants.strings.queuedSongs, items: queuedSongs.toArray()),
-                    SongSection(model: UIConstants.strings.playedSongs, items: playedSongs.toArray())
-                ]
-            }
-            .observeOn(MainScheduler.instance)
-    }
-    
-    private func setupSongPersistenceObservables() {
-        songPersistenceService.songs()
-            .do(onNext: { results in
-                    print("persisted songs count\(results.count)")
-                }
-            )
-            .subscribe()
-            .disposed(by: disposeBag)
-    }
-    
-    private func share(song: DMEventSong) {
-        multipeerService.connectedPeers()
-            .map { peers in
-                return (peers.flatMap { $0.peerID }, song)
-            }
-            .subscribe(shareAction.inputs)
-            .dispose()
-    }
-    
-    private lazy var shareAction: Action<([MCPeerID], DMEventSong), Void> = {
-        return Action(workFactory: { [unowned self] (peers: [MCPeerID], song: DMEventSong) -> Observable<Void> in
-            do {
-                let songData = try self.songSharingService.encode(song: song)
-                return self.multipeerService.send(toPeers: peers, data: songData, mode: MCSessionSendDataMode.reliable)
-            }
-            catch {
-                return Observable.empty()
-            }
-        })
-    }()
-    
-    // MARK: - Connection bindables
-    
-    lazy var playedAction: Action<DMEventSong, Void> = {
-        return Action(workFactory: { [unowned self] (song: DMEventSong) -> Observable<Void> in
-            return self.songPersistenceService.markAsPlayed(song: song).map { _ in }
-        })
-    }()
-    
-    lazy var onSongCreate: CocoaAction = {
-        return CocoaAction { [unowned self] in
-            let song = DMEventSong()
-            song.title = "songy"
-            song.addedBy = self.multipeerService.myEventPeer
-            song.upvotees.append(self.multipeerService.myEventPeer)
-            return self.songPersistenceService
-                .store(song: song)
-                .do(
-                    onNext: { [unowned self] persistedSong in
-                        self.share(song: persistedSong)
-                    },
-                    onError: { persistenceError in
-                        
-                    }
-                )
-                .map { _ in }
-        }
-    }()
-    
-    func onUpvote(song: DMEventSong) -> CocoaAction {
-        return CocoaAction(
-            enabledIf: Observable.just(!song.upvotees.contains(multipeerService.myEventPeer)),
-            workFactory: { [unowned self] in
-                return self.songPersistenceService
-                    .upvote(song: song, forUser: self.multipeerService.myEventPeer)
-                    .map { _ in }
-            }
-        )
-    }
 }

@@ -30,7 +30,7 @@ struct DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
             try realm.write {
                 song.id = (realm.objects(DMEventSong.self).max(ofProperty: "id") ?? 0) + 1
                 
-                // Parse peer who added song that's being persisted
+                // Parse peer which added song that's being persisted
                 if let addedPeerUUID = song.addedByUUID {
                     let uuidPredicate = NSPredicate(format: "uuid = %@", addedPeerUUID)
                     song.addedBy = realm.objects(DMEventPeer.self).filter(uuidPredicate).first

@@ -21,10 +21,23 @@ struct DMFlowSelectionViewModel: ViewModelType {
     
     func onCreateEvent() -> CocoaAction {
         return CocoaAction { _ in
+
+            let multipeerService = DMEventMultipeerService(
+                withDisplayName: UIDevice.current.name,
+                asEventHost: true
+            )
+            
+            let songSharingViewModel = DMEventSongSharingViewModel(
+                songPersistenceService: DMEventSongPersistenceService(),
+                songSharingService: DMEventSongSharingService(),
+                multipeerService: multipeerService
+            )
             let manageEventViewModel = DMEventManagementViewModel(
                 withSceneCoordinator: self.sceneCoordinator,
-                songPersistenceService: DMEventSongPersistenceService()
+                multipeerService: multipeerService,
+                songSharingViewModel: songSharingViewModel
             )
+            
             return self.sceneCoordinator.transition(
                 to: Scene.manage(manageEventViewModel),
                 type: .rootWithNavigationVC
