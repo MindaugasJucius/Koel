@@ -16,6 +16,9 @@ class DMFlowSelectionViewController: UIViewController, BindableType {
     var viewModel: DMFlowSelectionViewModel
     
     //MARK: - UI elements
+    
+    private var koelButton = DMKoelButton()
+    
     private let stackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
@@ -50,8 +53,6 @@ class DMFlowSelectionViewController: UIViewController, BindableType {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let koelButton = DMKoelButton()
-        
         view.addSubview(koelButton)
         koelButton.addConstraints(inSuperview: view)
         koelButton.setTitle(UIConstants.strings.addSong, for: .normal)
@@ -70,6 +71,7 @@ class DMFlowSelectionViewController: UIViewController, BindableType {
     }
     
     func bindViewModel() {
+        koelButton.rx.action = viewModel.onSpotifyLogin()
         createButton.rx.action = viewModel.onCreateEvent()
         searchButton.rx.action = viewModel.onSearchEvent()
     }

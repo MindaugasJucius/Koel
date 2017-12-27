@@ -13,6 +13,7 @@ import CloudKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var window: UIWindow? = UIWindow(frame: UIScreen.main.bounds)
+    private weak var spotifyService: DMSpotifyService? = nil
     
     private var backgroundTaskID = UIBackgroundTaskInvalid
     
@@ -22,40 +23,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.makeKeyAndVisible()
         
         let sceneCoordinator = SceneCoordinator(window: window!)
+        let spotifyService = DMSpotifyService(withSceneCoordinator: sceneCoordinator)
         
-        let flowSelectionViewModel = DMFlowSelectionViewModel(withSceneCoordinator: sceneCoordinator)
+        let flowSelectionViewModel = DMFlowSelectionViewModel(withSceneCoordinator: sceneCoordinator, spotifyService: spotifyService)
         let flowSelectionScene = Scene.selectFlow(flowSelectionViewModel)
         
         sceneCoordinator.transition(to: flowSelectionScene, type: .root)
-
+        
+        self.spotifyService = spotifyService
         return true
     }
-    
-    // participant
-    
-    // enter background
-    // disconnect from session
-    
-    // enter foreground
-    // retrieve host if available
-        // try to connect ->
-            // success: show event management
-            // failure: show flow selection
-    
-    // host
-    
-    // persist on retrieving songs
-    
-    // enter background
-    // extend multipeer lifecycle with background tasks (about 180s)
-    // disconnect on task expiration
-    
-    // enter foreground
-    // wait for reconnections from participants
-        // try to connect to each one of them ->
-            // send song list
-            // send currently playing song id
-    
+
     func applicationWillEnterForeground(_ application: UIApplication) {
         NotificationCenter.default.post(name: Notifications.willEnterForeground, object: nil)
     }
@@ -76,6 +54,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func applicationWillTerminate(_ application: UIApplication) {
         print("application will terminate")
+    }
+    
+    func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
+        guard let spotifyService = spotifyService else {
+            return false
+        }
+        
+        spotifyService.handle(callbackURL: url)
+        return true
     }
 
 }

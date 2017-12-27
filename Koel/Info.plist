@@ -25,7 +25,7 @@
 			<string>mobile.computing.Koel</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>Koel://returnAfterLogin</string>
+				<string>koel</string>
 			</array>
 		</dict>
 	</array>

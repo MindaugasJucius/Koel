@@ -12,8 +12,10 @@ import RxSwift
 struct DMFlowSelectionViewModel: ViewModelType {
     
     let sceneCoordinator: SceneCoordinatorType
+    private let spotifyService: DMSpotifyService
     
-    init(withSceneCoordinator sceneCoordinator: SceneCoordinatorType) {
+    init(withSceneCoordinator sceneCoordinator: SceneCoordinatorType, spotifyService: DMSpotifyService) {
+        self.spotifyService = spotifyService
         self.sceneCoordinator = sceneCoordinator
     }
     
@@ -27,6 +29,13 @@ struct DMFlowSelectionViewModel: ViewModelType {
                 to: Scene.manage(manageEventViewModel),
                 type: .rootWithNavigationVC
             )
+        }
+    }
+    
+    func onSpotifyLogin() -> CocoaAction {
+        return CocoaAction { _ in
+            self.spotifyService.performLoginIfNeeded()
+            return Observable.empty()
         }
     }
     
