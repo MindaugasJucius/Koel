@@ -17,6 +17,9 @@
 		5F01EC0D1F8FD28400E47E6A /* KoelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F01EC0C1F8FD28400E47E6A /* KoelTests.swift */; };
 		5F01EC1A1F8FD2AA00E47E6A /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F01EC191F8FD2AA00E47E6A /* CloudKit.framework */; };
 		5F01EC231F925EB200E47E6A /* CKRecord+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F01EC221F925EB200E47E6A /* CKRecord+Extensions.swift */; };
+		5F37D8821FF3C4CC002E0ACD /* SpotifyMetadata.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F37D87F1FF3C4CB002E0ACD /* SpotifyMetadata.framework */; };
+		5F37D8831FF3C4CC002E0ACD /* SpotifyAudioPlayback.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F37D8801FF3C4CC002E0ACD /* SpotifyAudioPlayback.framework */; };
+		5F37D8841FF3C4CC002E0ACD /* SpotifyAuthentication.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F37D8811FF3C4CC002E0ACD /* SpotifyAuthentication.framework */; };
 		5F47B8341FD403780053A0A5 /* DMEventSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F47B8331FD403780053A0A5 /* DMEventSearchViewController.swift */; };
 		5F47B8361FD4064C0053A0A5 /* DMFlowSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F47B8351FD4064C0053A0A5 /* DMFlowSelectionViewController.swift */; };
 		5F47B8391FD406FB0053A0A5 /* DMFlowSelectionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F47B8381FD406FB0053A0A5 /* DMFlowSelectionViewModel.swift */; };
@@ -87,6 +90,10 @@
 		5F01EC171F8FD2A600E47E6A /* Koel.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Koel.entitlements; sourceTree = "<group>"; };
 		5F01EC191F8FD2AA00E47E6A /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		5F01EC221F925EB200E47E6A /* CKRecord+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CKRecord+Extensions.swift"; sourceTree = "<group>"; };
+		5F37D87F1FF3C4CB002E0ACD /* SpotifyMetadata.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SpotifyMetadata.framework; sourceTree = "<group>"; };
+		5F37D8801FF3C4CC002E0ACD /* SpotifyAudioPlayback.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SpotifyAudioPlayback.framework; sourceTree = "<group>"; };
+		5F37D8811FF3C4CC002E0ACD /* SpotifyAuthentication.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SpotifyAuthentication.framework; sourceTree = "<group>"; };
+		5F37D8851FF3C50B002E0ACD /* Koel-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Koel-Bridging-Header.h"; sourceTree = "<group>"; };
 		5F47B8331FD403780053A0A5 /* DMEventSearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventSearchViewController.swift; sourceTree = "<group>"; };
 		5F47B8351FD4064C0053A0A5 /* DMFlowSelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMFlowSelectionViewController.swift; sourceTree = "<group>"; };
 		5F47B8381FD406FB0053A0A5 /* DMFlowSelectionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMFlowSelectionViewModel.swift; sourceTree = "<group>"; };
@@ -138,7 +145,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5F37D8841FF3C4CC002E0ACD /* SpotifyAuthentication.framework in Frameworks */,
 				5F01EC1A1F8FD2AA00E47E6A /* CloudKit.framework in Frameworks */,
+				5F37D8831FF3C4CC002E0ACD /* SpotifyAudioPlayback.framework in Frameworks */,
+				5F37D8821FF3C4CC002E0ACD /* SpotifyMetadata.framework in Frameworks */,
 				33CD43033F2349BABFA21363 /* Pods_Koel.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -207,6 +217,7 @@
 				5F01EBFE1F8FD28400E47E6A /* Assets.xcassets */,
 				5F01EC001F8FD28400E47E6A /* LaunchScreen.storyboard */,
 				5F01EC031F8FD28400E47E6A /* Info.plist */,
+				5F37D8851FF3C50B002E0ACD /* Koel-Bridging-Header.h */,
 			);
 			path = Koel;
 			sourceTree = "<group>";
@@ -223,6 +234,9 @@
 		5F01EC181F8FD2AA00E47E6A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				5F37D8801FF3C4CC002E0ACD /* SpotifyAudioPlayback.framework */,
+				5F37D8811FF3C4CC002E0ACD /* SpotifyAuthentication.framework */,
+				5F37D87F1FF3C4CB002E0ACD /* SpotifyMetadata.framework */,
 				5F01EC191F8FD2AA00E47E6A /* CloudKit.framework */,
 				859C054680781DDB43D6FFC3 /* Pods_Koel.framework */,
 				C68936EB8AF29A19F4BC4C74 /* Pods_KoelTests.framework */,
@@ -420,6 +434,7 @@
 				TargetAttributes = {
 					5F01EBF31F8FD28400E47E6A = {
 						CreatedOnToolsVersion = 9.0;
+						LastSwiftMigration = 0920;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
@@ -801,13 +816,20 @@
 			baseConfigurationReference = 2F9833A4A17A19528964480E /* Pods-Koel.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Koel/Koel.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = PDR4VQLAH4;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				INFOPLIST_FILE = Koel/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = mobile.computing.Koel;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Koel/Koel-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -818,13 +840,19 @@
 			baseConfigurationReference = 1EEEA22101255BEC78867464 /* Pods-Koel.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Koel/Koel.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = PDR4VQLAH4;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				INFOPLIST_FILE = Koel/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = mobile.computing.Koel;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Koel/Koel-Bridging-Header.h";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
