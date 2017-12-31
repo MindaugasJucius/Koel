@@ -10,7 +10,7 @@ import Foundation
 import RxSwift
 import Action
 
-struct DMEventParticipantViewModel: MultipeerViewModelType {
+struct DMEventParticipationViewModel: MultipeerViewModelType {
     
     private let disposeBag = DisposeBag()
     

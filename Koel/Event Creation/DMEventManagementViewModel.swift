@@ -15,9 +15,7 @@ import MultipeerConnectivity
 class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
     
     private let disposeBag = DisposeBag()
-    
-    private let peers = BehaviorSubject<[EventPeerSection]>(value: [EventPeerSection(model: "", items: [])])
-    
+
     let sceneCoordinator: SceneCoordinatorType
     let multipeerService: DMEventMultipeerService
     let songSharing: DMEventSongSharingViewModelType
@@ -76,29 +74,6 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
             .share()
     }
     
-    // MARK: shared
-    private var allPeersSectioned: Observable<[EventPeerSection]> {
-        return Observable
-            .of(multipeerService.nearbyFoundPeers(),
-                multipeerService.connectedPeers())
-            .merge()
-            .map { results in
-                let peersWithoutHosts = results.filter { !$0.isHost }
-                
-                let connectedPeers = peersWithoutHosts.filter { $0.isConnected }
-                let nearbyPeers = peersWithoutHosts.filter { !$0.isConnected }
-                
-                print("sectioned peers OBSERVABLES RESULTS:")
-                print(results.map { return "\(String(describing: $0.peerID?.displayName)) \($0.isConnected)" })
-                
-                return [
-                    EventPeerSection(model: UIConstants.strings.joinedPeers, items: connectedPeers),
-                    EventPeerSection(model: UIConstants.strings.nearbyPeers, items: nearbyPeers)
-                ]
-            }
-            .observeOn(MainScheduler.instance)
-    }
-    
     private var incommingParticipantInvitations: Observable<(DMEventPeer, (Bool) -> ())> {
         return incommingInvitations
             .filter{ (_, _, reconnect) in
@@ -136,10 +111,6 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
             })
             .disposed(by: disposeBag)
         
-        allPeersSectioned
-            .subscribe(peers.asObserver())
-            .disposed(by: disposeBag)
-        
         incommingParticipantReconnectInvitations
             .subscribe(onNext: { handler in
                 handler(true)
@@ -162,7 +133,6 @@ class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
             let invitationsViewModel = DMEventInvitationsViewModel(
                 withSceneCoordinator: self.sceneCoordinator,
                 multipeerService: self.multipeerService,
-                peers: self.peers,
                 onClose: self.onInvitesClose()
             )
             

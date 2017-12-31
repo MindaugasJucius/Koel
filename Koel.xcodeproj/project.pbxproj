@@ -27,7 +27,7 @@
 		5F47B83B1FD4073F0053A0A5 /* ViewModelType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F47B83A1FD4073F0053A0A5 /* ViewModelType.swift */; };
 		5F54458B1FD1976D0059A975 /* DMEventSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F54458A1FD1976D0059A975 /* DMEventSearchViewModel.swift */; };
 		5F54458E1FD198C40059A975 /* DMEventInvitationsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F54458C1FD198C40059A975 /* DMEventInvitationsViewController.swift */; };
-		5F5445951FD594460059A975 /* DMEventParticipantViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F5445941FD594460059A975 /* DMEventParticipantViewModel.swift */; };
+		5F5445951FD594460059A975 /* DMEventParticipationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F5445941FD594460059A975 /* DMEventParticipationViewModel.swift */; };
 		5F5445971FD594570059A975 /* DMEventParticipationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F5445961FD594570059A975 /* DMEventParticipationViewController.swift */; };
 		5F548F541FEAB55F007412F1 /* DMEventSongSharingServiceType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F548F531FEAB55F007412F1 /* DMEventSongSharingServiceType.swift */; };
 		5F548F561FEAB577007412F1 /* DMEventSongSharingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F548F551FEAB577007412F1 /* DMEventSongSharingService.swift */; };
@@ -103,7 +103,7 @@
 		5F47B83A1FD4073F0053A0A5 /* ViewModelType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModelType.swift; sourceTree = "<group>"; };
 		5F54458A1FD1976D0059A975 /* DMEventSearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventSearchViewModel.swift; sourceTree = "<group>"; };
 		5F54458C1FD198C40059A975 /* DMEventInvitationsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventInvitationsViewController.swift; sourceTree = "<group>"; };
-		5F5445941FD594460059A975 /* DMEventParticipantViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventParticipantViewModel.swift; sourceTree = "<group>"; };
+		5F5445941FD594460059A975 /* DMEventParticipationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventParticipationViewModel.swift; sourceTree = "<group>"; };
 		5F5445961FD594570059A975 /* DMEventParticipationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventParticipationViewController.swift; sourceTree = "<group>"; };
 		5F548F531FEAB55F007412F1 /* DMEventSongSharingServiceType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventSongSharingServiceType.swift; sourceTree = "<group>"; };
 		5F548F551FEAB577007412F1 /* DMEventSongSharingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventSongSharingService.swift; sourceTree = "<group>"; };
@@ -290,7 +290,7 @@
 		5F5445931FD590470059A975 /* Event Participation */ = {
 			isa = PBXGroup;
 			children = (
-				5F5445941FD594460059A975 /* DMEventParticipantViewModel.swift */,
+				5F5445941FD594460059A975 /* DMEventParticipationViewModel.swift */,
 				5F5445961FD594570059A975 /* DMEventParticipationViewController.swift */,
 			);
 			path = "Event Participation";
@@ -635,7 +635,7 @@
 				5F84FFA31FDAEC82003332B4 /* DMEventSong.swift in Sources */,
 				5F8186121FBB6EDB00477C71 /* DMKoelLogoView.swift in Sources */,
 				5F81861E1FD3FADB00477C71 /* UINavigationController+Rx.swift in Sources */,
-				5F5445951FD594460059A975 /* DMEventParticipantViewModel.swift in Sources */,
+				5F5445951FD594460059A975 /* DMEventParticipationViewModel.swift in Sources */,
 				5FB2C93A1FE7F534001D532F /* CAGradientLayer+Extensions.swift in Sources */,
 				5F84FFAC1FDB33F3003332B4 /* DMEventSongTableViewCell.swift in Sources */,
 				5F601D3D1FD04851003DE897 /* DMEventInvitationsViewModel.swift in Sources */,

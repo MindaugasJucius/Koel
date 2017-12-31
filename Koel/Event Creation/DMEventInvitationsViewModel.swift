@@ -19,10 +19,22 @@ struct DMEventInvitationsViewModel: ViewModelType, MultipeerViewModelType {
     
     let onClose: CocoaAction
     
-    let allPeersSectioned: Observable<[EventPeerSection]>
-    
-    var latestConnectedPeer: Observable<DMEventPeer> {
-        return multipeerService.latestConnectedPeer()
+    var allPeersSectioned: Observable<[EventPeerSection]> {
+        return multipeerService.allPeers()
+            .map { results in
+                let participantPeers = results.filter { !$0.isHost }
+                
+                let connectedPeers = participantPeers.filter { $0.isConnected }
+                let nearbyPeers = participantPeers.filter { !$0.isConnected }
+                
+                let sections = [
+                    EventPeerSection(model: UIConstants.strings.joinedPeers, items: connectedPeers),
+                    EventPeerSection(model: UIConstants.strings.nearbyPeers, items: nearbyPeers)
+                ]
+                
+                return sections
+            }
+            .observeOn(MainScheduler.instance)
     }
     
     //MARK: - Actions
@@ -38,12 +50,10 @@ struct DMEventInvitationsViewModel: ViewModelType, MultipeerViewModelType {
     
     init(withSceneCoordinator sceneCoordinator: SceneCoordinatorType,
          multipeerService: DMEventMultipeerService,
-         peers: Observable<[EventPeerSection]>,
          onClose: CocoaAction) {
         self.sceneCoordinator = sceneCoordinator
         self.multipeerService = multipeerService
         self.onClose = onClose
-        self.allPeersSectioned = peers
     }
     
 }

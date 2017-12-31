@@ -12,9 +12,9 @@ import RxSwift
 
 class DMEventParticipationViewController: UIViewController, BindableType {
 
-    typealias ViewModelType = DMEventParticipantViewModel
+    typealias ViewModelType = DMEventParticipationViewModel
     
-    var viewModel: DMEventParticipantViewModel
+    var viewModel: DMEventParticipationViewModel
 
     private let disposeBag = DisposeBag()
     
@@ -22,7 +22,7 @@ class DMEventParticipationViewController: UIViewController, BindableType {
     
     private let label = UILabel()
     
-    required init(withViewModel viewModel: DMEventParticipantViewModel) {
+    required init(withViewModel viewModel: DMEventParticipationViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }

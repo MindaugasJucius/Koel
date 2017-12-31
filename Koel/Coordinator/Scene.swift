@@ -20,7 +20,7 @@ enum Scene {
 
     //MARK: Participant
     case search(DMEventSearchViewModel)
-    case participation(DMEventParticipantViewModel)
+    case participation(DMEventParticipationViewModel)
     
     //MARK: Spotify
     case authenticateSpotify(URL)

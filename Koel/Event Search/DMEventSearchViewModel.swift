@@ -14,6 +14,7 @@ import MultipeerConnectivity
 class DMEventSearchViewModel: ViewModelType, MultipeerViewModelType {
     
     private let disposeBag = DisposeBag()
+    
     let multipeerService = DMEventMultipeerService(
         withDisplayName: UIDevice.current.name,
         asEventHost: false
@@ -44,7 +45,7 @@ class DMEventSearchViewModel: ViewModelType, MultipeerViewModelType {
     private lazy var pushParticipation: Action<DMEventPeer, Void> = {
         return Action (
             workFactory: { [unowned self] host in
-                let participationModel = DMEventParticipantViewModel(withMultipeerService: self.multipeerService, withHost: host)
+                let participationModel = DMEventParticipationViewModel(withMultipeerService: self.multipeerService, withHost: host)
                 let participationScene = Scene.participation(participationModel)
                 return self.sceneCoordinator.transition(to: participationScene, type: .root)
             }
