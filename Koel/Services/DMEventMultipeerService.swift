@@ -104,6 +104,10 @@ class DMEventMultipeerService: NSObject {
         return connections.asObservable()
     }
     
+    func allPeers() -> Observable<[DMEventPeer]> {
+        return Observable.of(connectedPeers(), nearbyFoundPeers()).flatMap { $0 }
+    }
+    
     func latestConnectedPeer() -> Observable<DMEventPeer> {
         return latestConnection.asObservable()
     }
