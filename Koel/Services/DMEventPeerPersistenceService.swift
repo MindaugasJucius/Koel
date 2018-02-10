@@ -41,6 +41,7 @@ struct DMEventPeerPersistenceService: DMEventPeerPersistenceServiceType {
                 if let peerID = peer.peerID {
                     peer.peerIDData = NSKeyedArchiver.archivedData(withRootObject: peerID)
                 }
+                peer.primaryKeyRef = peer.id
                 realm.add(peer)
             }
 
@@ -50,7 +51,7 @@ struct DMEventPeerPersistenceService: DMEventPeerPersistenceServiceType {
         return peerOnMainScheduler(fromReference: result, peerID: peer.peerID, errorOnFailure: .peerCreationFailed)
     }
     
-    func delete(peer: DMEventPeer) throws {
+    func delete(peer: DMEventPeer) -> Observable<Void> {
         _ = withRealm("deleting peer") { realm -> Void in
             guard let peerToDelete = realm.object(ofType: DMEventPeer.self, forPrimaryKey: peer.primaryKeyRef) else {
                 throw DMEventPeerPersistenceServiceError.deletionFailed(peer)
@@ -61,6 +62,8 @@ struct DMEventPeerPersistenceService: DMEventPeerPersistenceServiceType {
             }
             print("deleted peer: \(String(describing: peer.peerID?.displayName)), primarykey: \(peerToDelete.primaryKeyRef)")
         }
+        
+        return .empty()
     }
     
     func peerExists(withPeerID peerID: MCPeerID) -> Observable<DMEventPeer?> {

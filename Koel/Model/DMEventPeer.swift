@@ -44,6 +44,16 @@ class DMEventPeer: Object, Codable {
         return "id"
     }
     
+    var discoveryContext: [String:String] {
+        var discoveryInfo = ContextKeys.uuid(uuid).dictionary
+        
+        if isHost {
+            discoveryInfo.merge(ContextKeys.isHost.dictionary,
+                                uniquingKeysWith: { old, new in new })
+        }
+        return discoveryInfo
+    }
+    
 }
 
 extension DMEventPeer {

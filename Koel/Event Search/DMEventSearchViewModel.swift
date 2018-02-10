@@ -15,10 +15,7 @@ class DMEventSearchViewModel: ViewModelType, MultipeerViewModelType {
     
     private let disposeBag = DisposeBag()
     
-    let multipeerService = DMEventMultipeerService(
-        withDisplayName: UIDevice.current.name,
-        asEventHost: false
-    )
+    let multipeerService = DMEventMultipeerService(asEventHost: false)
     
     let sceneCoordinator: SceneCoordinatorType
 
@@ -45,6 +42,7 @@ class DMEventSearchViewModel: ViewModelType, MultipeerViewModelType {
     private lazy var pushParticipation: Action<DMEventPeer, Void> = {
         return Action (
             workFactory: { [unowned self] host in
+                
                 let songSharingViewModel = DMEventSongSharingViewModel(
                     songPersistenceService: DMEventSongPersistenceService(),
                     songSharingService: DMEventSongSharingService(),
@@ -68,17 +66,16 @@ class DMEventSearchViewModel: ViewModelType, MultipeerViewModelType {
     
     lazy var createEvent: CocoaAction = { this in
         return CocoaAction { _ in
-            
-            let multipeerService = DMEventMultipeerService(
-                withDisplayName: UIDevice.current.name,
-                asEventHost: true
-            )
+            this.multipeerService.stopAdvertising()
+            this.multipeerService.stopBrowsing()
+            this.multipeerService.disconnect()
             
             let songSharingViewModel = DMEventSongSharingViewModel(
                 songPersistenceService: DMEventSongPersistenceService(),
                 songSharingService: DMEventSongSharingService(),
-                multipeerService: multipeerService
+                multipeerService: DMEventMultipeerService(asEventHost: true)
             )
+            
             let manageEventViewModel = DMEventManagementViewModel(
                 sceneCoordinator: this.sceneCoordinator,
                 songSharingViewModel: songSharingViewModel

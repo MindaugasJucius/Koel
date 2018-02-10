@@ -21,6 +21,7 @@ class DMEventMultipeerService: NSObject {
     private let advertiser: MCNearbyServiceAdvertiser
     private let browser: MCNearbyServiceBrowser
     private let session: MCSession
+    
     private let peerPersistenceService: DMEventPeerPersistenceServiceType
     
     private let incomingInvitations: PublishSubject<(MCPeerID, [String: Any]?, (Bool, MCSession?) -> Void)> = PublishSubject()
@@ -38,51 +39,44 @@ class DMEventMultipeerService: NSObject {
     
     private let receivedData: PublishSubject<(MCPeerID, Data)> = PublishSubject()
     
-    init(withDisplayName displayName: String, asEventHost eventHost: Bool, peerPersistenceService: DMEventPeerPersistenceService = DMEventPeerPersistenceService()) {
+    init(withDisplayName displayName: String = UIDevice.current.name, asEventHost eventHost: Bool, peerPersistenceService: DMEventPeerPersistenceService = DMEventPeerPersistenceService()) {
         self.peerPersistenceService = peerPersistenceService
         
+        let peerID = MCPeerID(displayName: displayName)
+        
         if let selfPeer = DMEventMultipeerService.retrieveSelfPeer(withPeerPersistenceService: peerPersistenceService) {
+            peerPersistenceService.update(peer: selfPeer) {
+                $0.isHost = eventHost
+                return $0
+            }
             self.myEventPeer = selfPeer
         } else {
             let newlyStoredPeer = DMEventMultipeerService.storeSelfPeer(
                 withPeerPersistenceService: peerPersistenceService,
-                withDisplayName: UIDevice.current.name, asHost:
-                eventHost
+                withPeerID: peerID,
+                asHost: eventHost
             )
             self.myEventPeer = newlyStoredPeer
         }
 
-        guard let peerID = self.myEventPeer.peerID else {
-            fatalError("no peer id")
-        }
-        
         self.session = MCSession(
             peer: peerID,
             securityIdentity: nil,
-            encryptionPreference: .required)
-        
-        let discoveryInfo: [String:String]
-        let uuidDict = [DMEventPeerPersistenceContexts.ContextKeys.uuid.rawValue: self.myEventPeer.uuid]
-        
-        if eventHost {
-            var dict = DMEventPeerPersistenceContexts.hostDiscovery
-            dict.merge(uuidDict, uniquingKeysWith: { old, new in new })
-            discoveryInfo = dict
-        } else {
-            discoveryInfo = uuidDict
-        }
+            encryptionPreference: .none
+        )
         
         self.advertiser = MCNearbyServiceAdvertiser(
-            peer: self.session.myPeerID,
-            discoveryInfo: discoveryInfo,
-            serviceType: EventServiceType)
+            peer: peerID,
+            discoveryInfo: self.myEventPeer.discoveryContext,
+            serviceType: EventServiceType
+        )
         
         self.browser = MCNearbyServiceBrowser(
-            peer: self.session.myPeerID,
-            serviceType: EventServiceType)
+            peer: peerID,
+            serviceType: EventServiceType
+        )
         
         super.init()
-    
         advertiser.delegate = self
         browser.delegate = self
         session.delegate = self
@@ -140,16 +134,14 @@ class DMEventMultipeerService: NSObject {
     
     //MARK: - Advertising
     
-    @discardableResult
-    func startAdvertising() -> Observable<Void> {
-        return .just(advertiser.startAdvertisingPeer())
+    func startAdvertising() {
+        self.advertiser.startAdvertisingPeer()
     }
 
-    @discardableResult
-    func stopAdvertising() -> Observable<Void> {
-        return .just(advertiser.stopAdvertisingPeer())
+    func stopAdvertising() {
+        self.advertiser.stopAdvertisingPeer()
     }
-
+    
     //MARK: - Browsing
     
     @discardableResult
@@ -197,9 +189,13 @@ class DMEventMultipeerService: NSObject {
     ///             host: store self peer as host
     /// - Returns: created and stored identity
     static func storeSelfPeer(withPeerPersistenceService persistenceService: DMEventPeerPersistenceServiceType,
-                              withDisplayName displayName: String,
+                              withPeerID peerID: MCPeerID,
                               asHost host: Bool) -> DMEventPeer {
-        let selfPeer = DMEventPeer.peer(withDisplayName: displayName, storeAsSelf: true, storeAsHost: host)
+        let selfPeer = DMEventPeer.peer(
+            withPeerID: peerID,
+            storeAsSelf: true,
+            storeAsHost: host
+        )
         persistenceService.store(peer: selfPeer)
         return selfPeer
     }
@@ -348,7 +344,12 @@ extension DMEventMultipeerService: MCSessionDelegate {
 extension DMEventMultipeerService {
     
     func performUpdate(forPeer peer: DMEventPeer, toConnectedState connected: Bool) {
-        peerPersistenceService.update(peer: peer, toConnectedState: connected)
+        let peerUpdate: PeerUpdate = {
+            $0.isConnected = connected
+            return $0
+        }
+        
+        peerPersistenceService.update(peer: peer, updateBlock: peerUpdate)
         .subscribe(
             onNext: { [unowned self] updatedPeer in
                 //Is a currently connected peer changing state
