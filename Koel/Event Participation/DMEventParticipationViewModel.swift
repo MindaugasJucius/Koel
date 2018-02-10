@@ -11,16 +11,16 @@ import RxSwift
 import Action
 
 struct DMEventParticipationViewModel: MultipeerViewModelType {
-    
-    var multipeerService: DMEventMultipeerService {
-        return songSharingViewModel.multipeerService
-    }
 
     private let disposeBag = DisposeBag()
     
     let songSharingViewModel: DMEventSongSharingViewModelType
     
     private let host: DMEventPeer
+    
+    var multipeerService: DMEventMultipeerService {
+        return songSharingViewModel.multipeerService
+    }
     
     var hostExists: Observable<Bool> {
         return multipeerService.connectedPeers().map { peers in
@@ -37,7 +37,7 @@ struct DMEventParticipationViewModel: MultipeerViewModelType {
         }
     }
     
-    private var incommingHostReconnectInvitations: Observable<(Bool) -> ()> {
+    private var hostReconnectInvitations: Observable<(Bool) -> ()> {
         return multipeerService
             .incomingPeerInvitations()
             .filter { (client, context, handler) in
@@ -72,7 +72,7 @@ struct DMEventParticipationViewModel: MultipeerViewModelType {
         self.songSharingViewModel = songSharingViewModel
         self.host = host
 
-        incommingHostReconnectInvitations
+        hostReconnectInvitations
             .subscribe(onNext: { handler in
                     handler(true)
                 }
@@ -94,19 +94,6 @@ struct DMEventParticipationViewModel: MultipeerViewModelType {
             }
             .map { _ in host }
             .subscribe(requestReconnect.inputs)
-            .disposed(by: disposeBag)
-        
-        self.multipeerService.receive()
-            .subscribe(
-                onNext: { peerID, data in
-                    do {
-                        let song = try songSharingViewModel.songSharingService.parseSong(fromData: data)
-                        print("retrieved a song: \(song), added uuid: \(song.addedByUUID), upvoted uuids: \(song.upvotedByUUIDs)")
-                    } catch let error {
-                        print("song parsing failed: \(error.localizedDescription)")
-                    }
-                }
-            )
             .disposed(by: disposeBag)
     
         NotificationCenter.default.addObserver(

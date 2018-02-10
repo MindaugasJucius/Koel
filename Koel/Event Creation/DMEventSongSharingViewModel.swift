@@ -39,12 +39,26 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
         self.songPersistenceService = songPersistenceService
         self.multipeerService = multipeerService
         
+        multipeerService.receive()
+            .subscribe(
+                onNext: { peerID, data in
+                    do {
+                        let song = try songSharingService.parseSong(fromData: data)
+                        print("retrieved a song: \(song), added uuid: \(song.addedByUUID), upvoted uuids: \(song.upvotedByUUIDs)")
+                    } catch let error {
+                        print("song parsing failed: \(error.localizedDescription)")
+                    }
+                }
+            )
+            .disposed(by: disposeBag)
         
-        onSongCreate().errors.subscribe(
-            onNext: { actionError in
-                print("actionError \(actionError.localizedDescription)")
-            }
-        ).disposed(by: disposeBag)
+        onSongCreate().errors
+            .subscribe(
+                onNext: { actionError in
+                    print("song create error: \(actionError.localizedDescription)")
+                }
+            )
+            .disposed(by: disposeBag)
     }
     
     var songsSectioned: Observable<[SongSection]> {

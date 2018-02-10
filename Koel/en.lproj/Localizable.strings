@@ -22,5 +22,5 @@
 "PARTICIPATE_TITLE" = "Participate";
 
 // Search
-"SEARCH_SCREEN_TITLE" = "Search for Party Hosts";
-"SEARCH_SCREEN_TITLE_START" = "Start a Party";
+"SEARCH_SCREEN_TITLE" = "Party Hosts Near You";
+"SEARCH_SCREEN_TITLE_START" = "Start Your Own Party";

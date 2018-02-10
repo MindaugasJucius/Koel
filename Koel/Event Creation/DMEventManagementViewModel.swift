@@ -54,7 +54,7 @@ class DMEventManagementViewModel: ViewModelType, MultipeerViewModelType, Backgro
     // MARK: - Connection observables
     
     // MARK: shared
-    private var incommingInvitations: Observable<(DMEventPeer, (Bool) -> (), Bool)> {
+    private var connectionRequests: Observable<(DMEventPeer, (Bool) -> (), Bool)> {
         return multipeerService
             .incomingPeerInvitations()
             .map { (client, context, handler) in
@@ -75,8 +75,8 @@ class DMEventManagementViewModel: ViewModelType, MultipeerViewModelType, Backgro
             .share()
     }
     
-    private var incommingParticipantInvitations: Observable<(DMEventPeer, (Bool) -> ())> {
-        return incommingInvitations
+    private var participantWantsJoinRequests: Observable<(DMEventPeer, (Bool) -> ())> {
+        return connectionRequests
             .filter{ (_, _, reconnect) in
                 return !reconnect
             }
@@ -85,8 +85,8 @@ class DMEventManagementViewModel: ViewModelType, MultipeerViewModelType, Backgro
         }
     }
     
-    private var incommingParticipantReconnectInvitations: Observable<(Bool) -> ()> {
-        return incommingInvitations
+    private var participantWantsReconnectRequests: Observable<(Bool) -> ()> {
+        return connectionRequests
             .filter{ (_, _, reconnect) in
                 return reconnect
             }
@@ -96,7 +96,7 @@ class DMEventManagementViewModel: ViewModelType, MultipeerViewModelType, Backgro
     }
     
     private func setupConnectionObservables() {
-        incommingParticipantInvitations
+        participantWantsJoinRequests
             .subscribe(onNext: { [unowned self] invitation in
                 let alert = UIAlertController(title: "Connection request", message: "\(invitation.0.peerID?.displayName) wants to join your party", preferredStyle: .alert)
                 let connectAction = UIAlertAction(title: "Yes", style: UIAlertActionStyle.default, handler: { action in
@@ -112,7 +112,7 @@ class DMEventManagementViewModel: ViewModelType, MultipeerViewModelType, Backgro
             })
             .disposed(by: disposeBag)
         
-        incommingParticipantReconnectInvitations
+        participantWantsReconnectRequests
             .subscribe(onNext: { handler in
                 handler(true)
             })

@@ -324,7 +324,6 @@ extension DMEventMultipeerService: MCSessionDelegate {
     }
     
     public func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
-        let string = String(data: data, encoding: .utf8)
         receivedData.on(.next((peerID, data)))
     }
     
