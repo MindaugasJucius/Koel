@@ -10,11 +10,13 @@ import Foundation
 import RxSwift
 import Action
 
-struct DMEventParticipationViewModel: MultipeerViewModelType {
+class DMEventParticipationViewModel: MultipeerViewModelType, BackgroundDisconnectType {
 
     private let disposeBag = DisposeBag()
     
     let songSharingViewModel: DMEventSongSharingViewModelType
+
+    var backgroundTaskID = UIBackgroundTaskInvalid
     
     private let host: DMEventPeer
     
@@ -24,7 +26,7 @@ struct DMEventParticipationViewModel: MultipeerViewModelType {
     
     var hostExists: Observable<Bool> {
         return multipeerService.connectedPeers()
-            .map { peers in
+            .map { [unowned self] peers in
                 let hostExists = peers.filter { $0.peerID == self.host.peerID }.count == 1
                 print("hostExists observable \(hostExists)")
                 return hostExists
@@ -33,7 +35,7 @@ struct DMEventParticipationViewModel: MultipeerViewModelType {
     
     private var hostNearby: Observable<Bool> {
         return multipeerService.nearbyFoundHostPeers()
-            .map { peers in
+            .map { [unowned self] peers in
                 print("hostNearby observable \(peers.map { $0.peerID?.displayName })")
                 return peers.filter { $0.peerID == self.host.peerID }.count == 1
             }
@@ -43,22 +45,13 @@ struct DMEventParticipationViewModel: MultipeerViewModelType {
     private var hostReconnectInvitations: Observable<(Bool) -> ()> {
         return multipeerService
             .incomingPeerInvitations()
-            .filter { (client, context, handler) in
+            .filter { [unowned self] (client, context, handler) in
                 let eventPeer = DMEventPeer.peer(withPeerID: client, context: context as? [String : String])
                 return eventPeer.isHost && eventPeer.peerID == self.host.peerID
             }
             .map { (_, _, handler) in
                 return handler
             }
-    }
-    
-    private var didEnterBackgroundNotificationHandler: (Notification) -> () {
-        return { (notification: Notification) in
-            guard notification.name == Notifications.didEnterBackground else {
-                return
-            }
-            self.multipeerService.disconnect()
-        }
     }
     
     lazy var requestReconnect: Action<(DMEventPeer), Void> = { this in
@@ -94,12 +87,19 @@ struct DMEventParticipationViewModel: MultipeerViewModelType {
             .map { _ in host }
             .subscribe(requestReconnect.inputs)
             .disposed(by: disposeBag)
-    
+
         NotificationCenter.default.addObserver(
             forName: Notifications.didEnterBackground,
             object: nil,
             queue: nil,
             using: didEnterBackgroundNotificationHandler
+        )
+        
+        NotificationCenter.default.addObserver(
+            forName: Notifications.willEnterForeground,
+            object: nil,
+            queue: nil,
+            using: willEnterForegroundNotificationHandler
         )
     }
     
