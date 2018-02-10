@@ -25,10 +25,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let sceneCoordinator = SceneCoordinator(window: window!)
         let spotifyService = DMSpotifyService(withSceneCoordinator: sceneCoordinator)
         
-        let flowSelectionViewModel = DMFlowSelectionViewModel(withSceneCoordinator: sceneCoordinator, spotifyService: spotifyService)
-        let flowSelectionScene = Scene.selectFlow(flowSelectionViewModel)
-        
-        sceneCoordinator.transition(to: flowSelectionScene, type: .root)
+        let eventSearchViewModel = DMEventSearchViewModel(withSceneCoordinator: sceneCoordinator)
+        let eventSearchScene = Scene.search(eventSearchViewModel)
+
+        sceneCoordinator.transition(to: eventSearchScene, type: .rootWithNavigationVC)
         
         self.spotifyService = spotifyService
         return true

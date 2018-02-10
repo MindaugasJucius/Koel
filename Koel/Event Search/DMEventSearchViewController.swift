@@ -18,6 +18,7 @@ class DMEventSearchViewController: UIViewController, BindableType {
     var viewModel: DMEventSearchViewModel
     
     private var bag = DisposeBag()
+    private var startEventButton = DMKoelButton()
     
     //MARK: UI
     private let tableView = UITableView()
@@ -49,6 +50,10 @@ class DMEventSearchViewController: UIViewController, BindableType {
             tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ]
         NSLayoutConstraint.activate(constraints)
+        
+        view.addSubview(startEventButton)
+        startEventButton.addConstraints(inSuperview: view)
+        startEventButton.setTitle(UIConstants.strings.searchScreenButtonStartEventTitle, for: .normal)
     }
 
     func bindViewModel() {
@@ -71,6 +76,8 @@ class DMEventSearchViewController: UIViewController, BindableType {
                 return cell
             }
             .disposed(by: bag)
+        
+        startEventButton.rx.action = viewModel.createEvent
         
         tableView.rx
             .modelSelected(DMEventPeer.self)

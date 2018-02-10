@@ -12,14 +12,13 @@ import SafariServices
 
 enum Scene {
     //MARK: Shared
-    case selectFlow(DMFlowSelectionViewModel)
+    case search(DMEventSearchViewModel)
 
     //MARK: Host
     case invite(DMEventInvitationsViewModel)
     case manage(DMEventManagementViewModel)
 
     //MARK: Participant
-    case search(DMEventSearchViewModel)
     case participation(DMEventParticipationViewModel)
     
     //MARK: Spotify
@@ -29,17 +28,12 @@ enum Scene {
 extension Scene {
     func viewController() -> UIViewController {
         switch self {
-        //MARK: General
-        case .selectFlow(let viewModel):
-            let flowSelectionVC = DMFlowSelectionViewController(withViewModel: viewModel)
-            flowSelectionVC.setupForViewModel()
-            return flowSelectionVC
-        
-        //MARK: Participant
+        //MARK: Shared
         case .search(let viewModel):
             let eventSearchVC = DMEventSearchViewController(withViewModel: viewModel)
             eventSearchVC.setupForViewModel()
             return eventSearchVC
+        //MARK: Participant
         case .participation(let viewModel):
             let eventParticipationVC = DMEventParticipationViewController(withViewModel: viewModel)
             eventParticipationVC.setupForViewModel()

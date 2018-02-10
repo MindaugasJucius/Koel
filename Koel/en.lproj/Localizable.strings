@@ -11,10 +11,6 @@
 "QUEUED_SONGS_SECTION_TITLE" = "Queued";
 "PLAYED_SONGS_SECTION_TITLE" = "Played";
 
-// Flow selection
-"SEARCH_NEARBY_EVENTS" = "Search";
-"CREATE_EVENT" = "Create";
-
 // Management
 "NEARBY_PEERS_SECTION_TITLE" = "Nearby";
 "JOINED_PEERS_SECTION_TITLE" = "Joined";
@@ -27,3 +23,4 @@
 
 // Search
 "SEARCH_SCREEN_TITLE" = "Search for Party Hosts";
+"SEARCH_SCREEN_TITLE_START" = "Start a Party";

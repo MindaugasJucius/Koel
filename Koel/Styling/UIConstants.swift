@@ -40,15 +40,12 @@ struct UIConstants {
         static let nearbyPeers = NSLocalizedString("NEARBY_PEERS_SECTION_TITLE", comment: "")
         static let joinedPeers = NSLocalizedString("JOINED_PEERS_SECTION_TITLE", comment: "")
         
-        // Flow Selection
-        static let searchNearby = NSLocalizedString("SEARCH_NEARBY_EVENTS", comment: "")
-        static let createEvent = NSLocalizedString("CREATE_EVENT", comment: "")
-        
         // Participate
         static let participateTitle = NSLocalizedString("PARTICIPATE_TITLE", comment: "")
         
         // Search
         static let searchScreenTitle = NSLocalizedString("SEARCH_SCREEN_TITLE", comment: "")
+        static let searchScreenButtonStartEventTitle = NSLocalizedString("SEARCH_SCREEN_TITLE_START", comment: "")
     }
     
 }

@@ -65,6 +65,31 @@ class DMEventSearchViewModel: ViewModelType, MultipeerViewModelType {
             }
         )
     }(self)
+    
+    lazy var createEvent: CocoaAction = { this in
+        return CocoaAction { _ in
+            
+            let multipeerService = DMEventMultipeerService(
+                withDisplayName: UIDevice.current.name,
+                asEventHost: true
+            )
+            
+            let songSharingViewModel = DMEventSongSharingViewModel(
+                songPersistenceService: DMEventSongPersistenceService(),
+                songSharingService: DMEventSongSharingService(),
+                multipeerService: multipeerService
+            )
+            let manageEventViewModel = DMEventManagementViewModel(
+                sceneCoordinator: this.sceneCoordinator,
+                songSharingViewModel: songSharingViewModel
+            )
+            
+            return self.sceneCoordinator.transition(
+                to: Scene.manage(manageEventViewModel),
+                type: .rootWithNavigationVC
+            )
+        }
+    }(self)
 
     required init(withSceneCoordinator sceneCoordinator: SceneCoordinatorType) {
         self.sceneCoordinator = sceneCoordinator
