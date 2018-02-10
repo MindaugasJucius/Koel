@@ -13,16 +13,59 @@ import MultipeerConnectivity
 
 typealias PeerUpdate = (DMEventPeer) -> (DMEventPeer)
 
-struct DMEventPeerPersistenceContexts {
+enum ContextKeys {
+
+    case reconnect
+    case isHost
+    case uuid(String)
     
-    enum ContextKeys: String {
-        case reconnect
-        case isHost
-        case uuid
+    var dictionary: [String:String] {
+        switch self {
+        case .uuid(let value):
+            return [self.rawValue: value]
+        default:
+            return [self.rawValue: "true"]
+        }
+    }
+}
+
+extension ContextKeys: RawRepresentable {
+
+    typealias RawValue = String
+    
+    init?(rawValue: String) {
+        switch rawValue {
+        case "reconnect":
+            self = .reconnect
+        case "isHost":
+            self = .isHost
+        case (let value):
+            self = .uuid(value)
+        }
     }
     
-    static let hostDiscovery = [ContextKeys.isHost.rawValue: "true"]
-    static let participantReconnect = [ContextKeys.reconnect.rawValue: "true"]
+    var rawValue: RawValue {
+        switch self {
+        case .isHost:
+            return "isHost"
+        case .reconnect:
+            return "reconnect"
+        case .uuid(_):
+            return "uuid"
+        }
+    }
+}
+
+extension ContextKeys: Equatable {
+    static func == (lhs: ContextKeys, rhs: ContextKeys) -> Bool {
+        return lhs.rawValue == rhs.rawValue
+    }
+}
+
+extension ContextKeys: Hashable {
+    var hashValue: Int {
+        return self.rawValue.hashValue
+    }
 }
 
 enum DMEventPeerPersistenceServiceError: Error {
@@ -34,17 +77,20 @@ enum DMEventPeerPersistenceServiceError: Error {
 }
 
 protocol DMEventPeerPersistenceServiceType {
-    
+
+    @discardableResult
     func store(peer: DMEventPeer) -> Observable<DMEventPeer>
 
     func delete(peer: DMEventPeer) throws
 
+    @discardableResult
     func peerExists(withPeerID peerID: MCPeerID) -> Observable<DMEventPeer?>
     
     func retrieveHost() -> DMEventPeer?
     
     func retrieveSelf() -> DMEventPeer?
     
+    @discardableResult
     func update(peer: DMEventPeer, updateBlock: PeerUpdate) -> Observable<DMEventPeer>
 
     func peers() -> Observable<Results<DMEventPeer>>

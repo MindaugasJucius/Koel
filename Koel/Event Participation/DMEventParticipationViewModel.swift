@@ -65,7 +65,7 @@ struct DMEventParticipationViewModel: MultipeerViewModelType {
         return Action(
             workFactory: { (eventPeer: DMEventPeer) in
                 print("requesting reconnection for \(eventPeer.peerID?.displayName)")
-                let reconnectContext = DMEventPeerPersistenceContexts.participantReconnect
+                let reconnectContext = ContextKeys.reconnect.dictionary
                 return this.multipeerService.connect(eventPeer.peerID, context: reconnectContext)
             }
         )

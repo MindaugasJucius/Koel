@@ -71,8 +71,8 @@ extension DMEventPeer {
         guard let contextDict = context else {
             return DMEventPeer.peer(withPeerID: peerID, storeAsSelf: false, storeAsHost: false)
         }
-        let isHost = contextDict[DMEventPeerPersistenceContexts.ContextKeys.isHost.rawValue]
-        let uuid = contextDict[DMEventPeerPersistenceContexts.ContextKeys.uuid.rawValue]
+        let isHost = contextDict[ContextKeys.isHost.rawValue]
+        let uuid = contextDict[ContextKeys.uuid("").rawValue]
         return DMEventPeer.peer(withPeerID: peerID, storeAsSelf: false, storeAsHost: isHost != .none, uuid: uuid)
     }
     

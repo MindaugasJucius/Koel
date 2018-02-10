@@ -33,6 +33,7 @@ struct DMEventPeerPersistenceService: DMEventPeerPersistenceServiceType {
         }
     }
     
+    @discardableResult
     func store(peer: DMEventPeer) -> Observable<DMEventPeer> {
         let result = withRealm("creating peer") { realm -> ThreadSafeReference<DMEventPeer> in
             try realm.write {

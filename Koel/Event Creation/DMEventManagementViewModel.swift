@@ -63,7 +63,7 @@ class DMEventManagementViewModel: ViewModelType, MultipeerViewModelType, Backgro
                     return (DMEventPeer.peer(withPeerID: client, context: nil), handler, false)
                 }
                 
-                let reconnectKey = DMEventPeerPersistenceContexts.ContextKeys.reconnect.rawValue
+                let reconnectKey = ContextKeys.reconnect.rawValue
                 let isReconnect = contextDictionary[reconnectKey] != nil
                 let eventPeer = DMEventPeer.peer(
                     withPeerID: client,
