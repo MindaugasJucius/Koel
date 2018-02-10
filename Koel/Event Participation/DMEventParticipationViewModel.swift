@@ -12,10 +12,13 @@ import Action
 
 struct DMEventParticipationViewModel: MultipeerViewModelType {
     
+    var multipeerService: DMEventMultipeerService {
+        return songSharingViewModel.multipeerService
+    }
+
     private let disposeBag = DisposeBag()
     
-    let multipeerService: DMEventMultipeerService
-    let songSharingService: DMEventSongSharingServiceType
+    let songSharingViewModel: DMEventSongSharingViewModelType
     
     private let host: DMEventPeer
     
@@ -65,10 +68,8 @@ struct DMEventParticipationViewModel: MultipeerViewModelType {
         )
     }(self)
     
-    init(withMultipeerService multipeerService: DMEventMultipeerService, withHost host: DMEventPeer) {
-        self.multipeerService = multipeerService
-        let songSharingService = DMEventSongSharingService()
-        self.songSharingService = songSharingService
+    init(host: DMEventPeer, songSharingViewModel: DMEventSongSharingViewModelType) {
+        self.songSharingViewModel = songSharingViewModel
         self.host = host
 
         incommingHostReconnectInvitations
@@ -99,7 +100,7 @@ struct DMEventParticipationViewModel: MultipeerViewModelType {
             .subscribe(
                 onNext: { peerID, data in
                     do {
-                        let song = try songSharingService.parseSong(fromData: data)
+                        let song = try songSharingViewModel.songSharingService.parseSong(fromData: data)
                         print("retrieved a song: \(song), added uuid: \(song.addedByUUID), upvoted uuids: \(song.upvotedByUUIDs)")
                     } catch let error {
                         print("song parsing failed: \(error.localizedDescription)")

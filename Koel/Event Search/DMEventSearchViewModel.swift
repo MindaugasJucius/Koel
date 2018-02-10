@@ -45,7 +45,13 @@ class DMEventSearchViewModel: ViewModelType, MultipeerViewModelType {
     private lazy var pushParticipation: Action<DMEventPeer, Void> = {
         return Action (
             workFactory: { [unowned self] host in
-                let participationModel = DMEventParticipationViewModel(withMultipeerService: self.multipeerService, withHost: host)
+                let songSharingViewModel = DMEventSongSharingViewModel(
+                    songPersistenceService: DMEventSongPersistenceService(),
+                    songSharingService: DMEventSongSharingService(),
+                    multipeerService: self.multipeerService
+                )
+                let participationModel = DMEventParticipationViewModel(host: host, songSharingViewModel: songSharingViewModel)
+
                 let participationScene = Scene.participation(participationModel)
                 return self.sceneCoordinator.transition(to: participationScene, type: .root)
             }

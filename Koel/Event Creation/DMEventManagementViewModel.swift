@@ -12,23 +12,24 @@ import RxSwift
 import RealmSwift
 import MultipeerConnectivity
 
-class DMEventManagementViewModel: ViewModelType, BackgroundDisconnectType {
-    
+class DMEventManagementViewModel: ViewModelType, MultipeerViewModelType, BackgroundDisconnectType {
+
     private let disposeBag = DisposeBag()
 
     let sceneCoordinator: SceneCoordinatorType
-    let multipeerService: DMEventMultipeerService
-    let songSharing: DMEventSongSharingViewModelType
+    let songSharingViewModel: DMEventSongSharingViewModelType
 
     var backgroundTaskID = UIBackgroundTaskInvalid
+
+    var multipeerService: DMEventMultipeerService {
+        return songSharingViewModel.multipeerService
+    }
     
-    init(withSceneCoordinator sceneCoordinator: SceneCoordinatorType,
-         multipeerService: DMEventMultipeerService,
+    init(sceneCoordinator: SceneCoordinatorType,
          songSharingViewModel: DMEventSongSharingViewModelType) {
         
         self.sceneCoordinator = sceneCoordinator
-        self.songSharing = songSharingViewModel
-        self.multipeerService = multipeerService
+        self.songSharingViewModel = songSharingViewModel
         
         multipeerService.startBrowsing()
         multipeerService.startAdvertising()

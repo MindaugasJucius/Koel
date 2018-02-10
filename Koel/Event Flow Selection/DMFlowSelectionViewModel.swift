@@ -33,8 +33,7 @@ struct DMFlowSelectionViewModel: ViewModelType {
                 multipeerService: multipeerService
             )
             let manageEventViewModel = DMEventManagementViewModel(
-                withSceneCoordinator: self.sceneCoordinator,
-                multipeerService: multipeerService,
+                sceneCoordinator: self.sceneCoordinator,
                 songSharingViewModel: songSharingViewModel
             )
             
