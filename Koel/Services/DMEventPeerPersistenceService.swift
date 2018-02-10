@@ -102,6 +102,7 @@ struct DMEventPeerPersistenceService: DMEventPeerPersistenceServiceType {
             let selfPeer = realm.objects(DMEventPeer.self).filter("isSelf == true").first
             if let peer = selfPeer {
                 selfPeer?.peerID = NSKeyedUnarchiver.unarchiveObject(with: peer.peerIDData) as? MCPeerID
+                selfPeer?.primaryKeyRef = peer.id
             }
             return selfPeer
         }
@@ -117,15 +118,15 @@ struct DMEventPeerPersistenceService: DMEventPeerPersistenceServiceType {
     }
     
     // MARK: - Retrieved object updates
-    
-    func update(peer: DMEventPeer, toConnectedState isConnected: Bool) -> Observable<DMEventPeer> {
-        let result = withRealm("updating peer connectivity state") { realm -> ThreadSafeReference<DMEventPeer> in
+    @discardableResult
+    func update(peer: DMEventPeer, updateBlock: PeerUpdate) -> Observable<DMEventPeer> {
+        let result = withRealm("updating peer host status") { realm -> ThreadSafeReference<DMEventPeer> in
             guard let retrievedPeer = realm.object(ofType: DMEventPeer.self, forPrimaryKey: peer.primaryKeyRef) else {
                 throw DMEventPeerPersistenceServiceError.updateFailed(peer)
             }
             
             try realm.write {
-                retrievedPeer.isConnected = isConnected
+                realm.add(updateBlock(retrievedPeer), update: true)
             }
             
             return ThreadSafeReference(to: retrievedPeer)

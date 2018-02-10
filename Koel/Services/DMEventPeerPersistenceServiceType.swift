@@ -11,6 +11,8 @@ import RxSwift
 import RealmSwift
 import MultipeerConnectivity
 
+typealias PeerUpdate = (DMEventPeer) -> (DMEventPeer)
+
 struct DMEventPeerPersistenceContexts {
     
     enum ContextKeys: String {
@@ -33,21 +35,17 @@ enum DMEventPeerPersistenceServiceError: Error {
 
 protocol DMEventPeerPersistenceServiceType {
     
-    @discardableResult
     func store(peer: DMEventPeer) -> Observable<DMEventPeer>
 
     func delete(peer: DMEventPeer) throws
 
     func peerExists(withPeerID peerID: MCPeerID) -> Observable<DMEventPeer?>
     
-    @discardableResult
     func retrieveHost() -> DMEventPeer?
-
-    @discardableResult
+    
     func retrieveSelf() -> DMEventPeer?
     
-    @discardableResult
-    func update(peer: DMEventPeer, toConnectedState isConnected: Bool) -> Observable<DMEventPeer>
+    func update(peer: DMEventPeer, updateBlock: PeerUpdate) -> Observable<DMEventPeer>
 
     func peers() -> Observable<Results<DMEventPeer>>
     
