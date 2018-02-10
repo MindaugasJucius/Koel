@@ -23,18 +23,21 @@ struct DMEventParticipationViewModel: MultipeerViewModelType {
     }
     
     var hostExists: Observable<Bool> {
-        return multipeerService.connectedPeers().map { peers in
-            let hostExists = peers.filter { $0.peerID == self.host.peerID }.count == 1
-            print("hostExists observable \(hostExists)")
-            return hostExists
-        }
+        return multipeerService.connectedPeers()
+            .map { peers in
+                let hostExists = peers.filter { $0.peerID == self.host.peerID }.count == 1
+                print("hostExists observable \(hostExists)")
+                return hostExists
+            }
     }
     
     private var hostNearby: Observable<Bool> {
-        return multipeerService.nearbyFoundHostPeers().map { peers in
-            print("hostNearby observable \(peers.map { $0.peerID?.displayName })")
-            return peers.filter { $0.peerID == self.host.peerID }.count == 1
-        }
+        return multipeerService.nearbyFoundHostPeers()
+            .map { peers in
+                print("hostNearby observable \(peers.map { $0.peerID?.displayName })")
+                return peers.filter { $0.peerID == self.host.peerID }.count == 1
+            }
+            .filter { $0 }
     }
     
     private var hostReconnectInvitations: Observable<(Bool) -> ()> {
@@ -82,16 +85,12 @@ struct DMEventParticipationViewModel: MultipeerViewModelType {
         let hostDisconnectedObservable = multipeerService
             .connectedPeers()
             .map { connections in
-            return connections.filter { $0.peerID == host.peerID }.count == 0 // true if current host is not connected
-        }
+                return connections.filter { $0.peerID == host.peerID }.count == 0 // true if current host is not connected
+            }
         
         hostNearby
-            .filter { $0 }
             .withLatestFrom(hostDisconnectedObservable)
-            .filter { hostDisconnected in
-                print("is host disconnected \(hostDisconnected)")
-                return hostDisconnected
-            }
+            .filter { $0 }
             .map { _ in host }
             .subscribe(requestReconnect.inputs)
             .disposed(by: disposeBag)
