@@ -67,9 +67,9 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
                 
                 let songSortDescriptors = [
                     SortDescriptor(keyPath: "upvoteCount", ascending: false),
-                    SortDescriptor(keyPath: "added", ascending: true)
+                    SortDescriptor(keyPath: "added", ascending: false)
                 ]
-                
+
                 let queuedSongs = results
                     .filter("played == nil")
                     .sorted(by: songSortDescriptors)
@@ -93,6 +93,7 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
             let song = DMEventSong()
             song.title = "songy"
             song.addedBy = self.selfPeer
+            song.upvotedByUUIDs = [self.selfPeer.uuid]
             return self.songPersistenceService
                 .store(song: song)
                 .do(
@@ -103,7 +104,7 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
                         
                     }
                 )
-            .map { _ in }
+                .map { _ in }
         }
     }
     

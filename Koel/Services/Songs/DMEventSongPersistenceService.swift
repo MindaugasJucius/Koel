@@ -41,6 +41,7 @@ struct DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
                     let uuidPredicate = NSPredicate(format: "uuid IN %@", upvoteesUUIDs)
                     let upvotees = realm.objects(DMEventPeer.self).filter(uuidPredicate)
                     song.upvotees.append(objectsIn: upvotees)
+                    song.upvoteCount = upvoteesUUIDs.count
                 }
                 
                 realm.add(song)
