@@ -8,6 +8,7 @@
 
 import MultipeerConnectivity
 import RxSwift
+import RxOptional
 
 fileprivate let IdentityCacheKey = "IdentityCacheKey"
 fileprivate let EventServiceType = "song-event"
@@ -44,20 +45,13 @@ class DMEventMultipeerService: NSObject {
         
         let peerID = MCPeerID(displayName: displayName)
         
-        if let selfPeer = DMEventMultipeerService.retrieveSelfPeer(withPeerPersistenceService: peerPersistenceService) {
-            peerPersistenceService.update(peer: selfPeer) {
-                $0.isHost = eventHost
-                return $0
-            }
-            self.myEventPeer = selfPeer
-        } else {
-            let newlyStoredPeer = DMEventMultipeerService.storeSelfPeer(
-                withPeerPersistenceService: peerPersistenceService,
-                withPeerID: peerID,
-                asHost: eventHost
-            )
-            self.myEventPeer = newlyStoredPeer
-        }
+        let storedSelfPeer = DMEventMultipeerService.storeSelfPeer(
+            withPeerPersistenceService: peerPersistenceService,
+            withPeerID: peerID,
+            asHost: eventHost
+        )
+        
+        self.myEventPeer = storedSelfPeer
 
         self.session = MCSession(
             peer: peerID,
@@ -169,25 +163,12 @@ class DMEventMultipeerService: NSObject {
         return .just(browser.invitePeer(peerID, to: self.session, withContext: data, timeout: timeout))
     }
     
-    /// Retrieve DMEventPeer from UserDefaults if one exists
-    ///
-    /// - Parameter persistenceService: Service used to manage DMEventPeer objects
-    /// - Returns: identity
-    static func retrieveSelfPeer(withPeerPersistenceService persistenceService: DMEventPeerPersistenceServiceType) -> DMEventPeer? {
-        
-        guard let storedSelfPeer = persistenceService.retrieveSelf() else {
-            return nil
-        }
-
-        return storedSelfPeer
-    }
-    
     /// Create and store a DMEventPeer to Realm
     ///
     /// - Parameter persistenceService: Service used to persist DMEventPeer objects,
     ///             displayName: string to display to other peers
     ///             host: store self peer as host
-    /// - Returns: created and stored identity
+    /// - Returns: created identity
     static func storeSelfPeer(withPeerPersistenceService persistenceService: DMEventPeerPersistenceServiceType,
                               withPeerID peerID: MCPeerID,
                               asHost host: Bool) -> DMEventPeer {
@@ -196,7 +177,12 @@ class DMEventMultipeerService: NSObject {
             storeAsSelf: true,
             storeAsHost: host
         )
-        persistenceService.store(peer: selfPeer)
+        
+        persistenceService
+            .store(peer: selfPeer)
+            .subscribe()
+            .disposed(by: DisposeBag())
+        
         return selfPeer
     }
     
@@ -237,12 +223,22 @@ class DMEventMultipeerService: NSObject {
 extension DMEventMultipeerService: MCNearbyServiceBrowserDelegate {
     
     func browser(_ browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String : String]?) {
-        peerPersistenceService.peerExists(withPeerID: peerID)
-            .catchOnNil { [unowned self] () -> Observable<DMEventPeer> in
-                print("storing peer: \(peerID.displayName)")
-                let unmanagedPeer = DMEventPeer.peer(withPeerID: peerID, context: info)
-                return self.peerPersistenceService.store(peer: unmanagedPeer)
+        peerPersistenceService
+            .peerExists(withPeerID: peerID)
+            .catchError { (error) -> Observable<DMEventPeer> in
+                if let peerPersistenceError = error as? DMEventPeerPersistenceServiceError {
+                    switch peerPersistenceError {
+                    case .peerDoesNotExist:
+                        let unmanagedPeer = DMEventPeer.peer(withPeerID: peerID, context: info)
+                        print("storing peer: \(peerID.displayName)")
+                        return self.peerPersistenceService.store(peer: unmanagedPeer)
+                    default:
+                        return Observable.empty()
+                    }
+                }
+                return Observable.empty()
             }
+            
             .subscribe(
                 onNext: { [unowned self] peer in
                     if !self.nearbyPeers.value.contains(peer) {
@@ -304,18 +300,17 @@ extension DMEventMultipeerService: MCSessionDelegate {
     public func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
         print("\(peerID.displayName) changed to state \(state.rawValue)")
         if state != .connecting {
-            peerPersistenceService.peerExists(withPeerID: peerID).subscribe(
-                onNext: { [unowned self] peer in
-                    guard let `peer` = peer else {
-                        return
+            peerPersistenceService
+                .peerExists(withPeerID: peerID)
+                .subscribe(
+                    onNext: { [unowned self] peer in
+                        self.performUpdate(forPeer: peer, toConnectedState: state == .connected)
+                    },
+                    onError: { error in
+                        print("peer state change failed - \(error)")
                     }
-                    self.performUpdate(forPeer: peer, toConnectedState: state == .connected)
-                },
-                onError: { error in
-                    print("peer state change failed - \(error)")
-                }
-            )
-            .disposed(by: disposeBag)
+                )
+                .disposed(by: disposeBag)
         }
     }
     
