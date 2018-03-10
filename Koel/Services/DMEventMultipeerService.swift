@@ -175,9 +175,10 @@ class DMEventMultipeerService: NSObject {
         let selfPeer = DMEventPeer.peer(
             withPeerID: peerID,
             storeAsSelf: true,
-            storeAsHost: host
+            storeAsHost: host,
+            uuid: DMEventPeer.selfPeerUUID
         )
-        
+                
         persistenceService
             .store(peer: selfPeer)
             .subscribe()
@@ -223,14 +224,22 @@ class DMEventMultipeerService: NSObject {
 extension DMEventMultipeerService: MCNearbyServiceBrowserDelegate {
     
     func browser(_ browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String : String]?) {
+        print("foundPeer \(peerID.displayName)")
+        
+        //MultipeerConnectivity finds itself https://stackoverflow.com/questions/22525806/ios-7-multipeer-connectivity-mcnearbyservicebrowser-finds-itself
+        guard let foundPeerUUID = info?[ContextKeys.uuid("").rawValue], foundPeerUUID != DMEventPeer.selfPeerUUID else {
+            return
+        }
+        
         peerPersistenceService
             .peerExists(withPeerID: peerID)
             .catchError { (error) -> Observable<DMEventPeer> in
+                print("checking for existence returned an error: \(error.localizedDescription)")
                 if let peerPersistenceError = error as? DMEventPeerPersistenceServiceError {
                     switch peerPersistenceError {
                     case .peerDoesNotExist:
                         let unmanagedPeer = DMEventPeer.peer(withPeerID: peerID, context: info)
-                        print("storing peer: \(peerID.displayName)")
+                        print("will attempt to store")
                         return self.peerPersistenceService.store(peer: unmanagedPeer)
                     default:
                         return Observable.empty()
@@ -238,7 +247,6 @@ extension DMEventMultipeerService: MCNearbyServiceBrowserDelegate {
                 }
                 return Observable.empty()
             }
-            
             .subscribe(
                 onNext: { [unowned self] peer in
                     if !self.nearbyPeers.value.contains(peer) {
@@ -247,11 +255,7 @@ extension DMEventMultipeerService: MCNearbyServiceBrowserDelegate {
                         self.nearbyPeers.value = self.nearbyPeers.value
                     }
                     self.nearbyHostPeers.onNext(self.nearbyPeers.value.filter { $0.isHost })
-                    print("foundPeer \(peerID.displayName) isHost \(peer.isHost)")
-                    print("nearby peers \(self.nearbyPeers.value.map { $0.peerID?.displayName })")
-                },
-                onError: { error in
-                    print("error on found peer \(error.localizedDescription)")
+                    print("nearby peers \(self.nearbyPeers.value.map { "\($0.peerID?.displayName) ishost \($0.isHost)" })")
                 }
             )
             .disposed(by: disposeBag)

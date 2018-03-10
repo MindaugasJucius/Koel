@@ -127,7 +127,6 @@ class DMEventManagementViewModel: ViewModelType, MultipeerViewModelType, Backgro
         }
     }
     
-    // MARK: - shared/rename
     func onInvite() -> CocoaAction {
         return CocoaAction { [unowned self] _ in
             

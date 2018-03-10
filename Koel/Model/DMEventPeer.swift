@@ -15,6 +15,8 @@ typealias EventPeerSection = AnimatableSectionModel<String, DMEventPeer>
 
 @objcMembers
 class DMEventPeer: Object, Codable {
+
+    static let selfPeerUUID = "self-peer-identifier"
     
     private enum CodingKeys: String, CodingKey {
         case fullName
