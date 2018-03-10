@@ -31,27 +31,8 @@ extension Realm {
         .subscribeOn(MainScheduler.instance)
     }
 
-    static func optionalObjectOnMainSchedulerObservable<T: Object>(fromReference reference: ThreadSafeReference<T>?, errorOnFailure: DMEventPeerPersistenceServiceError) -> Observable<T?> {
-        return Observable<T?>.create { observer in
-            if let threadSafeRef = reference {
-                do {
-                    let realm = try Realm()
-                    if let resolvedObject = realm.resolve(threadSafeRef) {
-                        observer.onNext(resolvedObject)
-                    } else {
-                        observer.onNext(nil)
-                    }
-                } catch {
-                    observer.onError(errorOnFailure)
-                }
-            } else {
-                observer.onNext(nil)
-            }
-            observer.onCompleted()
-            return Disposables.create()
-        }
-        .observeOn(MainScheduler.instance)
-        .subscribeOn(MainScheduler.instance)
+    static func deleteAll<T: Object>(ofType type: T) -> Observable<Void> {
+        return .empty()
     }
     
 }
