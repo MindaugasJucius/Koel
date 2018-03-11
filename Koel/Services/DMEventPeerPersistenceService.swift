@@ -39,24 +39,13 @@ struct DMEventPeerPersistenceService: DMEventPeerPersistenceServiceType {
         return withRealm("creating peer") { realm -> ThreadSafeReference<DMEventPeer> in
             try realm.write {
                 
-                //always use id = 0 for self peer (for auto updates)
-                let id: Int
-
-                if peer.isSelf {
-                    id = SelfPeerID
-                } else {
-                    id = (realm.objects(DMEventPeer.self).max(ofProperty: "id") ?? 0) + 1
-                }
-                
-                print("storing \(peer.peerID?.displayName) isSelf \(peer.isSelf) isHost \(peer.isHost) with id \(id)")
-                
-                peer.id = id
+                print("storing \(peer.peerID?.displayName) isSelf \(peer.isSelf) isHost \(peer.isHost) with uuid \(peer.uuid)")
                 
                 if let peerID = peer.peerID {
                     peer.peerIDData = NSKeyedArchiver.archivedData(withRootObject: peerID)
                 }
                 
-                peer.primaryKeyRef = peer.id
+                peer.primaryKeyRef = peer.uuid
                 realm.add(peer, update: true)
             }
 
@@ -142,7 +131,7 @@ extension DMEventPeerPersistenceService {
         return Realm.objectOnMainSchedulerObservable(fromReference: reference, errorOnFailure: errorOnFailure)
             .map { resolvedPeer in
                 resolvedPeer.peerID = peerID
-                resolvedPeer.primaryKeyRef = resolvedPeer.id
+                resolvedPeer.primaryKeyRef = resolvedPeer.uuid
                 return resolvedPeer
             }
     }

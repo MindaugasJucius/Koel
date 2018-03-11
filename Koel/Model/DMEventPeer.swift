@@ -16,8 +16,6 @@ typealias EventPeerSection = AnimatableSectionModel<String, DMEventPeer>
 @objcMembers
 class DMEventPeer: Object, Codable {
 
-    static let selfPeerUUID = "self-peer-identifier"
-    
     private enum CodingKeys: String, CodingKey {
         case fullName
         case isHost
@@ -26,7 +24,6 @@ class DMEventPeer: Object, Codable {
         case peerIDData
     }
     
-    dynamic var id: Int = 0
     dynamic var fullName: String? = nil
     dynamic var isHost: Bool = false
     dynamic var isConnected: Bool = false
@@ -36,14 +33,14 @@ class DMEventPeer: Object, Codable {
     
     var peerID: MCPeerID? = nil
     
-    var primaryKeyRef = 0
+    var primaryKeyRef = ""
     
     override static func ignoredProperties() -> [String] {
         return ["peerID"]
     }
     
     override class func primaryKey() -> String? {
-        return "id"
+        return "uuid"
     }
     
     var discoveryContext: [String:String] {
@@ -91,7 +88,7 @@ extension DMEventPeer {
 }
 
 extension DMEventPeer: IdentifiableType {
-    var identity: Int {
-        return self.isInvalidated ? 0 : id
+    var identity: String {
+        return self.isInvalidated ? "" : uuid
     }
 }

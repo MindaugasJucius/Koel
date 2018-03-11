@@ -10,7 +10,7 @@ import MultipeerConnectivity
 import RxSwift
 import RxOptional
 
-fileprivate let IdentityCacheKey = "IdentityCacheKey"
+fileprivate let SelfPeerUUIDKey = "SelfPeerUUIDKey"
 fileprivate let EventServiceType = "song-event"
 
 class DMEventMultipeerService: NSObject {
@@ -45,13 +45,19 @@ class DMEventMultipeerService: NSObject {
         
         let peerID = MCPeerID(displayName: displayName)
         
-        let storedSelfPeer = DMEventMultipeerService.storeSelfPeer(
-            withPeerPersistenceService: peerPersistenceService,
+        let myPeer = DMEventPeer.peer(
             withPeerID: peerID,
-            asHost: eventHost
+            storeAsSelf: true,
+            storeAsHost: eventHost
         )
         
-        self.myEventPeer = storedSelfPeer
+        if let uuid = UserDefaults.standard.string(forKey: SelfPeerUUIDKey) {
+            myPeer.uuid = uuid
+        } else {
+            UserDefaults.standard.set(myPeer.uuid, forKey: SelfPeerUUIDKey)
+        }
+        
+        self.myEventPeer = myPeer
 
         self.session = MCSession(
             peer: peerID,
@@ -163,30 +169,6 @@ class DMEventMultipeerService: NSObject {
         return .just(browser.invitePeer(peerID, to: self.session, withContext: data, timeout: timeout))
     }
     
-    /// Create and store a DMEventPeer to Realm
-    ///
-    /// - Parameter persistenceService: Service used to persist DMEventPeer objects,
-    ///             displayName: string to display to other peers
-    ///             host: store self peer as host
-    /// - Returns: created identity
-    static func storeSelfPeer(withPeerPersistenceService persistenceService: DMEventPeerPersistenceServiceType,
-                              withPeerID peerID: MCPeerID,
-                              asHost host: Bool) -> DMEventPeer {
-        let selfPeer = DMEventPeer.peer(
-            withPeerID: peerID,
-            storeAsSelf: true,
-            storeAsHost: host,
-            uuid: DMEventPeer.selfPeerUUID
-        )
-                
-        persistenceService
-            .store(peer: selfPeer)
-            .subscribe()
-            .disposed(by: DisposeBag())
-        
-        return selfPeer
-    }
-    
     //MARK: - Sending
     
     func send(toPeers others: [MCPeerID],
@@ -227,21 +209,22 @@ extension DMEventMultipeerService: MCNearbyServiceBrowserDelegate {
         print("foundPeer \(peerID.displayName)")
         
         //MultipeerConnectivity finds itself https://stackoverflow.com/questions/22525806/ios-7-multipeer-connectivity-mcnearbyservicebrowser-finds-itself
-        guard let foundPeerUUID = info?[ContextKeys.uuid("").rawValue], foundPeerUUID != DMEventPeer.selfPeerUUID else {
+        guard let discoveredPeerUUID = info?[ContextKeys.uuid("").rawValue],
+            discoveredPeerUUID != myEventPeer.uuid else {
             return
         }
         
         peerPersistenceService
             .peerExists(withPeerID: peerID)
             .catchError { (error) -> Observable<DMEventPeer> in
-                print("checking for existence returned an error: \(error.localizedDescription)")
                 if let peerPersistenceError = error as? DMEventPeerPersistenceServiceError {
                     switch peerPersistenceError {
                     case .peerDoesNotExist:
                         let unmanagedPeer = DMEventPeer.peer(withPeerID: peerID, context: info)
-                        print("will attempt to store")
+                        print("peer does not exist - will attempt to store")
                         return self.peerPersistenceService.store(peer: unmanagedPeer)
                     default:
+                        print("peer checking failed")
                         return Observable.empty()
                     }
                 }
@@ -255,7 +238,7 @@ extension DMEventMultipeerService: MCNearbyServiceBrowserDelegate {
                         self.nearbyPeers.value = self.nearbyPeers.value
                     }
                     self.nearbyHostPeers.onNext(self.nearbyPeers.value.filter { $0.isHost })
-                    print("nearby peers \(self.nearbyPeers.value.map { "\($0.peerID?.displayName) ishost \($0.isHost)" })")
+                    print("nearby peers: \n \(self.nearbyPeers.value.map { "\($0.peerID?.displayName) ishost \($0.isHost) \n" })")
                 }
             )
             .disposed(by: disposeBag)
@@ -355,6 +338,7 @@ extension DMEventMultipeerService {
                 let currentConnection = self.connections.value.filter { $0.peerID == updatedPeer.peerID }.first
                 
                 if connected {
+                    NSLog("new connection \(peer.peerID?.displayName)")
                     self.latestConnection.onNext(updatedPeer)
                     //Emit to connections observable only if this is a new connection
                     if currentConnection == .none {
