@@ -20,7 +20,8 @@ struct DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
     func store(song: DMEventSong) -> Observable<DMEventSong> {
         let result = Realm.withRealm(
             operation: "persisting a song",
-            error: DMEventSongPersistenceServiceError.creationFailed) { realm -> DMEventSong in
+            error: DMEventSongPersistenceServiceError.creationFailed,
+            scheduler: songPersistenceScheduler) { realm -> DMEventSong in
                 try realm.write {
                     song.id = (realm.objects(DMEventSong.self).max(ofProperty: "id") ?? 0) + 1
                     
@@ -87,7 +88,8 @@ struct DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
     func songs() -> Observable<Results<DMEventSong>> {
         let result = Realm.withRealm(
             operation: "getting all songs",
-            error: DMEventSongPersistenceServiceError.fetchingSongsFailed) { realm -> Results<DMEventSong> in
+            error: DMEventSongPersistenceServiceError.fetchingSongsFailed,
+            scheduler: songPersistenceScheduler) { realm -> Results<DMEventSong> in
                 let songs = realm.objects(DMEventSong.self)
                 return songs
             }

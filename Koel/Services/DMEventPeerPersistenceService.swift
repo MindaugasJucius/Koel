@@ -12,33 +12,17 @@ import RealmSwift
 import RxRealm
 import MultipeerConnectivity
 
-private let SelfPeerID = 0
+private let peerPersistenceScheduler = ConcurrentDispatchQueueScheduler(qos: DispatchQoS.background)
 
 struct DMEventPeerPersistenceService: DMEventPeerPersistenceServiceType {
-
-    private let concurrentScheduler = ConcurrentDispatchQueueScheduler(qos: DispatchQoS.background)
-    
-    private func withRealm<T>(_ operation: String, action: @escaping (Realm) throws -> T) -> Observable<T> {
-        return Observable<T>
-            .create { observer -> Disposable in
-                do {
-                    let realm = try Realm()
-                    observer.onNext(try action(realm))
-                } catch let error {
-                    observer.onError(error)
-                }
-                return Disposables.create()
-            }
-            .subscribeOn(concurrentScheduler)
-            .observeOn(MainScheduler.instance)
-    }
     
     @discardableResult
     func store(peer: DMEventPeer) -> Observable<DMEventPeer> {
 
         let result = Realm.withRealm(
             operation: "creating peer",
-            error: DMEventPeerPersistenceServiceError.peerCreationFailed) { (realm) -> DMEventPeer in
+            error: DMEventPeerPersistenceServiceError.peerCreationFailed,
+            scheduler: peerPersistenceScheduler) { (realm) -> DMEventPeer in
                 try realm.write {
                     
                     print("storing \(peer.peerID?.displayName) isSelf \(peer.isSelf) isHost \(peer.isHost) with uuid \(peer.uuid)")
@@ -65,6 +49,7 @@ struct DMEventPeerPersistenceService: DMEventPeerPersistenceServiceType {
         let result = Realm.withRealm(
             operation: "checking if peer exists",
             error: DMEventPeerPersistenceServiceError.existenceCheckFailed,
+            scheduler: peerPersistenceScheduler,
             nilResultHandler: { observer in
                 observer.onError(DMEventPeerPersistenceServiceError.peerDoesNotExist)
             },
@@ -89,7 +74,8 @@ struct DMEventPeerPersistenceService: DMEventPeerPersistenceServiceType {
     func update(peer: DMEventPeer, updateBlock: @escaping PeerUpdate) -> Observable<DMEventPeer> {
         return Realm.withRealm(
             operation: "updating peer",
-            error: DMEventPeerPersistenceServiceError.updateFailed(peer)) { realm -> DMEventPeer in
+            error: DMEventPeerPersistenceServiceError.updateFailed(peer),
+            scheduler: peerPersistenceScheduler) { realm -> DMEventPeer in
                 guard let retrievedPeer = realm.object(ofType: DMEventPeer.self, forPrimaryKey: peer.primaryKeyRef) else {
                     throw DMEventPeerPersistenceServiceError.updateFailed(peer)
                 }
