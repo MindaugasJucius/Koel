@@ -44,7 +44,7 @@ struct DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
                     song.upvoteCount = upvoteesUUIDs.count
                 }
                 
-                realm.add(song)
+                realm.add(song, update: true)
             }
             return .just(song)
         }

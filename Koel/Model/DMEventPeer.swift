@@ -85,7 +85,13 @@ extension DMEventPeer {
         return DMEventPeer.peer(withPeerID: peerID, storeAsSelf: false, storeAsHost: isHost != .none, uuid: uuid)
     }
     
+    override func isEqual(_ object: Any?) -> Bool {
+        return uuid == (object as? DMEventPeer)?.uuid
+    }
+    
 }
+
+
 
 extension DMEventPeer: IdentifiableType {
     var identity: String {
