@@ -29,12 +29,10 @@ struct DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
                     }
                     
                     // Parse peers who upvoted song that's being persisted
-                    if let upvoteesUUIDs = song.upvotedByUUIDs {
-                        let uuidPredicate = NSPredicate(format: "uuid IN %@", upvoteesUUIDs)
-                        let upvotees = realm.objects(DMEventPeer.self).filter(uuidPredicate)
-                        song.upvotees.append(objectsIn: upvotees)
-                        song.upvoteCount = upvoteesUUIDs.count
-                    }
+                    let uuidPredicate = NSPredicate(format: "uuid IN %@", song.upvotedByUUIDs)
+                    let upvotees = realm.objects(DMEventPeer.self).filter(uuidPredicate)
+                    song.upvotees.append(objectsIn: upvotees)
+                    song.upvoteCount = upvotees.count
                     
                     realm.add(song, update: true)
                 }

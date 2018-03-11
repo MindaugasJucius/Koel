@@ -36,7 +36,7 @@ class DMEventSong: Object, Codable {
     let upvotees = List<DMEventPeer>()
     
     var addedByUUID: String? = nil
-    var upvotedByUUIDs: [String]? = nil
+    var upvotedByUUIDs: [String] = []
     
     override class func primaryKey() -> String? {
         return "id"

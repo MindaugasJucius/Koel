@@ -61,6 +61,11 @@ class DMEventMultipeerService: NSObject {
             uuid:selfUUID
         )
         
+        peerPersistenceService
+            .store(peer: myPeer)
+            .subscribe()
+            .disposed(by: disposeBag)
+        
         self.myEventPeer = myPeer
 
         self.session = MCSession(
@@ -214,7 +219,7 @@ extension DMEventMultipeerService: MCNearbyServiceBrowserDelegate {
         
         //MultipeerConnectivity finds itself https://stackoverflow.com/questions/22525806/ios-7-multipeer-connectivity-mcnearbyservicebrowser-finds-itself
         guard let discoveredPeerUUID = info?[ContextKeys.uuid("").rawValue],
-            discoveredPeerUUID != myEventPeer.uuid else {
+            discoveredPeerUUID != myEventPeer.primaryKeyRef else {
             return
         }
         

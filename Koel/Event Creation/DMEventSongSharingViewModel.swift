@@ -52,19 +52,6 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
                 }
             )
             .disposed(by: disposeBag)
-        
-        onSongCreate.elements.subscribe(
-            onNext: { print("next") },
-            onError: {error in print("error")}
-        ).disposed(by: disposeBag)
-        
-        onSongCreate.executing.subscribe { executing in
-            print("executing \(executing)")
-        }
-    
-        onSongCreate.enabled.subscribe { executing in
-            print("enabled \(executing)")
-        }
     }
     
     var songsSectioned: Observable<[SongSection]> {
@@ -135,8 +122,9 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
     //MARK: - Created song management
     
     func onUpvote(song: DMEventSong) -> CocoaAction {
+        let upvoteesContainSelf = song.addedBy?.uuid == selfPeer.primaryKeyRef
         return CocoaAction(
-            enabledIf: Observable.just(!song.upvotees.contains(selfPeer)),
+            enabledIf: Observable.just(!upvoteesContainSelf),
             workFactory: { [unowned self] in
                 return self.songPersistenceService
                     .upvote(song: song, forUser: self.selfPeer)
@@ -152,4 +140,3 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
     }()
     
 }
-
