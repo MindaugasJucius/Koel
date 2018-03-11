@@ -47,7 +47,6 @@ struct DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
     
     @discardableResult
     func markAsPlayed(song: DMEventSong) -> Observable<DMEventSong> {
-
         return safeSongOnPersistenceScheduler(
             song: song,
             error: DMEventSongPersistenceServiceError.toggleFailed(song)

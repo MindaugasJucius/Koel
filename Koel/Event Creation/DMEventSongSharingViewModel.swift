@@ -40,17 +40,14 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
         self.songPersistenceService = songPersistenceService
         self.multipeerService = multipeerService
         
-        multipeerService.receive()
-            .subscribe(
-                onNext: { peerID, data in
-                    do {
-                        let song = try songSharingService.parseSong(fromData: data)
-                        print("retrieved a song: \(song), added uuid: \(song.addedByUUID), upvoted uuids: \(song.upvotedByUUIDs)")
-                    } catch let error {
-                        print("song parsing failed: \(error.localizedDescription)")
-                    }
-                }
-            )
+        multipeerService
+            .receive()
+            .map { receivedInfo -> DMEventSong in
+                let song = try songSharingService.parseSong(fromData: receivedInfo.1)
+                print("retrieved a song: \(song), added uuid: \(song.addedByUUID), upvoted uuids: \(song.upvotedByUUIDs)")
+                return song
+            }
+            .subscribe(createAction.inputs)
             .disposed(by: disposeBag)
     }
     
@@ -87,8 +84,7 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
             song.title = "songy"
             song.addedByUUID = self.selfPeer.primaryKeyRef
             song.upvotedByUUIDs = [self.selfPeer.primaryKeyRef]
-            return self.songPersistenceService
-                .store(song: song)
+            return self.createAction.execute(song)
                 .do(
                     onNext: { [unowned self] persistedSong in
                         self.share(song: persistedSong)
@@ -106,6 +102,12 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
             .subscribe(shareAction.inputs)
             .dispose()
     }
+    
+    private lazy var createAction: Action<DMEventSong, DMEventSong> = {
+        return Action(workFactory: { [unowned self] (song: DMEventSong) -> Observable<DMEventSong> in
+            return self.songPersistenceService.store(song: song)
+        })
+    }()
     
     private lazy var shareAction: Action<([MCPeerID], DMEventSong), Void> = {
         return Action(workFactory: { [unowned self] (peers: [MCPeerID], song: DMEventSong) -> Observable<Void> in
