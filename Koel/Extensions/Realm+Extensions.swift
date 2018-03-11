@@ -17,6 +17,7 @@ extension Realm {
     static func withRealm<T>(
         operation: String,
         error: Swift.Error,
+        scheduler: SchedulerType = concurrentScheduler,
         nilResultHandler: ((AnyObserver<ThreadSafeReference<T>>) -> ())? = nil,
         action: @escaping (Realm) throws -> T?) -> Observable<T> {
         return Observable<ThreadSafeReference<T>>
