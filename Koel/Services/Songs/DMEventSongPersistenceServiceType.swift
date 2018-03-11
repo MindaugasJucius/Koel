@@ -12,6 +12,7 @@ import RealmSwift
 
 enum DMEventSongPersistenceServiceError: Error {
     case creationFailed
+    case fetchingSongsFailed
     case updateFailed(DMEventSong)
     case deletionFailed(DMEventSong)
     case toggleFailed(DMEventSong)

@@ -19,9 +19,10 @@ protocol DMEventSongSharingViewModelType: MultipeerViewModelType {
 
     var songsSectioned: Observable<[SongSection]> { get }
     
-    func onSongCreate() -> CocoaAction
-    func onUpvote(song: DMEventSong) -> CocoaAction
+    var onSongCreate: CocoaAction { get }
     var onPlayed: Action<DMEventSong, Void> { get }
+
+    func onUpvote(song: DMEventSong) -> CocoaAction
 }
 
 class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
@@ -52,13 +53,18 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
             )
             .disposed(by: disposeBag)
         
-        onSongCreate().errors
-            .subscribe(
-                onNext: { actionError in
-                    print("song create error: \(actionError.localizedDescription)")
-                }
-            )
-            .disposed(by: disposeBag)
+        onSongCreate.elements.subscribe(
+            onNext: { print("next") },
+            onError: {error in print("error")}
+        ).disposed(by: disposeBag)
+        
+        onSongCreate.executing.subscribe { executing in
+            print("executing \(executing)")
+        }
+    
+        onSongCreate.enabled.subscribe { executing in
+            print("enabled \(executing)")
+        }
     }
     
     var songsSectioned: Observable<[SongSection]> {
@@ -87,8 +93,8 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
     }
     
     //MARK: - Song creation
-    
-    func onSongCreate() -> CocoaAction {
+  
+    lazy var onSongCreate: CocoaAction = {
         return CocoaAction { [unowned self] in
             let song = DMEventSong()
             song.title = "songy"
@@ -99,14 +105,11 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
                 .do(
                     onNext: { [unowned self] persistedSong in
                         self.share(song: persistedSong)
-                    },
-                    onError: { persistenceError in
-                        
                     }
                 )
                 .map { _ in }
-        }
-    }
+            }
+    }()
     
     private func share(song: DMEventSong) {
         multipeerService.connectedPeers()

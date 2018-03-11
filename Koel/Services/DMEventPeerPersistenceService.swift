@@ -126,7 +126,8 @@ struct DMEventPeerPersistenceService: DMEventPeerPersistenceServiceType {
 // MARK: - Helpers
 extension DMEventPeerPersistenceService {
     
-    func peerOnMainScheduler(fromReference reference: ThreadSafeReference<DMEventPeer>?, peerID: MCPeerID?,
+    func peerOnMainScheduler(fromReference reference: ThreadSafeReference<DMEventPeer>?,
+                             peerID: MCPeerID?,
                              errorOnFailure: DMEventPeerPersistenceServiceError) -> Observable<DMEventPeer> {
         return Realm.objectOnMainSchedulerObservable(fromReference: reference, errorOnFailure: errorOnFailure)
             .map { resolvedPeer in

@@ -86,7 +86,7 @@ extension DMEventPeer {
     }
     
     override func isEqual(_ object: Any?) -> Bool {
-        return uuid == (object as? DMEventPeer)?.uuid
+        return primaryKeyRef == (object as? DMEventPeer)?.primaryKeyRef
     }
     
 }
