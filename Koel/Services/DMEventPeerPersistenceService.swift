@@ -61,21 +61,6 @@ struct DMEventPeerPersistenceService: DMEventPeerPersistenceServiceType {
        
     }
     
-    func delete(peer: DMEventPeer) -> Observable<Void> {
-        _ = withRealm("deleting peer") { realm -> Void in
-            guard let peerToDelete = realm.object(ofType: DMEventPeer.self, forPrimaryKey: peer.primaryKeyRef) else {
-                throw DMEventPeerPersistenceServiceError.deletionFailed(peer)
-            }
-            
-            try realm.write {
-                realm.delete(peerToDelete)
-            }
-            print("deleted peer: \(String(describing: peer.peerID?.displayName)), primarykey: \(peerToDelete.primaryKeyRef)")
-        }
-        
-        return .empty()
-    }
-    
     func peerExists(withUUID uuid: String) -> Observable<DMEventPeer> {
         let result = Realm.withRealm(
             operation: "checking if peer exists",
