@@ -102,6 +102,10 @@ class DMEventSong: Object, Codable {
         super.init(realm: realm, schema: schema)
     }
     
+    override func isEqual(_ object: Any?) -> Bool {
+        return id == (object as? DMEventSong)?.id
+    }
+    
 }
 
 extension DMEventSong: IdentifiableType {

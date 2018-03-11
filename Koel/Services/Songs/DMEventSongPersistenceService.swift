@@ -13,36 +13,11 @@ import RxRealm
 import MultipeerConnectivity
 
 struct DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
-    
-    private let concurrentScheduler = ConcurrentDispatchQueueScheduler(qos: DispatchQoS.background)
-    
-    private func withRealm<T: ThreadConfined>(operation: String, error: Error, action: @escaping (Realm) throws -> T) -> Observable<T> {
-        return Observable<ThreadSafeReference<T>>
-            .create { observer -> Disposable in
-                do {
-                    let realm = try Realm()
-                    let result = try action(realm)
-                    observer.onNext(ThreadSafeReference(to: result))
-                } catch {
-                    observer.onError(error)
-                }
-                observer.onCompleted()
-                return Disposables.create()
-            }
-            .subscribeOn(concurrentScheduler)
-            .observeOn(MainScheduler.instance)
-            .flatMap { threadSafePlayedSongReference -> Observable<T> in
-                return Realm.objectOnMainSchedulerObservable(
-                    fromReference: threadSafePlayedSongReference,
-                    errorOnFailure: error
-            )
-        }
-    }
 
     @discardableResult
     func store(song: DMEventSong) -> Observable<DMEventSong> {
-        let result = withRealm(
-            operation: "creating",
+        let result = Realm.withRealm(
+            operation: "persisting a song",
             error: DMEventSongPersistenceServiceError.creationFailed) { realm -> DMEventSong in
                 try realm.write {
                     song.id = (realm.objects(DMEventSong.self).max(ofProperty: "id") ?? 0) + 1
@@ -71,8 +46,8 @@ struct DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
     
     @discardableResult
     func markAsPlayed(song: DMEventSong) -> Observable<DMEventSong> {
-        let result = withRealm(
-            operation: "marking as played",
+        let result = Realm.withRealm(
+            operation: "marking song as played",
             error: DMEventSongPersistenceServiceError.toggleFailed(song)) { realm -> DMEventSong in
                 try realm.write {
                     if song.played == nil {
@@ -87,8 +62,8 @@ struct DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
     
     @discardableResult
     func upvote(song: DMEventSong, forUser user: DMEventPeer) -> Observable<DMEventSong> {
-        let result = withRealm(
-            operation: "upvoting",
+        let result = Realm.withRealm(
+            operation: "upvoting song",
             error: DMEventSongPersistenceServiceError.upvoteFailed(song)) { realm -> DMEventSong in
                 try realm.write {
                     song.upvotees.append(user)
@@ -100,7 +75,7 @@ struct DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
     }
     
     func songs() -> Observable<Results<DMEventSong>> {
-        let result = withRealm(
+        let result = Realm.withRealm(
             operation: "getting all songs",
             error: DMEventSongPersistenceServiceError.fetchingSongsFailed) { realm -> Results<DMEventSong> in
                 let songs = realm.objects(DMEventSong.self)

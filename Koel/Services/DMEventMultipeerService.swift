@@ -43,19 +43,23 @@ class DMEventMultipeerService: NSObject {
     init(withDisplayName displayName: String = UIDevice.current.name, asEventHost eventHost: Bool, peerPersistenceService: DMEventPeerPersistenceService = DMEventPeerPersistenceService()) {
         self.peerPersistenceService = peerPersistenceService
         
-        let peerID = MCPeerID(displayName: displayName)
+        let selfUUID: String
+        
+        if let uuid = UserDefaults.standard.string(forKey: SelfPeerUUIDKey) {
+            selfUUID = uuid
+        } else {
+            selfUUID = UUID.init().uuidString
+            UserDefaults.standard.set(selfUUID, forKey: SelfPeerUUIDKey)
+        }
+
+        let peerID = MCPeerID(displayName: selfUUID)
         
         let myPeer = DMEventPeer.peer(
             withPeerID: peerID,
             storeAsSelf: true,
-            storeAsHost: eventHost
+            storeAsHost: eventHost,
+            uuid:selfUUID
         )
-        
-        if let uuid = UserDefaults.standard.string(forKey: SelfPeerUUIDKey) {
-            myPeer.uuid = uuid
-        } else {
-            UserDefaults.standard.set(myPeer.uuid, forKey: SelfPeerUUIDKey)
-        }
         
         self.myEventPeer = myPeer
 
@@ -215,7 +219,7 @@ extension DMEventMultipeerService: MCNearbyServiceBrowserDelegate {
         }
         
         peerPersistenceService
-            .peerExists(withPeerID: peerID)
+            .peerExists(withUUID: peerID.displayName)
             .catchError { (error) -> Observable<DMEventPeer> in
                 if let peerPersistenceError = error as? DMEventPeerPersistenceServiceError {
                     switch peerPersistenceError {
@@ -288,7 +292,7 @@ extension DMEventMultipeerService: MCSessionDelegate {
         print("\(peerID.displayName) changed to state \(state.rawValue)")
         if state != .connecting {
             peerPersistenceService
-                .peerExists(withPeerID: peerID)
+                .peerExists(withUUID: peerID.displayName)
                 .subscribe(
                     onNext: { [unowned self] peer in
                         self.performUpdate(forPeer: peer, toConnectedState: state == .connected)

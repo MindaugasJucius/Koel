@@ -35,30 +35,30 @@ struct DMEventPeerPersistenceService: DMEventPeerPersistenceServiceType {
     
     @discardableResult
     func store(peer: DMEventPeer) -> Observable<DMEventPeer> {
-        
-        return withRealm("creating peer") { realm -> ThreadSafeReference<DMEventPeer> in
-            try realm.write {
-                
-                print("storing \(peer.peerID?.displayName) isSelf \(peer.isSelf) isHost \(peer.isHost) with uuid \(peer.uuid)")
-                
-                if let peerID = peer.peerID {
-                    peer.peerIDData = NSKeyedArchiver.archivedData(withRootObject: peerID)
-                }
-                
-                peer.primaryKeyRef = peer.uuid
-                realm.add(peer, update: true)
-            }
 
-            return ThreadSafeReference(to: peer)
-        }
-        .flatMap { safePeerReference -> Observable<DMEventPeer> in
-            return self.peerOnMainScheduler(
-                fromReference: safePeerReference,
-                peerID: peer.peerID,
-                errorOnFailure: .peerCreationFailed
-            )
-        }
+        let result = Realm.withRealm(
+            operation: "creating peer",
+            error: DMEventPeerPersistenceServiceError.peerCreationFailed) { (realm) -> DMEventPeer in
+                try realm.write {
+                    
+                    print("storing \(peer.peerID?.displayName) isSelf \(peer.isSelf) isHost \(peer.isHost) with uuid \(peer.uuid)")
+                    
+                    if let peerID = peer.peerID {
+                        peer.peerIDData = NSKeyedArchiver.archivedData(withRootObject: peerID)
+                    }
+                    
+                    peer.primaryKeyRef = peer.uuid
+                    realm.add(peer, update: true)
+                }
+                return peer
+            }
         
+        return result.flatMap { (resolvedPeer) -> Observable<DMEventPeer> in
+            resolvedPeer.peerID = peer.peerID
+            resolvedPeer.primaryKeyRef = resolvedPeer.uuid
+            return Observable.just(resolvedPeer)
+        }
+       
     }
     
     func delete(peer: DMEventPeer) -> Observable<Void> {
@@ -76,24 +76,25 @@ struct DMEventPeerPersistenceService: DMEventPeerPersistenceServiceType {
         return .empty()
     }
     
-    func peerExists(withPeerID peerID: MCPeerID) -> Observable<DMEventPeer> {
-        return withRealm("checking if peer exists") { realm -> ThreadSafeReference<DMEventPeer>? in
-            let allPeers = realm.objects(DMEventPeer.self).toArray()
-            for peer in allPeers {
-                guard let unarchivedPeerID = NSKeyedUnarchiver.unarchiveObject(with: peer.peerIDData) as? MCPeerID,
-                 peerID == unarchivedPeerID else {
-                    continue
-                }
-                peer.peerID = unarchivedPeerID
-                return ThreadSafeReference(to: peer)
+    func peerExists(withUUID uuid: String) -> Observable<DMEventPeer> {
+        let result = Realm.withRealm(
+            operation: "checking if peer exists",
+            error: DMEventPeerPersistenceServiceError.existenceCheckFailed,
+            nilResultHandler: { observer in
+                observer.onError(DMEventPeerPersistenceServiceError.peerDoesNotExist)
+            },
+            action: { realm -> DMEventPeer? in
+                let uuidPredicate = NSPredicate(format: "uuid = %@", uuid)
+                return realm.objects(DMEventPeer.self).filter(uuidPredicate).first
             }
-            return nil
-        }
-        .flatMap { maybeSafePeerReference -> Observable<DMEventPeer> in
-            guard let safePeerReference = maybeSafePeerReference else {
-                return Observable.error(DMEventPeerPersistenceServiceError.peerDoesNotExist)
+        )
+        
+        return result.flatMap { (resolvedPeer) -> Observable<DMEventPeer> in
+            if let unarchivedPeerID = NSKeyedUnarchiver.unarchiveObject(with: resolvedPeer.peerIDData) as? MCPeerID {
+                resolvedPeer.peerID = unarchivedPeerID
             }
-            return self.peerOnMainScheduler(fromReference: safePeerReference, peerID: peerID, errorOnFailure: .existenceCheckFailed)
+            resolvedPeer.primaryKeyRef = resolvedPeer.uuid
+            return Observable.just(resolvedPeer)
         }
         
     }
@@ -101,39 +102,23 @@ struct DMEventPeerPersistenceService: DMEventPeerPersistenceServiceType {
     // MARK: - Retrieved object updates
     @discardableResult
     func update(peer: DMEventPeer, updateBlock: @escaping PeerUpdate) -> Observable<DMEventPeer> {
-        return withRealm("updating peer host status") { realm -> ThreadSafeReference<DMEventPeer> in
-            guard let retrievedPeer = realm.object(ofType: DMEventPeer.self, forPrimaryKey: peer.primaryKeyRef) else {
-                throw DMEventPeerPersistenceServiceError.updateFailed(peer)
+        return Realm.withRealm(
+            operation: "updating peer",
+            error: DMEventPeerPersistenceServiceError.updateFailed(peer)) { realm -> DMEventPeer in
+                guard let retrievedPeer = realm.object(ofType: DMEventPeer.self, forPrimaryKey: peer.primaryKeyRef) else {
+                    throw DMEventPeerPersistenceServiceError.updateFailed(peer)
+                }
+                
+                try realm.write {
+                    realm.add(updateBlock(retrievedPeer), update: true)
+                }
+                
+                return retrievedPeer
             }
-            
-            try realm.write {
-                realm.add(updateBlock(retrievedPeer), update: true)
-            }
-            
-            return ThreadSafeReference(to: retrievedPeer)
-        }
-        .flatMap { safePeerReference -> Observable<DMEventPeer> in
-            return self.peerOnMainScheduler(
-                fromReference: safePeerReference,
-                peerID: peer.peerID,
-                errorOnFailure: .updateFailed(peer)
-            )
-        }
-    }
-    
-}
-
-// MARK: - Helpers
-extension DMEventPeerPersistenceService {
-    
-    func peerOnMainScheduler(fromReference reference: ThreadSafeReference<DMEventPeer>?,
-                             peerID: MCPeerID?,
-                             errorOnFailure: DMEventPeerPersistenceServiceError) -> Observable<DMEventPeer> {
-        return Realm.objectOnMainSchedulerObservable(fromReference: reference, errorOnFailure: errorOnFailure)
-            .map { resolvedPeer in
-                resolvedPeer.peerID = peerID
+            .flatMap { (resolvedPeer) -> Observable<DMEventPeer> in
+                resolvedPeer.peerID = peer.peerID
                 resolvedPeer.primaryKeyRef = resolvedPeer.uuid
-                return resolvedPeer
+                return Observable.just(resolvedPeer)
             }
     }
     

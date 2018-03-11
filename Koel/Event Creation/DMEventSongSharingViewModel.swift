@@ -98,8 +98,8 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
         return CocoaAction { [unowned self] in
             let song = DMEventSong()
             song.title = "songy"
-            song.addedBy = self.selfPeer
-            song.upvotedByUUIDs = [self.selfPeer.uuid]
+            song.addedByUUID = self.selfPeer.primaryKeyRef
+            song.upvotedByUUIDs = [self.selfPeer.primaryKeyRef]
             return self.songPersistenceService
                 .store(song: song)
                 .do(
