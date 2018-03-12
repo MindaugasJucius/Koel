@@ -19,6 +19,7 @@ class DMEventSongTableViewCell: UITableViewCell, ReusableView {
     
     private let titleLabel: UILabel = {
         let label = UILabel()
+        label.numberOfLines = 0
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -45,7 +46,7 @@ class DMEventSongTableViewCell: UITableViewCell, ReusableView {
         contentView.addSubview(upvoteButton)
         let buttonConstraints = [
             contentView.rightAnchor.constraint(equalTo: upvoteButton.rightAnchor, constant: 5),
-            upvoteButton.leftAnchor.constraint(equalTo: titleLabel.rightAnchor, constant: 5),
+            upvoteButton.widthAnchor.constraint(equalToConstant: 50),
             upvoteButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
         ]
         
