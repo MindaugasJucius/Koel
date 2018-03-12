@@ -222,23 +222,10 @@ extension DMEventMultipeerService: MCNearbyServiceBrowserDelegate {
             discoveredPeerUUID != myEventPeer.primaryKeyRef else {
             return
         }
+        let peer = DMEventPeer.peer(withPeerID: peerID, context: info)
         
         peerPersistenceService
-            .peerExists(withUUID: peerID.displayName)
-            .catchError { (error) -> Observable<DMEventPeer> in
-                if let peerPersistenceError = error as? DMEventPeerPersistenceServiceError {
-                    switch peerPersistenceError {
-                    case .peerDoesNotExist:
-                        let unmanagedPeer = DMEventPeer.peer(withPeerID: peerID, context: info)
-                        print("peer does not exist - will attempt to store")
-                        return self.peerPersistenceService.store(peer: unmanagedPeer)
-                    default:
-                        print("peer checking failed")
-                        return Observable.empty()
-                    }
-                }
-                return Observable.empty()
-            }
+            .store(peer: peer)
             .subscribe(
                 onNext: { [unowned self] peer in
                     if !self.nearbyPeers.value.contains(peer) {
