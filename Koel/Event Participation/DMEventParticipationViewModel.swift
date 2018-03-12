@@ -10,7 +10,7 @@ import Foundation
 import RxSwift
 import Action
 
-class DMEventParticipationViewModel: MultipeerViewModelType, BackgroundDisconnectType {
+class DMEventParticipationViewModel: MultipeerViewModelType, BackgroundDisconnectType, SongSharingViewModelType {
 
     private let disposeBag = DisposeBag()
     

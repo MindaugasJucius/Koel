@@ -39,7 +39,7 @@ class DMEventSearchViewModel: ViewModelType, MultipeerViewModelType {
         return multipeerService.latestConnectedPeer()
     }
     
-    private lazy var pushParticipation: Action<DMEventPeer, Void> = {
+    lazy var pushParticipation: Action<DMEventPeer, Void> = {
         return Action (
             workFactory: { [unowned self] host in
                 
@@ -51,20 +51,12 @@ class DMEventSearchViewModel: ViewModelType, MultipeerViewModelType {
                 let participationModel = DMEventParticipationViewModel(host: host, songSharingViewModel: songSharingViewModel)
 
                 let participationScene = Scene.participation(participationModel)
-                return self.sceneCoordinator.transition(to: participationScene, type: .root)
+                return self.sceneCoordinator.transition(to: participationScene, type: .rootWithNavigationVC)
             }
         )
     }()
     
-    lazy var requestAccess: Action<(DMEventPeer), Void> = { this in
-        return Action (
-            workFactory: { (eventPeer: DMEventPeer) in
-                return this.multipeerService.connect(eventPeer.peerID, context: nil)
-            }
-        )
-    }(self)
-    
-    lazy var createEvent: CocoaAction = { this in
+    lazy var pushCreateEvent: CocoaAction = { this in
         return CocoaAction { _ in
             this.multipeerService.stopAdvertising()
             this.multipeerService.stopBrowsing()
@@ -88,6 +80,14 @@ class DMEventSearchViewModel: ViewModelType, MultipeerViewModelType {
         }
     }(self)
 
+    lazy var requestAccess: Action<(DMEventPeer), Void> = { this in
+        return Action (
+            workFactory: { (eventPeer: DMEventPeer) in
+                return this.multipeerService.connect(eventPeer.peerID, context: nil)
+            }
+        )
+    }(self)
+    
     required init(withSceneCoordinator sceneCoordinator: SceneCoordinatorType) {
         self.sceneCoordinator = sceneCoordinator
         
@@ -98,5 +98,6 @@ class DMEventSearchViewModel: ViewModelType, MultipeerViewModelType {
             .observeOn(MainScheduler.instance)
             .subscribe(pushParticipation.inputs)
             .disposed(by: disposeBag)
+
     }
 }
