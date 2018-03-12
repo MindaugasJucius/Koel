@@ -32,13 +32,18 @@ class DMEventSearchViewController: UIViewController, BindableType {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func didMove(toParentViewController parent: UIViewController?) {
+        navigationController?.navigationBar.apply(DefaultStylesheet.navigationBarStyle)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
         title = UIConstants.strings.searchScreenTitle
 
         view.backgroundColor = .white
-        
+        navigationController?.navigationBar.apply(DefaultStylesheet.navigationBarStyle)
+
         tableView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(tableView)
         additionalSafeAreaInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
@@ -55,7 +60,7 @@ class DMEventSearchViewController: UIViewController, BindableType {
         startEventButton.addConstraints(inSuperview: view)
         startEventButton.setTitle(UIConstants.strings.searchScreenButtonStartEventTitle, for: .normal)
     }
-
+    
     func bindViewModel() {
         viewModel.incommingInvitations
             .subscribe(onNext: { invitation in
@@ -77,7 +82,7 @@ class DMEventSearchViewController: UIViewController, BindableType {
             }
             .disposed(by: bag)
         
-        startEventButton.rx.action = viewModel.createEvent
+        startEventButton.rx.action = viewModel.pushCreateEvent
         
         tableView.rx
             .modelSelected(DMEventPeer.self)

@@ -12,12 +12,13 @@ import RxSwift
 import RealmSwift
 import MultipeerConnectivity
 
-class DMEventManagementViewModel: ViewModelType, MultipeerViewModelType, BackgroundDisconnectType {
-
+class DMEventManagementViewModel: ViewModelType, MultipeerViewModelType, BackgroundDisconnectType, SongSharingViewModelType {
+    
+    var songSharingViewModel: DMEventSongSharingViewModelType
+    
     private let disposeBag = DisposeBag()
 
     let sceneCoordinator: SceneCoordinatorType
-    let songSharingViewModel: DMEventSongSharingViewModelType
 
     var backgroundTaskID = UIBackgroundTaskInvalid
 

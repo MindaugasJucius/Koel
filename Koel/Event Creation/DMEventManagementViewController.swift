@@ -23,7 +23,7 @@ class DMEventManagementViewController: UIViewController, BindableType {
     private let tableView: UITableView = {
         let tableView = UITableView()
         tableView.translatesAutoresizingMaskIntoConstraints = false
-        tableView.register(DMEventSongTableViewCell.self, forCellReuseIdentifier: "cell")
+        tableView.register(DMEventSongTableViewCell.self, forCellReuseIdentifier: DMEventSongTableViewCell.reuseIdentifier)
         return tableView
     }()
     
@@ -53,8 +53,13 @@ class DMEventManagementViewController: UIViewController, BindableType {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func didMove(toParentViewController parent: UIViewController?) {
+        navigationController?.navigationBar.apply(DefaultStylesheet.navigationBarStyle)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         title = UIConstants.strings.managementTitle
         view.backgroundColor = .white
         view.addSubview(tableView)
@@ -103,11 +108,11 @@ class DMEventManagementViewController: UIViewController, BindableType {
 
 extension DMEventManagementViewController {
     
-    static func dataSource(withViewModel viewModel: DMEventManagementViewModel) -> RxTableViewSectionedAnimatedDataSource<SongSection> {
+    static func dataSource(withViewModel viewModel: SongSharingViewModelType) -> RxTableViewSectionedAnimatedDataSource<SongSection> {
         return RxTableViewSectionedAnimatedDataSource<SongSection>(
             animationConfiguration: AnimationConfiguration(insertAnimation: .top, reloadAnimation: .fade, deleteAnimation: .left),
             configureCell: { (dataSource, tableView, indexPath, element) -> UITableViewCell in
-                let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+                let cell = tableView.dequeueReusableCell(withIdentifier: DMEventSongTableViewCell.reuseIdentifier, for: indexPath)
                 
                 guard let songCell = cell as? DMEventSongTableViewCell else {
                     return cell

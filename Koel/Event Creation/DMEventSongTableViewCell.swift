@@ -13,7 +13,7 @@ import RxOptional
 import RealmSwift
 import Action
 
-class DMEventSongTableViewCell: UITableViewCell {
+class DMEventSongTableViewCell: UITableViewCell, ReusableView {
 
     private var disposeBag = DisposeBag()
     
