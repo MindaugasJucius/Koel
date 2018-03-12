@@ -36,18 +36,19 @@ extension Realm {
                 observer.onCompleted()
                 return Disposables.create()
             }
-            .subscribeOn(concurrentScheduler)
-            .observeOn(MainScheduler.instance)
-            .flatMap { threadSafePlayedSongReference -> Observable<T> in
-                return Realm.objectOnMainSchedulerObservable(
-                    fromReference: threadSafePlayedSongReference,
-                    errorOnFailure: error)
+            .subscribeOn(scheduler)
+            .flatMap { threadSafeReferenceToResult -> Observable<T> in
+                return Realm.safeObject(
+                    resolveOnScheduler: MainScheduler.instance,
+                    fromReference: threadSafeReferenceToResult,
+                    errorOnFailure: error
+                )
             }
     }
     
+    // resolves safe object reference on subscribeOn scheduler
     static func safeObject<T>(
-        observeOn: SchedulerType,
-        subscribeOn: SchedulerType,
+        resolveOnScheduler: SchedulerType,
         fromReference reference: ThreadSafeReference<T>?,
         errorOnFailure: Swift.Error) -> Observable<T> {
         
@@ -65,18 +66,7 @@ extension Realm {
             observer.onCompleted()
             return Disposables.create()
         }
-        .observeOn(observeOn)
-        .subscribeOn(subscribeOn)
-    }
-    
-    static func objectOnMainSchedulerObservable<T>(fromReference reference: ThreadSafeReference<T>?, errorOnFailure: Swift.Error) -> Observable<T> {
-
-        return Realm.safeObject(
-            observeOn: MainScheduler.instance,
-            subscribeOn: MainScheduler.instance,
-            fromReference: reference,
-            errorOnFailure: errorOnFailure
-        )
+        .subscribeOn(resolveOnScheduler)
     }
     
 }
