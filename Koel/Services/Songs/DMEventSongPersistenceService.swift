@@ -51,14 +51,14 @@ struct DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
         return Realm.withRealm(
             operation: "marking song as played",
             error: DMEventSongPersistenceServiceError.toggleFailed(song),
-            scheduler: songPersistenceScheduler) { realm -> DMEventSong in
+            scheduler: songPersistenceScheduler) { realm -> DMEventSong? in
                 let resolvedSong = realm.resolve(threadSafeSongReference)
                 try realm.write {
                     if resolvedSong?.played == nil {
                         resolvedSong?.played = Date()
                     }
                 }
-                return resolvedSong!
+                return resolvedSong
             }
 
     }
@@ -69,14 +69,16 @@ struct DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
         return Realm.withRealm(
             operation: "upvoting song",
             error: DMEventSongPersistenceServiceError.upvoteFailed(song),
-            scheduler: songPersistenceScheduler) { realm -> DMEventSong in
-                let resolvedSong = realm.resolve(threadSafeSongReference)
-                let resolvedUser = realm.object(ofType: DMEventPeer.self, forPrimaryKey: userUUID)
-                try realm.write {
-                    resolvedSong?.upvotees.append(resolvedUser!)
-                    resolvedSong!.upvoteCount = resolvedSong!.upvoteCount + 1
+            scheduler: songPersistenceScheduler) { realm -> DMEventSong? in
+                guard let resolvedSong = realm.resolve(threadSafeSongReference),
+                    let fetchedUser = realm.object(ofType: DMEventPeer.self, forPrimaryKey: userUUID) else {
+                    return .none
                 }
-                return resolvedSong!
+                try realm.write {
+                    resolvedSong.upvotees.append(fetchedUser)
+                    resolvedSong.upvoteCount = resolvedSong.upvoteCount + 1
+                }
+                return resolvedSong
         }
     }
     
