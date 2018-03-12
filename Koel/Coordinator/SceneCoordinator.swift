@@ -58,6 +58,7 @@ class SceneCoordinator: NSObject, SceneCoordinatorType {
     func transition(to scene: Scene, type: SceneTransitionType) -> Observable<Void> {
         let subject = PublishSubject<Void>()
         let viewController = scene.viewController()
+        
         switch type {
         case .root:
             currentViewController = SceneCoordinator.actualViewController(for: viewController)
@@ -65,7 +66,8 @@ class SceneCoordinator: NSObject, SceneCoordinatorType {
             subject.onCompleted()
         case .rootWithNavigationVC:
             currentViewController = SceneCoordinator.actualViewController(for: viewController)
-            window.rootViewController = navigationController(withRoot: currentViewController)
+
+            window.rootViewController =             UINavigationController(rootViewController: currentViewController)
             subject.onCompleted()
         case .push:
 
@@ -128,12 +130,4 @@ class SceneCoordinator: NSObject, SceneCoordinatorType {
         }
         return subject.asObservable()
     }
-
-    
-    private func navigationController(withRoot root: UIViewController) -> UINavigationController {
-        let navigationController = UINavigationController(rootViewController: root)
-        navigationController.navigationBar.apply(DefaultStylesheet.navigationBarStyle)
-        return navigationController
-    }
-    
 }
