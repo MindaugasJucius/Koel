@@ -126,10 +126,10 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
     func onUpvote(song: DMEventSong) -> CocoaAction {
         let upvoteesContainSelf = song.addedBy?.uuid == selfPeer.primaryKeyRef
         return CocoaAction(
-            enabledIf: Observable.just(!upvoteesContainSelf),
+            enabledIf: Observable.just(true),
             workFactory: { [unowned self] in
                 return self.songPersistenceService
-                    .upvote(song: song, forUser: self.selfPeer)
+                    .upvote(song: song, forUser: self.selfPeer.primaryKeyRef)
                     .map { _ in }
             }
         )

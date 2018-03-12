@@ -47,40 +47,36 @@ struct DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
     
     @discardableResult
     func markAsPlayed(song: DMEventSong) -> Observable<DMEventSong> {
-        return safeSongOnPersistenceScheduler(
-            song: song,
-            error: DMEventSongPersistenceServiceError.toggleFailed(song)
-        )
-        .flatMap { threadSafeSong -> Observable<DMEventSong> in
-            return Realm.withRealm(
-                operation: "marking song as played",
-                error: DMEventSongPersistenceServiceError.toggleFailed(song)) { realm -> DMEventSong in
-                    try realm.write {
-                        if threadSafeSong.played == nil {
-                            threadSafeSong.played = Date()
-                        }
+        let threadSafeSongReference = ThreadSafeReference(to: song)
+        return Realm.withRealm(
+            operation: "marking song as played",
+            error: DMEventSongPersistenceServiceError.toggleFailed(song),
+            scheduler: songPersistenceScheduler) { realm -> DMEventSong in
+                let resolvedSong = realm.resolve(threadSafeSongReference)
+                try realm.write {
+                    if resolvedSong?.played == nil {
+                        resolvedSong?.played = Date()
                     }
-                return threadSafeSong
+                }
+                return resolvedSong!
             }
-        }
+
     }
     
     @discardableResult
-    func upvote(song: DMEventSong, forUser user: DMEventPeer) -> Observable<DMEventSong> {
-        return safeSongOnPersistenceScheduler(
-            song: song,
-            error: DMEventSongPersistenceServiceError.toggleFailed(song)
-        )
-        .flatMap { threadSafeSong -> Observable<DMEventSong> in
-            return Realm.withRealm(
-                operation: "upvoting song",
-                error: DMEventSongPersistenceServiceError.upvoteFailed(song)) { realm -> DMEventSong in
-                    try realm.write {
-                        song.upvotees.append(user)
-                        song.upvoteCount = song.upvoteCount + 1
-                    }
-                    return song
-            }
+    func upvote(song: DMEventSong, forUser userUUID: String) -> Observable<DMEventSong> {
+        let threadSafeSongReference = ThreadSafeReference(to: song)
+        return Realm.withRealm(
+            operation: "upvoting song",
+            error: DMEventSongPersistenceServiceError.upvoteFailed(song),
+            scheduler: songPersistenceScheduler) { realm -> DMEventSong in
+                let resolvedSong = realm.resolve(threadSafeSongReference)
+                let resolvedUser = realm.object(ofType: DMEventPeer.self, forPrimaryKey: userUUID)
+                try realm.write {
+                    resolvedSong?.upvotees.append(resolvedUser!)
+                    resolvedSong!.upvoteCount = resolvedSong!.upvoteCount + 1
+                }
+                return resolvedSong!
         }
     }
     
@@ -98,17 +94,4 @@ struct DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
         return result
     }
 
-}
-
-extension DMEventSongPersistenceService {
-    
-    func safeSongOnPersistenceScheduler(song: DMEventSong, error: Error) -> Observable<DMEventSong> {
-        return Realm.safeObject(
-            observeOn: MainScheduler.instance,
-            subscribeOn: songPersistenceScheduler,
-            fromReference: ThreadSafeReference(to: song),
-            errorOnFailure: error
-        )
-    }
-    
 }
