@@ -9,6 +9,7 @@
 import UIKit
 import RxCocoa
 import RxSwift
+import RxDataSources
 
 class DMEventParticipationViewController: UIViewController, BindableType {
 
@@ -20,10 +21,20 @@ class DMEventParticipationViewController: UIViewController, BindableType {
     
     //MARK: UI
     
+    private let tableView: UITableView = {
+        let tableView = UITableView()
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.register(DMEventSongTableViewCell.self, forCellReuseIdentifier: DMEventSongTableViewCell.reuseIdentifier)
+        return tableView
+    }()
+    
+    private let tableViewDataSource: RxTableViewSectionedAnimatedDataSource<SongSection>
+    
     private let label = UILabel()
     
     required init(withViewModel viewModel: DMEventParticipationViewModel) {
         self.viewModel = viewModel
+        self.tableViewDataSource = DMEventParticipationViewController.dataSource(withViewModel: viewModel)
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -31,10 +42,23 @@ class DMEventParticipationViewController: UIViewController, BindableType {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func didMove(toParentViewController parent: UIViewController?) {
+        navigationController?.navigationBar.apply(DefaultStylesheet.navigationBarStyle)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
         title = UIConstants.strings.participateTitle
+        
+        view.addSubview(tableView)
+        let tableViewConstraints = [
+            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            tableView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
+            tableView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        ]
+        NSLayoutConstraint.activate(tableViewConstraints)
         
         label.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(label)
@@ -51,6 +75,37 @@ class DMEventParticipationViewController: UIViewController, BindableType {
             .map { $0 ? "host exists" : "host disconnected" }
             .bind(to: label.rx.text)
             .disposed(by: disposeBag)
+        
+        viewModel.songSharingViewModel.songsSectioned
+            .bind(to: tableView.rx.items(dataSource: tableViewDataSource))
+            .disposed(by: disposeBag)
     }
 
+}
+
+extension DMEventParticipationViewController {
+    
+    static func dataSource(withViewModel viewModel: SongSharingViewModelType) -> RxTableViewSectionedAnimatedDataSource<SongSection> {
+        return RxTableViewSectionedAnimatedDataSource<SongSection>(
+            animationConfiguration: AnimationConfiguration(insertAnimation: .top, reloadAnimation: .fade, deleteAnimation: .left),
+            configureCell: { (dataSource, tableView, indexPath, element) -> UITableViewCell in
+                let cell = tableView.dequeueReusableCell(withIdentifier: DMEventSongTableViewCell.reuseIdentifier, for: indexPath)
+                
+                guard let songCell = cell as? DMEventSongTableViewCell else {
+                    return cell
+                }
+                
+                songCell.configure(
+                    withSong: element,
+                    upvoteAction: viewModel.songSharingViewModel.onUpvote(song: element)
+                )
+                
+                return cell
+            },
+            titleForHeaderInSection: { dataSource, sectionIndex in
+                return dataSource[sectionIndex].model
+            }
+        )
+    }
+    
 }
