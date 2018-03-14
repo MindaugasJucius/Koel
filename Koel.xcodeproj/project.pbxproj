@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		031D904420566AE4007D1156 /* ReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 031D904320566AE4007D1156 /* ReusableView.swift */; };
 		031D904620566EB3007D1156 /* SongSharingViewModelType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 031D904520566EB3007D1156 /* SongSharingViewModelType.swift */; };
+		037A47E3205923990030D25F /* DMEntitySharingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 037A47E1205923980030D25F /* DMEntitySharingService.swift */; };
+		037A47E4205923990030D25F /* DMEntitySharingServiceType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 037A47E2205923980030D25F /* DMEntitySharingServiceType.swift */; };
 		33CD43033F2349BABFA21363 /* Pods_Koel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 859C054680781DDB43D6FFC3 /* Pods_Koel.framework */; };
 		47ADB8775C90C90A34CB0B4E /* Pods_KoelTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C68936EB8AF29A19F4BC4C74 /* Pods_KoelTests.framework */; };
 		5F014BD41FB9E20000079009 /* WaveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F014BD31FB9E20000079009 /* WaveView.swift */; };
@@ -29,8 +31,6 @@
 		5F54458E1FD198C40059A975 /* DMEventInvitationsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F54458C1FD198C40059A975 /* DMEventInvitationsViewController.swift */; };
 		5F5445951FD594460059A975 /* DMEventParticipationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F5445941FD594460059A975 /* DMEventParticipationViewModel.swift */; };
 		5F5445971FD594570059A975 /* DMEventParticipationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F5445961FD594570059A975 /* DMEventParticipationViewController.swift */; };
-		5F548F541FEAB55F007412F1 /* DMEventSongSharingServiceType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F548F531FEAB55F007412F1 /* DMEventSongSharingServiceType.swift */; };
-		5F548F561FEAB577007412F1 /* DMEventSongSharingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F548F551FEAB577007412F1 /* DMEventSongSharingService.swift */; };
 		5F58F0311F9CB793006B9B47 /* UIViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F58F0301F9CB793006B9B47 /* UIViewController+Extensions.swift */; };
 		5F601D3B1FD043DC003DE897 /* DMEventMultipeerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F601D3A1FD043DC003DE897 /* DMEventMultipeerService.swift */; };
 		5F601D3D1FD04851003DE897 /* DMEventInvitationsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F601D3C1FD04851003DE897 /* DMEventInvitationsViewModel.swift */; };
@@ -78,6 +78,8 @@
 /* Begin PBXFileReference section */
 		031D904320566AE4007D1156 /* ReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReusableView.swift; sourceTree = "<group>"; };
 		031D904520566EB3007D1156 /* SongSharingViewModelType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongSharingViewModelType.swift; sourceTree = "<group>"; };
+		037A47E1205923980030D25F /* DMEntitySharingService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DMEntitySharingService.swift; path = Koel/Services/DMEntitySharingService.swift; sourceTree = SOURCE_ROOT; };
+		037A47E2205923980030D25F /* DMEntitySharingServiceType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DMEntitySharingServiceType.swift; path = Koel/Services/DMEntitySharingServiceType.swift; sourceTree = SOURCE_ROOT; };
 		1EEEA22101255BEC78867464 /* Pods-Koel.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Koel.release.xcconfig"; path = "Pods/Target Support Files/Pods-Koel/Pods-Koel.release.xcconfig"; sourceTree = "<group>"; };
 		2F9833A4A17A19528964480E /* Pods-Koel.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Koel.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Koel/Pods-Koel.debug.xcconfig"; sourceTree = "<group>"; };
 		4BFB7D7E45702A7F3768CF64 /* Pods-KoelTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KoelTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-KoelTests/Pods-KoelTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -105,8 +107,6 @@
 		5F54458C1FD198C40059A975 /* DMEventInvitationsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventInvitationsViewController.swift; sourceTree = "<group>"; };
 		5F5445941FD594460059A975 /* DMEventParticipationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventParticipationViewModel.swift; sourceTree = "<group>"; };
 		5F5445961FD594570059A975 /* DMEventParticipationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventParticipationViewController.swift; sourceTree = "<group>"; };
-		5F548F531FEAB55F007412F1 /* DMEventSongSharingServiceType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventSongSharingServiceType.swift; sourceTree = "<group>"; };
-		5F548F551FEAB577007412F1 /* DMEventSongSharingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventSongSharingService.swift; sourceTree = "<group>"; };
 		5F58F0301F9CB793006B9B47 /* UIViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extensions.swift"; sourceTree = "<group>"; };
 		5F601D3A1FD043DC003DE897 /* DMEventMultipeerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventMultipeerService.swift; sourceTree = "<group>"; };
 		5F601D3C1FD04851003DE897 /* DMEventInvitationsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventInvitationsViewModel.swift; sourceTree = "<group>"; };
@@ -289,10 +289,10 @@
 		5F548F571FEAB583007412F1 /* Songs */ = {
 			isa = PBXGroup;
 			children = (
+				037A47E1205923980030D25F /* DMEntitySharingService.swift */,
+				037A47E2205923980030D25F /* DMEntitySharingServiceType.swift */,
 				5F84FFA81FDAF69E003332B4 /* DMEventSongPersistenceServiceType.swift */,
 				5F84FFA61FDAF0B8003332B4 /* DMEventSongPersistenceService.swift */,
-				5F548F531FEAB55F007412F1 /* DMEventSongSharingServiceType.swift */,
-				5F548F551FEAB577007412F1 /* DMEventSongSharingService.swift */,
 			);
 			path = Songs;
 			sourceTree = "<group>";
@@ -620,7 +620,6 @@
 			files = (
 				5FB2C9381FE7F428001D532F /* CALayer+Extensions.swift in Sources */,
 				5F84FF9A1FD86350003332B4 /* DMEventManagementViewModel.swift in Sources */,
-				5F548F561FEAB577007412F1 /* DMEventSongSharingService.swift in Sources */,
 				5F9C2D231FDED1970067BDC4 /* DMKoelButton.swift in Sources */,
 				5FB2C9421FE92D26001D532F /* Realm+Extensions.swift in Sources */,
 				5FA42B5C1FD6E6F600578EF5 /* Notifications.swift in Sources */,
@@ -660,9 +659,10 @@
 				5F014BD41FB9E20000079009 /* WaveView.swift in Sources */,
 				5F47B8341FD403780053A0A5 /* DMEventSearchViewController.swift in Sources */,
 				5FB2C9401FE8075F001D532F /* Stylesheet.swift in Sources */,
-				5F548F541FEAB55F007412F1 /* DMEventSongSharingServiceType.swift in Sources */,
 				5F47B83B1FD4073F0053A0A5 /* ViewModelType.swift in Sources */,
+				037A47E3205923990030D25F /* DMEntitySharingService.swift in Sources */,
 				5F84FF9C1FD86367003332B4 /* DMEventManagementViewController.swift in Sources */,
+				037A47E4205923990030D25F /* DMEntitySharingServiceType.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

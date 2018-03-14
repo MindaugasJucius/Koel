@@ -14,7 +14,7 @@ import RealmSwift
 
 protocol DMEventSongSharingViewModelType: MultipeerViewModelType {
     
-    var songSharingService: DMEventSongSharingServiceType { get }
+    var songSharingService: DMEntitySharingService<DMEventSong> { get }
     var songPersistenceService: DMEventSongPersistenceServiceType { get }
 
     var songsSectioned: Observable<[SongSection]> { get }
@@ -29,12 +29,12 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
     
     private let disposeBag = DisposeBag()
     
-    var songSharingService: DMEventSongSharingServiceType
+    var songSharingService: DMEntitySharingService<DMEventSong>
     var songPersistenceService: DMEventSongPersistenceServiceType
     var multipeerService: DMEventMultipeerService
     
     init(songPersistenceService: DMEventSongPersistenceServiceType,
-         songSharingService: DMEventSongSharingServiceType,
+         songSharingService: DMEntitySharingService<DMEventSong>,
          multipeerService: DMEventMultipeerService) {
         self.songSharingService = songSharingService
         self.songPersistenceService = songPersistenceService
@@ -42,8 +42,8 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
         
         multipeerService
             .receive()
-            .map { receivedInfo -> DMEventSong in
-                let song = try songSharingService.parseSong(fromData: receivedInfo.1)
+            .map { (peer, data) -> DMEventSong in
+                let song = try songSharingService.parse(fromData: data)
                 print("retrieved a song: \(song), added uuid: \(song.addedByUUID), upvoted uuids: \(song.upvotedByUUIDs)")
                 return song
             }
@@ -84,40 +84,15 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
             song.title = "songy"
             song.addedByUUID = self.selfPeer.primaryKeyRef
             song.upvotedByUUIDs = [self.selfPeer.primaryKeyRef]
-            return self.createAction.execute(song)
-                .do(
-                    onNext: { [unowned self] persistedSong in
-                        self.share(song: persistedSong)
-                    }
-                )
-                .map { _ in }
+            return self.createAction
+                .execute(song)
+                .share(withMultipeerService: self.multipeerService, sharingService: self.songSharingService)
             }
     }()
-    
-    private func share(song: DMEventSong) {
-        multipeerService.connectedPeers()
-            .map { peers in
-                return (peers.flatMap { $0.peerID }, song)
-            }
-            .subscribe(shareAction.inputs)
-            .dispose()
-    }
-    
+
     private lazy var createAction: Action<DMEventSong, DMEventSong> = {
         return Action(workFactory: { [unowned self] (song: DMEventSong) -> Observable<DMEventSong> in
             return self.songPersistenceService.store(song: song)
-        })
-    }()
-    
-    private lazy var shareAction: Action<([MCPeerID], DMEventSong), Void> = {
-        return Action(workFactory: { [unowned self] (peers: [MCPeerID], song: DMEventSong) -> Observable<Void> in
-            do {
-                let songData = try self.songSharingService.encode(song: song)
-                return self.multipeerService.send(toPeers: peers, data: songData, mode: MCSessionSendDataMode.reliable)
-            }
-            catch {
-                return Observable.empty()
-            }
         })
     }()
     
@@ -126,19 +101,39 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
     func onUpvote(song: DMEventSong) -> CocoaAction {
         let upvoteesContainSelf = song.addedBy?.uuid == selfPeer.primaryKeyRef
         return CocoaAction(
-            enabledIf: Observable.just(true),
+            enabledIf: Observable.just(!upvoteesContainSelf),
             workFactory: { [unowned self] in
                 return self.songPersistenceService
                     .upvote(song: song, forUser: self.selfPeer.primaryKeyRef)
-                    .map { _ in }
+                    .share(withMultipeerService: self.multipeerService, sharingService: self.songSharingService)
             }
         )
     }
     
     lazy var onPlayed: Action<DMEventSong, Void> = {
         return Action(workFactory: { [unowned self] (song: DMEventSong) -> Observable<Void> in
-            return self.songPersistenceService.markAsPlayed(song: song).map { _ in }
+            //shareSong.workFactory
+            return self.songPersistenceService
+                .markAsPlayed(song: song)
+                .share(withMultipeerService: self.multipeerService, sharingService: self.songSharingService)
         })
     }()
+ 
+}
+
+private extension Observable where Element: Codable {
+    
+    func share<SharingService: DMEntitySharingServiceType>(withMultipeerService multipeerService: DMEventMultipeerService, sharingService: SharingService) -> Observable<Void> where Element == SharingService.Entity {
+        return self.withLatestFrom(multipeerService.connectedPeers()) { (entity, peers) -> Observable<Void> in
+            let availablePeerIDs = peers.flatMap { $0.peerID }
+            let encodedEntity = try! sharingService.encode(entity: entity)
+            return multipeerService.send(
+                toPeers: availablePeerIDs,
+                data: encodedEntity,
+                mode: MCSessionSendDataMode.reliable
+            )
+            }.flatMap { $0 }
+
+    }
     
 }

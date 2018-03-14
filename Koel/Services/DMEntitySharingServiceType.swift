@@ -7,10 +7,12 @@
 //
 
 import Foundation
-import RxSwift
 
-protocol DMEventSongSharingServiceType {
+protocol DMEntitySharingServiceType {
     
-    func encode(song: DMEventSong) throws -> Data
-    func parseSong(fromData: Data) throws -> DMEventSong
+    associatedtype Entity
+    
+    func encode(entity: Entity) throws -> Data
+    func parse(fromData data: Data) throws -> Entity
+    
 }

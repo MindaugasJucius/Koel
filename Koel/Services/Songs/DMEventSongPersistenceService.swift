@@ -19,11 +19,11 @@ struct DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
     @discardableResult
     func store(song: DMEventSong) -> Observable<DMEventSong> {
         let result = Realm.withRealm(
-            operation: "persisting a song",
+            operation: "persisting a song with id: \(song.uuid)",
             error: DMEventSongPersistenceServiceError.creationFailed,
             scheduler: songPersistenceScheduler) { realm -> DMEventSong in
                 try realm.write {
-                    song.id = (realm.objects(DMEventSong.self).max(ofProperty: "id") ?? 0) + 1
+                    //song.id = (realm.objects(DMEventSong.self).max(ofProperty: "id") ?? 0) + 1
                     
                     // Parse peer which added song that's being persisted
                     if let addedPeerUUID = song.addedByUUID {
@@ -35,11 +35,11 @@ struct DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
                     let uuidPredicate = NSPredicate(format: "uuid IN %@", song.upvotedByUUIDs)
                     let upvotees = realm.objects(DMEventPeer.self).filter(uuidPredicate)
                     song.upvotees.append(objectsIn: upvotees)
-                    song.upvoteCount = upvotees.count
+                    song.upvoteCount = song.upvotedByUUIDs.count//upvotees.count
                     
                     realm.add(song, update: true)
                 }
-                return song
+                 return song
             }
     
         return result

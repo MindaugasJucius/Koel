@@ -24,9 +24,10 @@ class DMEventSong: Object, Codable {
         case upvotedByUUIDs
         case played
         case upvoteCount
+        case uuid
     }
     
-    dynamic var id: Int = 0
+    dynamic var uuid = NSUUID().uuidString
     dynamic var title: String = ""
     dynamic var added: Date = Date()
     dynamic var played: Date? = nil
@@ -39,7 +40,7 @@ class DMEventSong: Object, Codable {
     var upvotedByUUIDs: [String] = []
     
     override class func primaryKey() -> String? {
-        return "id"
+        return "uuid"
     }
     
     override static func ignoredProperties() -> [String] {
@@ -50,6 +51,7 @@ class DMEventSong: Object, Codable {
         
         var container = encoder.container(keyedBy: CodingKeys.self)
 
+        try container.encode(uuid, forKey: .uuid)
         try container.encode(title, forKey: .title)
         try container.encode(added, forKey: .added)
         try container.encode(played, forKey: .played)
@@ -66,6 +68,7 @@ class DMEventSong: Object, Codable {
 
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        let uuid = try container.decode(String.self, forKey: .uuid)
         let title = try container.decode(String.self, forKey: .title)
         let added = try container.decode(Date.self, forKey: .added)
         let played = try container.decodeIfPresent(Date.self, forKey: .played)
@@ -81,7 +84,7 @@ class DMEventSong: Object, Codable {
         }
         
         super.init()
-        
+        self.uuid = uuid
         self.title = title
         self.added = added
         self.played = played
@@ -103,13 +106,23 @@ class DMEventSong: Object, Codable {
     }
     
     override func isEqual(_ object: Any?) -> Bool {
-        return id == (object as? DMEventSong)?.id
+        guard let anotherSong = object as? DMEventSong else {
+            return false
+        }
+        return uuid == anotherSong.uuid && upvoteCount == anotherSong.upvoteCount
     }
     
 }
 
+//func == (lhs: DMEventSong, rhs: DMEventSong) -> Bool {
+//    // Here you should compare all the values you want to trigger reload of the cell
+//    // If `id` is changed cell will be removed and inserted (because `id` is our identity)
+//    // If `data` is changed cell will be reloaded
+//    return lhs.uuid == rhs.uuid && lhs.upvoteCount == rhs.upvoteCount
+//}
+
 extension DMEventSong: IdentifiableType {
-    var identity: Int {
-        return self.isInvalidated ? 0 : id
+    var identity: String {
+        return self.isInvalidated ? "" : uuid
     }
 }

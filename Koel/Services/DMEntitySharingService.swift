@@ -9,7 +9,9 @@
 import Foundation
 import RxSwift
 
-struct DMEventSongSharingService: DMEventSongSharingServiceType {
+struct DMEntitySharingService<T: Codable>: DMEntitySharingServiceType {
+    
+    typealias Entity = T
     
     private let encoder: JSONEncoder = {
         let encoder = JSONEncoder()
@@ -23,11 +25,12 @@ struct DMEventSongSharingService: DMEventSongSharingServiceType {
         return decoder
     }()
     
-    func encode(song: DMEventSong) throws -> Data {
-        return try encoder.encode(song)
+    func encode(entity: T) throws -> Data {
+        return try encoder.encode(entity)
     }
     
-    func parseSong(fromData data: Data) throws -> DMEventSong {
-        return try decoder.decode(DMEventSong.self, from: data)
+    func parse(fromData data: Data) throws -> T {
+        return try decoder.decode(T.self, from: data)
     }
+    
 }
