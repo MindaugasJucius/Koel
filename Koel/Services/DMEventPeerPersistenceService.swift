@@ -25,7 +25,7 @@ struct DMEventPeerPersistenceService: DMEventPeerPersistenceServiceType {
             scheduler: peerPersistenceScheduler) { (realm) -> DMEventPeer in
                 try realm.write {
                     
-                    print("storing \(peer.peerID?.displayName) isSelf \(peer.isSelf) isHost \(peer.isHost) with uuid \(peer.uuid)")
+                    print("storing peer: isSelf \(peer.isSelf) isHost \(peer.isHost) with uuid \(peer.uuid)")
                     
                     if let peerID = peer.peerID {
                         peer.peerIDData = NSKeyedArchiver.archivedData(withRootObject: peerID)

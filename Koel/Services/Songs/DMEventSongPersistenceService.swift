@@ -15,7 +15,10 @@ import MultipeerConnectivity
 private let songPersistenceScheduler = ConcurrentDispatchQueueScheduler(qos: DispatchQoS.background)
 
 struct DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
-
+    
+    var selfPeer: DMEventPeer
+    
+    
     @discardableResult
     func store(song: DMEventSong) -> Observable<DMEventSong> {
         let result = Realm.withRealm(
@@ -23,8 +26,6 @@ struct DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
             error: DMEventSongPersistenceServiceError.creationFailed,
             scheduler: songPersistenceScheduler) { realm -> DMEventSong in
                 try realm.write {
-                    //song.id = (realm.objects(DMEventSong.self).max(ofProperty: "id") ?? 0) + 1
-                    
                     // Parse peer which added song that's being persisted
                     if let addedPeerUUID = song.addedByUUID {
                         let uuidPredicate = NSPredicate(format: "uuid = %@", addedPeerUUID)
@@ -35,7 +36,8 @@ struct DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
                     let uuidPredicate = NSPredicate(format: "uuid IN %@", song.upvotedByUUIDs)
                     let upvotees = realm.objects(DMEventPeer.self).filter(uuidPredicate)
                     song.upvotees.append(objectsIn: upvotees)
-                    song.upvoteCount = song.upvotedByUUIDs.count//upvotees.count
+                    song.upvoteCount = upvotees.count
+                    song.upvotedBySelfPeer = song.upvotedByUUIDs.contains(self.selfPeer.primaryKeyRef)
                     
                     realm.add(song, update: true)
                 }
@@ -77,6 +79,7 @@ struct DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
                 try realm.write {
                     resolvedSong.upvotees.append(fetchedUser)
                     resolvedSong.upvoteCount = resolvedSong.upvoteCount + 1
+                    resolvedSong.upvotedBySelfPeer = true
                 }
                 return resolvedSong
         }

@@ -84,8 +84,7 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
             song.title = "songy"
             song.addedByUUID = self.selfPeer.primaryKeyRef
             song.upvotedByUUIDs = [self.selfPeer.primaryKeyRef]
-            return self.createAction
-                .execute(song)
+            return self.createAction.execute(song)
                 .share(withMultipeerService: self.multipeerService, sharingService: self.songSharingService)
             }
     }()
@@ -99,9 +98,13 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
     //MARK: - Created song management
     
     func onUpvote(song: DMEventSong) -> CocoaAction {
-        let upvoteesContainSelf = song.addedBy?.uuid == selfPeer.primaryKeyRef
+        
+        let availableForUpvote = song.rx.observe(Bool.self, "upvotedBySelfPeer")
+            .filterNil()
+            .map { !$0 }
+        
         return CocoaAction(
-            enabledIf: Observable.just(!upvoteesContainSelf),
+            enabledIf: availableForUpvote,
             workFactory: { [unowned self] in
                 return self.songPersistenceService
                     .upvote(song: song, forUser: self.selfPeer.primaryKeyRef)
@@ -112,7 +115,6 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
     
     lazy var onPlayed: Action<DMEventSong, Void> = {
         return Action(workFactory: { [unowned self] (song: DMEventSong) -> Observable<Void> in
-            //shareSong.workFactory
             return self.songPersistenceService
                 .markAsPlayed(song: song)
                 .share(withMultipeerService: self.multipeerService, sharingService: self.songSharingService)
@@ -132,7 +134,8 @@ private extension Observable where Element: Codable {
                 data: encodedEntity,
                 mode: MCSessionSendDataMode.reliable
             )
-            }.flatMap { $0 }
+        }
+        .flatMap { $0 }
 
     }
     

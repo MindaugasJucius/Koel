@@ -21,6 +21,8 @@ enum DMEventSongPersistenceServiceError: Error {
 
 protocol DMEventSongPersistenceServiceType {
     
+    var selfPeer: DMEventPeer { get }
+    
     @discardableResult
     func store(song: DMEventSong) -> Observable<DMEventSong>
     

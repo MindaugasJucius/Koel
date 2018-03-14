@@ -36,7 +36,9 @@ class DMEventSearchViewModel: ViewModelType, MultipeerViewModelType {
     }
     
     var host: Observable<DMEventPeer> {
-        return multipeerService.latestConnectedPeer()
+        return multipeerService
+            .latestConnectedPeer()
+            .filter { $0.isHost }
     }
     
     lazy var pushParticipation: Action<DMEventPeer, Void> = {
@@ -44,7 +46,7 @@ class DMEventSearchViewModel: ViewModelType, MultipeerViewModelType {
             workFactory: { [unowned self] host in
                 
                 let songSharingViewModel = DMEventSongSharingViewModel(
-                    songPersistenceService: DMEventSongPersistenceService(),
+                    songPersistenceService: DMEventSongPersistenceService(selfPeer: self.multipeerService.myEventPeer),
                     songSharingService: DMEntitySharingService(),
                     multipeerService: self.multipeerService
                 )
@@ -62,10 +64,12 @@ class DMEventSearchViewModel: ViewModelType, MultipeerViewModelType {
             this.multipeerService.stopBrowsing()
             this.multipeerService.disconnect()
             
+            let multipeerService = DMEventMultipeerService(asEventHost: true)
+            
             let songSharingViewModel = DMEventSongSharingViewModel(
-                songPersistenceService: DMEventSongPersistenceService(),
+                songPersistenceService: DMEventSongPersistenceService(selfPeer: multipeerService.myEventPeer),
                 songSharingService: DMEntitySharingService(),
-                multipeerService: DMEventMultipeerService(asEventHost: true)
+                multipeerService: multipeerService
             )
             
             let manageEventViewModel = DMEventManagementViewModel(

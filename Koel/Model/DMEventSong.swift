@@ -33,6 +33,7 @@ class DMEventSong: Object, Codable {
     dynamic var played: Date? = nil
     dynamic var addedBy: DMEventPeer? = nil
     dynamic var upvoteCount: Int = 0
+    dynamic var upvotedBySelfPeer: Bool = false
     
     let upvotees = List<DMEventPeer>()
     
