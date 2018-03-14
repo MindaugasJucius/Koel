@@ -327,29 +327,31 @@ extension DMEventMultipeerService {
             return $0
         }
         
-        peerPersistenceService.update(peer: peer, updateBlock: peerUpdate)
-        .subscribe(
-            onNext: { [unowned self] updatedPeer in
-                //Is a currently connected peer changing state
-                let currentConnection = self.connections.value.filter { $0.peerID == updatedPeer.peerID }.first
-                
-                if connected {
-                    NSLog("new connection \(peer.peerID?.displayName)")
-                    self.latestConnection.onNext(updatedPeer)
-                    //Emit to connections observable only if this is a new connection
-                    if currentConnection == .none {
-                        self.connections.value = self.connections.value + [updatedPeer]
+        peerPersistenceService
+            .update(peer: peer, updateBlock: peerUpdate)
+            .subscribe(
+                onNext: { [unowned self] updatedPeer in
+                    //Is a currently connected peer changing state
+                    let currentConnection = self.connections.value.filter { $0.peerID == updatedPeer.peerID }.first
+                    
+                    if connected {
+                        NSLog("new connection \(peer.peerID?.displayName)")
+                        self.latestConnection.onNext(updatedPeer)
+                        //Emit to connections observable only if this is a new connection
+                        if currentConnection == .none {
+                            self.connections.value = self.connections.value + [updatedPeer]
+                        }
+                    } else if let currentlyConnected = currentConnection { // Filter out disconnected peer
+                        self.connections.value = self.connections.value.filter { $0.peerID != currentlyConnected.peerID }
                     }
-                } else if let currentlyConnected = currentConnection { // Filter out disconnected peer
-                    self.connections.value = self.connections.value.filter {  $0.peerID != currentlyConnected.peerID }
-                }
+                    
+                    print("CURRENT CONNECTIONS \(self.connections.value.map { $0.peerID?.displayName })")
+                },
+                onError: { error in
                 
-                print("CURRENT CONNECTIONS \(self.connections.value.map { $0.peerID?.displayName })")
-            },
-            onError: { error in
-            
-            }
-        ).disposed(by: disposeBag)
+                }
+            )
+            .disposed(by: disposeBag)
     }
 }
 
