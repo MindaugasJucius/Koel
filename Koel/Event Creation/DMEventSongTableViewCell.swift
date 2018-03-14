@@ -60,7 +60,6 @@ class DMEventSongTableViewCell: UITableViewCell, ReusableView {
     
     func configure(withSong song: DMEventSong, upvoteAction: CocoaAction) {
         let playedObservable = song.rx.observe(Date.self, "played")
-            .share(replay: 1, scope: SubjectLifetimeScope.whileConnected)
         
         let addedObservable = song.rx.observe(Date.self, "added")
             .startWith(song.added)
@@ -83,19 +82,15 @@ class DMEventSongTableViewCell: UITableViewCell, ReusableView {
             .bind(to: titleLabel.rx.text)
             .disposed(by: disposeBag)
         
-        upvoteButton.rx.action = upvoteAction
-        
-        let playedUpvoteCountEnabled = playedObservable
-            .filterNil()
-            .map { _ in false }
-
-        let tappedUpvoteCountEnabled = upvoteButton.rx.controlEvent(.touchUpInside)
-            .asObservable()
-            .map { false }
-
-        playedUpvoteCountEnabled.amb(tappedUpvoteCountEnabled)
+        playedObservable
+            .map { [unowned self] _ in
+                self.upvoteButton.rx.action = nil
+                return false
+            }
             .bind(to: upvoteButton.rx.isEnabled)
             .disposed(by: disposeBag)
+        
+        upvoteButton.rx.action = upvoteAction
         
         song.rx.observe(Int.self, "upvoteCount")
             .filterNil()
