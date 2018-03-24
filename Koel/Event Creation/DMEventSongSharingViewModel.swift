@@ -57,7 +57,7 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
                 
                 let songSortDescriptors = [
                     SortDescriptor(keyPath: "upvoteCount", ascending: false),
-                    SortDescriptor(keyPath: "added", ascending: false)
+                    SortDescriptor(keyPath: "added", ascending: true)
                 ]
 
                 let queuedSongs = results

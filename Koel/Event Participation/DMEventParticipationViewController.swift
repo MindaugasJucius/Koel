@@ -82,30 +82,3 @@ class DMEventParticipationViewController: UIViewController, BindableType {
     }
 
 }
-
-extension DMEventParticipationViewController {
-    
-    static func dataSource(withViewModel viewModel: SongSharingViewModelType) -> RxTableViewSectionedAnimatedDataSource<SongSection> {
-        return RxTableViewSectionedAnimatedDataSource<SongSection>(
-            animationConfiguration: AnimationConfiguration(insertAnimation: .top, reloadAnimation: .fade, deleteAnimation: .left),
-            configureCell: { (dataSource, tableView, indexPath, element) -> UITableViewCell in
-                let cell = tableView.dequeueReusableCell(withIdentifier: DMEventSongTableViewCell.reuseIdentifier, for: indexPath)
-                
-                guard let songCell = cell as? DMEventSongTableViewCell else {
-                    return cell
-                }
-                
-                songCell.configure(
-                    withSong: element,
-                    upvoteAction: viewModel.songSharingViewModel.onUpvote(song: element)
-                )
-                
-                return cell
-            },
-            titleForHeaderInSection: { dataSource, sectionIndex in
-                return dataSource[sectionIndex].model
-            }
-        )
-    }
-    
-}

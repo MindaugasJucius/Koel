@@ -69,7 +69,7 @@ class DMEventSongTableViewCell: UITableViewCell, ReusableView {
             .startWith(song.title)
             .filterNil()
 
-        Observable.combineLatest(
+        Observable.combineLatest(   
             playedObservable, addedObservable, titleObservable,
             resultSelector: { played, added, title in
                     if let playedDate = played {

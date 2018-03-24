@@ -20,7 +20,7 @@ class DMEventManagementViewController: UIViewController, BindableType {
     
     var viewModel: DMEventManagementViewModel
     
-    private let tableView: UITableView = {
+    private lazy var tableView: UITableView = {
         let tableView = UITableView()
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.register(DMEventSongTableViewCell.self, forCellReuseIdentifier: DMEventSongTableViewCell.reuseIdentifier)
@@ -103,32 +103,6 @@ class DMEventManagementViewController: UIViewController, BindableType {
 
         addButton.rx.action = viewModel.songSharingViewModel.onSongCreate
         invitationsButton.rx.action = viewModel.onInvite()
-    }
-}
-
-extension DMEventManagementViewController {
-    
-    static func dataSource(withViewModel viewModel: SongSharingViewModelType) -> RxTableViewSectionedAnimatedDataSource<SongSection> {
-        return RxTableViewSectionedAnimatedDataSource<SongSection>(
-            animationConfiguration: AnimationConfiguration(insertAnimation: .top, reloadAnimation: .fade, deleteAnimation: .left),
-            configureCell: { (dataSource, tableView, indexPath, element) -> UITableViewCell in
-                let cell = tableView.dequeueReusableCell(withIdentifier: DMEventSongTableViewCell.reuseIdentifier, for: indexPath)
-                
-                guard let songCell = cell as? DMEventSongTableViewCell else {
-                    return cell
-                }
-                
-                songCell.configure(
-                    withSong: element,
-                    upvoteAction: viewModel.songSharingViewModel.onUpvote(song: element)
-                )
-                
-                return cell
-            },
-            titleForHeaderInSection: { dataSource, sectionIndex in
-                return dataSource[sectionIndex].model
-            }
-        )
     }
     
 }

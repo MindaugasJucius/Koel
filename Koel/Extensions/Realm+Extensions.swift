@@ -9,6 +9,7 @@
 import Foundation
 import RealmSwift
 import RxSwift
+import os.log
 
 private let concurrentScheduler = ConcurrentDispatchQueueScheduler(qos: DispatchQoS.background)
 
@@ -22,7 +23,7 @@ extension Realm {
         action: @escaping (Realm) throws -> T?) -> Observable<T> {
         return Observable<ThreadSafeReference<T>>
             .create { observer -> Disposable in
-                print("performing operation: \(operation)")
+                os_log("performing operation: %@", log: OSLog.default, type: OSLogType.info, operation)
                 do {
                     let realm = try Realm()
                     if let result = try action(realm) {
@@ -46,7 +47,7 @@ extension Realm {
             }
     }
     
-    // resolves safe object reference on subscribeOn scheduler
+    // resolves safe object reference on scheduler
     static func safeObject<T>(
         resolveOnScheduler: SchedulerType,
         fromReference reference: ThreadSafeReference<T>?,
