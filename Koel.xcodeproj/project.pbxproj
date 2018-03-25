@@ -20,7 +20,6 @@
 		5F01EBFF1F8FD28400E47E6A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5F01EBFE1F8FD28400E47E6A /* Assets.xcassets */; };
 		5F01EC021F8FD28400E47E6A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5F01EC001F8FD28400E47E6A /* LaunchScreen.storyboard */; };
 		5F01EC0D1F8FD28400E47E6A /* KoelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F01EC0C1F8FD28400E47E6A /* KoelTests.swift */; };
-		5F01EC1A1F8FD2AA00E47E6A /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F01EC191F8FD2AA00E47E6A /* CloudKit.framework */; };
 		5F01EC231F925EB200E47E6A /* CKRecord+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F01EC221F925EB200E47E6A /* CKRecord+Extensions.swift */; };
 		5F37D8821FF3C4CC002E0ACD /* SpotifyMetadata.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F37D87F1FF3C4CB002E0ACD /* SpotifyMetadata.framework */; };
 		5F37D8831FF3C4CC002E0ACD /* SpotifyAudioPlayback.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F37D8801FF3C4CC002E0ACD /* SpotifyAudioPlayback.framework */; };
@@ -96,7 +95,6 @@
 		5F01EC0C1F8FD28400E47E6A /* KoelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KoelTests.swift; sourceTree = "<group>"; };
 		5F01EC0E1F8FD28400E47E6A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5F01EC171F8FD2A600E47E6A /* Koel.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Koel.entitlements; sourceTree = "<group>"; };
-		5F01EC191F8FD2AA00E47E6A /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		5F01EC221F925EB200E47E6A /* CKRecord+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CKRecord+Extensions.swift"; sourceTree = "<group>"; };
 		5F37D87F1FF3C4CB002E0ACD /* SpotifyMetadata.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SpotifyMetadata.framework; sourceTree = "<group>"; };
 		5F37D8801FF3C4CC002E0ACD /* SpotifyAudioPlayback.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SpotifyAudioPlayback.framework; sourceTree = "<group>"; };
@@ -152,7 +150,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				5F37D8841FF3C4CC002E0ACD /* SpotifyAuthentication.framework in Frameworks */,
-				5F01EC1A1F8FD2AA00E47E6A /* CloudKit.framework in Frameworks */,
 				5F37D8831FF3C4CC002E0ACD /* SpotifyAudioPlayback.framework in Frameworks */,
 				5F37D8821FF3C4CC002E0ACD /* SpotifyMetadata.framework in Frameworks */,
 				33CD43033F2349BABFA21363 /* Pods_Koel.framework in Frameworks */,
@@ -242,7 +239,6 @@
 				5F37D8801FF3C4CC002E0ACD /* SpotifyAudioPlayback.framework */,
 				5F37D8811FF3C4CC002E0ACD /* SpotifyAuthentication.framework */,
 				5F37D87F1FF3C4CB002E0ACD /* SpotifyMetadata.framework */,
-				5F01EC191F8FD2AA00E47E6A /* CloudKit.framework */,
 				859C054680781DDB43D6FFC3 /* Pods_Koel.framework */,
 				C68936EB8AF29A19F4BC4C74 /* Pods_KoelTests.framework */,
 			);
@@ -442,10 +438,10 @@
 								enabled = 1;
 							};
 							com.apple.Push = {
-								enabled = 1;
+								enabled = 0;
 							};
 							com.apple.iCloud = {
-								enabled = 1;
+								enabled = 0;
 							};
 						};
 					};
@@ -821,7 +817,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = Koel/Koel.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = PDR4VQLAH4;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -845,7 +840,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = Koel/Koel.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = PDR4VQLAH4;
 				FRAMEWORK_SEARCH_PATHS = (
