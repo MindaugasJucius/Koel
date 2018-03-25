@@ -12,6 +12,7 @@ target 'Koel' do
     pod 'RxOptional'
     pod 'Action'
     pod 'SCSiriWaveformView'
+    pod 'Spartan'
   # Pods for Koel
 
   target 'KoelTests' do
