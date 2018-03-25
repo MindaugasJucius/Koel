@@ -101,7 +101,7 @@ class DMEventManagementViewController: UIViewController, BindableType {
             .subscribe(viewModel.songSharingViewModel.onPlayed.inputs)
             .disposed(by: disposeBag)
 
-        addButton.rx.action = viewModel.songSharingViewModel.onSongCreate
+        addButton.rx.action = viewModel.songSharingViewModel.onSongSearch
         invitationsButton.rx.action = viewModel.onInvite()
     }
     

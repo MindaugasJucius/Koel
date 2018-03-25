@@ -23,6 +23,7 @@ enum Scene {
     
     //MARK: Spotify
     case authenticateSpotify(URL)
+    case searchSpotify(DMSpotifySongSearchViewModelType)
 }
 
 extension Scene {
@@ -53,6 +54,9 @@ extension Scene {
         case .authenticateSpotify(let authenticationURL):
             let authenticationController = SFSafariViewController(url: authenticationURL)
             return authenticationController
+        case .searchSpotify(let viewModel):
+            let searchViewController = DMSpotifySongSearchViewController(withViewModel: viewModel)
+            return searchViewController
         }
     }
 }

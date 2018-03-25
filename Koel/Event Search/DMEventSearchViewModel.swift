@@ -50,8 +50,8 @@ class DMEventSearchViewModel: ViewModelType, MultipeerViewModelType {
                 let songSharingViewModel = DMEventSongSharingViewModel(
                     songPersistenceService: DMEventSongPersistenceService(selfPeer: self.multipeerService.myEventPeer),
                     songSharingService: DMEntitySharingService(),
-                    songSearchService: self.spotifySearchService,
-                    multipeerService: self.multipeerService
+                    multipeerService: self.multipeerService,
+                    sceneCoordinator: self.sceneCoordinator
                 )
                 
                 let participationModel = DMEventParticipationViewModel(host: host, songSharingViewModel: songSharingViewModel)
@@ -75,8 +75,8 @@ class DMEventSearchViewModel: ViewModelType, MultipeerViewModelType {
             let songSharingViewModel = DMEventSongSharingViewModel(
                 songPersistenceService: DMEventSongPersistenceService(selfPeer: multipeerService.myEventPeer),
                 songSharingService: DMEntitySharingService(),
-                songSearchService: this.spotifySearchService,
-                multipeerService: multipeerService
+                multipeerService: multipeerService,
+                sceneCoordinator: self.sceneCoordinator
             )
 
             let manageEventViewModel = DMEventManagementViewModel(

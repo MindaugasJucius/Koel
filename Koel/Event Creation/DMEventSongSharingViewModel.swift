@@ -14,13 +14,13 @@ import RealmSwift
 
 protocol DMEventSongSharingViewModelType: MultipeerViewModelType {
     
-    var songSearchService: DMSpotifySearchServiceType { get }
+    var sceneCoordinator: SceneCoordinatorType { get }
     var songSharingService: DMEntitySharingService<DMEventSong> { get }
     var songPersistenceService: DMEventSongPersistenceServiceType { get }
 
     var songsSectioned: Observable<[SongSection]> { get }
     
-    var onSongCreate: CocoaAction { get }
+    var onSongSearch: CocoaAction { get }
     var onPlayed: Action<DMEventSong, Void> { get }
     
     func onUpvote(song: DMEventSong) -> CocoaAction
@@ -30,19 +30,19 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
     
     private let disposeBag = DisposeBag()
 
-    var songSearchService: DMSpotifySearchServiceType
     var songSharingService: DMEntitySharingService<DMEventSong>
     var songPersistenceService: DMEventSongPersistenceServiceType
     var multipeerService: DMEventMultipeerService
+    var sceneCoordinator: SceneCoordinatorType
     
     init(songPersistenceService: DMEventSongPersistenceServiceType,
          songSharingService: DMEntitySharingService<DMEventSong>,
-         songSearchService: DMSpotifySearchServiceType,
-         multipeerService: DMEventMultipeerService) {
+         multipeerService: DMEventMultipeerService,
+         sceneCoordinator: SceneCoordinatorType) {
         self.songSharingService = songSharingService
         self.songPersistenceService = songPersistenceService
-        self.songSearchService = songSearchService
         self.multipeerService = multipeerService
+        self.sceneCoordinator = sceneCoordinator
         
         multipeerService
             .receive()
@@ -82,7 +82,7 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
     
     //MARK: - Song creation
   
-    lazy var onSongCreate: CocoaAction = {
+    lazy var onSongSearch: CocoaAction = {
         return CocoaAction { [unowned self] in
             let song = DMEventSong()
             song.title = "songy"
