@@ -10,6 +10,7 @@
 		031D904420566AE4007D1156 /* ReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 031D904320566AE4007D1156 /* ReusableView.swift */; };
 		031D904620566EB3007D1156 /* SongSharingViewModelType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 031D904520566EB3007D1156 /* SongSharingViewModelType.swift */; };
 		035596DA2066B4D20067A737 /* Bindable+SongTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035596D92066B4D20067A737 /* Bindable+SongTableView.swift */; };
+		035596DC2067FA020067A737 /* DMSpotifySearchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035596DB2067FA020067A737 /* DMSpotifySearchService.swift */; };
 		037A47E3205923990030D25F /* DMEntitySharingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 037A47E1205923980030D25F /* DMEntitySharingService.swift */; };
 		037A47E4205923990030D25F /* DMEntitySharingServiceType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 037A47E2205923980030D25F /* DMEntitySharingServiceType.swift */; };
 		33CD43033F2349BABFA21363 /* Pods_Koel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 859C054680781DDB43D6FFC3 /* Pods_Koel.framework */; };
@@ -79,6 +80,7 @@
 		031D904320566AE4007D1156 /* ReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReusableView.swift; sourceTree = "<group>"; };
 		031D904520566EB3007D1156 /* SongSharingViewModelType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongSharingViewModelType.swift; sourceTree = "<group>"; };
 		035596D92066B4D20067A737 /* Bindable+SongTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bindable+SongTableView.swift"; sourceTree = "<group>"; };
+		035596DB2067FA020067A737 /* DMSpotifySearchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMSpotifySearchService.swift; sourceTree = "<group>"; };
 		037A47E1205923980030D25F /* DMEntitySharingService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DMEntitySharingService.swift; path = Koel/Services/DMEntitySharingService.swift; sourceTree = SOURCE_ROOT; };
 		037A47E2205923980030D25F /* DMEntitySharingServiceType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DMEntitySharingServiceType.swift; path = Koel/Services/DMEntitySharingServiceType.swift; sourceTree = SOURCE_ROOT; };
 		1EEEA22101255BEC78867464 /* Pods-Koel.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Koel.release.xcconfig"; path = "Pods/Target Support Files/Pods-Koel/Pods-Koel.release.xcconfig"; sourceTree = "<group>"; };
@@ -262,6 +264,7 @@
 				5F84FFAD1FDC2F3F003332B4 /* DMEventPeerPersistenceServiceType.swift */,
 				5F84FFAF1FDC3AB0003332B4 /* DMEventPeerPersistenceService.swift */,
 				5F37D8891FF3D0A6002E0ACD /* DMSpotifyAuthService.swift */,
+				035596DB2067FA020067A737 /* DMSpotifySearchService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -666,6 +669,7 @@
 				5F01EBF81F8FD28400E47E6A /* AppDelegate.swift in Sources */,
 				5F54458B1FD1976D0059A975 /* DMEventSearchViewModel.swift in Sources */,
 				5F014BD41FB9E20000079009 /* WaveView.swift in Sources */,
+				035596DC2067FA020067A737 /* DMSpotifySearchService.swift in Sources */,
 				5F47B8341FD403780053A0A5 /* DMEventSearchViewController.swift in Sources */,
 				5FB2C9401FE8075F001D532F /* Stylesheet.swift in Sources */,
 				5F47B83B1FD4073F0053A0A5 /* ViewModelType.swift in Sources */,

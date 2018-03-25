@@ -19,6 +19,8 @@ class DMEventSearchViewModel: ViewModelType, MultipeerViewModelType {
     
     let sceneCoordinator: SceneCoordinatorType
 
+    private let spotifySearchService: DMSpotifySearchServiceType
+    
     var incommingInvitations: Observable<(DMEventPeer, (Bool) -> ())> {
         return multipeerService
             .incomingPeerInvitations()
@@ -48,14 +50,15 @@ class DMEventSearchViewModel: ViewModelType, MultipeerViewModelType {
                 let songSharingViewModel = DMEventSongSharingViewModel(
                     songPersistenceService: DMEventSongPersistenceService(selfPeer: self.multipeerService.myEventPeer),
                     songSharingService: DMEntitySharingService(),
+                    songSearchService: self.spotifySearchService,
                     multipeerService: self.multipeerService
                 )
                 
                 let participationModel = DMEventParticipationViewModel(host: host, songSharingViewModel: songSharingViewModel)
 
-                let participationScene = Scene.participation(participationModel)
                 return self.sceneCoordinator.transition(
-                    to: participationScene, type: .rootWithNavigationVC
+                    to: Scene.participation(participationModel),
+                    type: .rootWithNavigationVC
                 )
             }
         )
@@ -72,9 +75,10 @@ class DMEventSearchViewModel: ViewModelType, MultipeerViewModelType {
             let songSharingViewModel = DMEventSongSharingViewModel(
                 songPersistenceService: DMEventSongPersistenceService(selfPeer: multipeerService.myEventPeer),
                 songSharingService: DMEntitySharingService(),
+                songSearchService: this.spotifySearchService,
                 multipeerService: multipeerService
             )
-            
+
             let manageEventViewModel = DMEventManagementViewModel(
                 sceneCoordinator: this.sceneCoordinator,
                 songSharingViewModel: songSharingViewModel
@@ -97,6 +101,9 @@ class DMEventSearchViewModel: ViewModelType, MultipeerViewModelType {
     
     required init(withSceneCoordinator sceneCoordinator: SceneCoordinatorType) {
         self.sceneCoordinator = sceneCoordinator
+        
+        let spotifyAuthService = DMSpotifyAuthService(sceneCoordinator: sceneCoordinator)
+        self.spotifySearchService = DMSpotifySearchService(authService: spotifyAuthService)
         
         multipeerService.startAdvertising()
         multipeerService.startBrowsing()

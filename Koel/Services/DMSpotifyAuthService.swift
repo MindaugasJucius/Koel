@@ -12,6 +12,9 @@ import os.log
 
 private let KoelSpotifySessionUserDefaultsKey = "koel_spotify_session"
 
+let SpotifyURLCallbackNotification = Notification.Name("SpotifyURLCallbackNotification")
+let SpotifyURLCallbackNotificationUserInfoURLKey = "SpotifyURLCallbackNotificationUserInfoURLKey"
+
 class DMSpotifyAuthService: NSObject {
 
     let sceneCoordinator: SceneCoordinatorType
@@ -27,7 +30,7 @@ class DMSpotifyAuthService: NSObject {
         return auth.session
     }
     
-    init(withSceneCoordinator sceneCoordinator: SceneCoordinatorType) {
+    init(sceneCoordinator: SceneCoordinatorType) {
         self.sceneCoordinator = sceneCoordinator
         super.init()
         auth.clientID = "e693a6d7103f4d46ac64eebc6906f8f4"
@@ -41,6 +44,13 @@ class DMSpotifyAuthService: NSObject {
             SPTAuthUserLibraryReadScope,
             SPTAuthPlaylistReadPrivateScope
         ]
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleAuthNotification(notification:)),
+            name: SpotifyURLCallbackNotification,
+            object: nil
+        )
         
 //        do {
             //try player.start(withClientId: auth.clientID)
@@ -60,7 +70,7 @@ class DMSpotifyAuthService: NSObject {
         }
     }
     
-    func handle(callbackURL: URL) {
+    private func handle(callbackURL: URL) {
         if sceneCoordinator.currentViewController is SFSafariViewController {
             sceneCoordinator.pop()
         }
@@ -79,6 +89,24 @@ class DMSpotifyAuthService: NSObject {
                 }
             }
         )
+    }
+    
+}
+
+//MARK: - Notification handling
+extension DMSpotifyAuthService {
+    
+    @objc private func handleAuthNotification(notification: Notification) {
+        guard notification.name == SpotifyURLCallbackNotification else {
+            fatalError("wrong notification handler")
+        }
+        
+        guard let userInfo = notification.userInfo,
+            let url = userInfo[SpotifyURLCallbackNotification] as? URL else {
+            return
+        }
+    
+        handle(callbackURL: url)
     }
     
 }

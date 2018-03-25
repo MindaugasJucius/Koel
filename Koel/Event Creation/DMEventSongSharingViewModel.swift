@@ -14,6 +14,7 @@ import RealmSwift
 
 protocol DMEventSongSharingViewModelType: MultipeerViewModelType {
     
+    var songSearchService: DMSpotifySearchServiceType { get }
     var songSharingService: DMEntitySharingService<DMEventSong> { get }
     var songPersistenceService: DMEventSongPersistenceServiceType { get }
 
@@ -28,16 +29,19 @@ protocol DMEventSongSharingViewModelType: MultipeerViewModelType {
 class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
     
     private let disposeBag = DisposeBag()
-    
+
+    var songSearchService: DMSpotifySearchServiceType
     var songSharingService: DMEntitySharingService<DMEventSong>
     var songPersistenceService: DMEventSongPersistenceServiceType
     var multipeerService: DMEventMultipeerService
     
     init(songPersistenceService: DMEventSongPersistenceServiceType,
          songSharingService: DMEntitySharingService<DMEventSong>,
+         songSearchService: DMSpotifySearchServiceType,
          multipeerService: DMEventMultipeerService) {
         self.songSharingService = songSharingService
         self.songPersistenceService = songPersistenceService
+        self.songSearchService = songSearchService
         self.multipeerService = multipeerService
         
         multipeerService

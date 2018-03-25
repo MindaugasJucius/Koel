@@ -13,7 +13,7 @@ import CloudKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var window: UIWindow? = UIWindow(frame: UIScreen.main.bounds)
-    var spotifyAuthService: DMSpotifyAuthService? = nil
+    //var spotifyAuthService: DMSpotifyAuthService? = nil
     
     private var backgroundTaskID = UIBackgroundTaskInvalid
     
@@ -29,7 +29,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         sceneCoordinator.transition(to: eventSearchScene, type: .rootWithNavigationVC)
         
-        self.spotifyAuthService = DMSpotifyAuthService(withSceneCoordinator: sceneCoordinator)
+        //self.spotifyAuthService = DMSpotifyAuthService(sceneCoordinator: sceneCoordinator)
         return true
     }
 
@@ -55,8 +55,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         print("application will terminate")
     }
     
-    func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {        
-        spotifyAuthService?.handle(callbackURL: url)
+    func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
+        //spotifyAuthService?.handle(callbackURL: url)
+        NotificationCenter.default.post(
+            name: SpotifyURLCallbackNotification,
+            object: nil,
+            userInfo: [SpotifyURLCallbackNotificationUserInfoURLKey : url]
+        )
         return true
     }
 
