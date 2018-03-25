@@ -21,7 +21,7 @@ protocol DMEventSongSharingViewModelType: MultipeerViewModelType {
     
     var onSongCreate: CocoaAction { get }
     var onPlayed: Action<DMEventSong, Void> { get }
-
+    
     func onUpvote(song: DMEventSong) -> CocoaAction
 }
 
@@ -86,7 +86,7 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
             song.upvotedByUUIDs = [self.selfPeer.primaryKeyRef]
             return self.createAction.execute(song)
                 .share(withMultipeerService: self.multipeerService, sharingService: self.songSharingService)
-            }
+        }
     }()
 
     private lazy var createAction: Action<DMEventSong, DMEventSong> = {
@@ -98,7 +98,6 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
     //MARK: - Created song management
     
     func onUpvote(song: DMEventSong) -> CocoaAction {
-        
         let availableForUpvote = song.rx.observe(Bool.self, "upvotedBySelfPeer")
             .filterNil()
             .map { !$0 }

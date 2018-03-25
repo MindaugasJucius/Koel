@@ -13,7 +13,7 @@ import CloudKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var window: UIWindow? = UIWindow(frame: UIScreen.main.bounds)
-    private weak var spotifyService: DMSpotifyService? = nil
+    var spotifyAuthService: DMSpotifyAuthService? = nil
     
     private var backgroundTaskID = UIBackgroundTaskInvalid
     
@@ -23,14 +23,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.makeKeyAndVisible()
         
         let sceneCoordinator = SceneCoordinator(window: window!)
-        let spotifyService = DMSpotifyService(withSceneCoordinator: sceneCoordinator)
         
         let eventSearchViewModel = DMEventSearchViewModel(withSceneCoordinator: sceneCoordinator)
         let eventSearchScene = Scene.search(eventSearchViewModel)
 
         sceneCoordinator.transition(to: eventSearchScene, type: .rootWithNavigationVC)
         
-        self.spotifyService = spotifyService
+        self.spotifyAuthService = DMSpotifyAuthService(withSceneCoordinator: sceneCoordinator)
         return true
     }
 
@@ -56,12 +55,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         print("application will terminate")
     }
     
-    func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
-        guard let spotifyService = spotifyService else {
-            return false
-        }
-        
-        spotifyService.handle(callbackURL: url)
+    func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {        
+        spotifyAuthService?.handle(callbackURL: url)
         return true
     }
 

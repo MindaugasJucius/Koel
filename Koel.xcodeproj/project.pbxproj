@@ -24,7 +24,7 @@
 		5F37D8821FF3C4CC002E0ACD /* SpotifyMetadata.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F37D87F1FF3C4CB002E0ACD /* SpotifyMetadata.framework */; };
 		5F37D8831FF3C4CC002E0ACD /* SpotifyAudioPlayback.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F37D8801FF3C4CC002E0ACD /* SpotifyAudioPlayback.framework */; };
 		5F37D8841FF3C4CC002E0ACD /* SpotifyAuthentication.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F37D8811FF3C4CC002E0ACD /* SpotifyAuthentication.framework */; };
-		5F37D88A1FF3D0A6002E0ACD /* DMSpotifyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F37D8891FF3D0A6002E0ACD /* DMSpotifyService.swift */; };
+		5F37D88A1FF3D0A6002E0ACD /* DMSpotifyAuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F37D8891FF3D0A6002E0ACD /* DMSpotifyAuthService.swift */; };
 		5F47B8341FD403780053A0A5 /* DMEventSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F47B8331FD403780053A0A5 /* DMEventSearchViewController.swift */; };
 		5F47B83B1FD4073F0053A0A5 /* ViewModelType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F47B83A1FD4073F0053A0A5 /* ViewModelType.swift */; };
 		5F54458B1FD1976D0059A975 /* DMEventSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F54458A1FD1976D0059A975 /* DMEventSearchViewModel.swift */; };
@@ -100,7 +100,7 @@
 		5F37D8801FF3C4CC002E0ACD /* SpotifyAudioPlayback.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SpotifyAudioPlayback.framework; sourceTree = "<group>"; };
 		5F37D8811FF3C4CC002E0ACD /* SpotifyAuthentication.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SpotifyAuthentication.framework; sourceTree = "<group>"; };
 		5F37D8851FF3C50B002E0ACD /* Koel-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Koel-Bridging-Header.h"; sourceTree = "<group>"; };
-		5F37D8891FF3D0A6002E0ACD /* DMSpotifyService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMSpotifyService.swift; sourceTree = "<group>"; };
+		5F37D8891FF3D0A6002E0ACD /* DMSpotifyAuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMSpotifyAuthService.swift; sourceTree = "<group>"; };
 		5F47B8331FD403780053A0A5 /* DMEventSearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventSearchViewController.swift; sourceTree = "<group>"; };
 		5F47B83A1FD4073F0053A0A5 /* ViewModelType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModelType.swift; sourceTree = "<group>"; };
 		5F54458A1FD1976D0059A975 /* DMEventSearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventSearchViewModel.swift; sourceTree = "<group>"; };
@@ -261,7 +261,7 @@
 				5F601D3A1FD043DC003DE897 /* DMEventMultipeerService.swift */,
 				5F84FFAD1FDC2F3F003332B4 /* DMEventPeerPersistenceServiceType.swift */,
 				5F84FFAF1FDC3AB0003332B4 /* DMEventPeerPersistenceService.swift */,
-				5F37D8891FF3D0A6002E0ACD /* DMSpotifyService.swift */,
+				5F37D8891FF3D0A6002E0ACD /* DMSpotifyAuthService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -652,7 +652,7 @@
 				5F84FFA11FD98531003332B4 /* MultipeerViewModelType.swift in Sources */,
 				5F5445971FD594570059A975 /* DMEventParticipationViewController.swift in Sources */,
 				031D904620566EB3007D1156 /* SongSharingViewModelType.swift in Sources */,
-				5F37D88A1FF3D0A6002E0ACD /* DMSpotifyService.swift in Sources */,
+				5F37D88A1FF3D0A6002E0ACD /* DMSpotifyAuthService.swift in Sources */,
 				5F014BD61FB9E29700079009 /* UIColor+Extensions.swift in Sources */,
 				5F81861C1FD3FAB000477C71 /* SceneCoordinator.swift in Sources */,
 				5F8186181FD3F7F200477C71 /* BindableType.swift in Sources */,

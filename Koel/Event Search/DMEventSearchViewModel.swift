@@ -50,10 +50,13 @@ class DMEventSearchViewModel: ViewModelType, MultipeerViewModelType {
                     songSharingService: DMEntitySharingService(),
                     multipeerService: self.multipeerService
                 )
+                
                 let participationModel = DMEventParticipationViewModel(host: host, songSharingViewModel: songSharingViewModel)
 
                 let participationScene = Scene.participation(participationModel)
-                return self.sceneCoordinator.transition(to: participationScene, type: .rootWithNavigationVC)
+                return self.sceneCoordinator.transition(
+                    to: participationScene, type: .rootWithNavigationVC
+                )
             }
         )
     }()
