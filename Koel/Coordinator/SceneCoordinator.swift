@@ -67,7 +67,7 @@ class SceneCoordinator: NSObject, SceneCoordinatorType {
         case .rootWithNavigationVC:
             currentViewController = SceneCoordinator.actualViewController(for: viewController)
 
-            window.rootViewController =             UINavigationController(rootViewController: currentViewController)
+            window.rootViewController = UINavigationController(rootViewController: currentViewController)
             subject.onCompleted()
         case .push:
 

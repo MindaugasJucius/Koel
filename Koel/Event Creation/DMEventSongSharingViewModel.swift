@@ -143,7 +143,6 @@ private extension Observable where Element: Codable {
             )
         }
         .flatMap { $0 }
-
     }
     
 }

@@ -23,6 +23,8 @@ struct DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
         self.sceneCoordinator = sceneCoordinator
         self.spotifySearchService = spotifySearchService
         
+        //spotifySearchService.authService.currentSession.subscribe(onNext: <#T##((SPTSession) -> Void)?##((SPTSession) -> Void)?##(SPTSession) -> Void#>, onError: <#T##((Error) -> Void)?##((Error) -> Void)?##(Error) -> Void#>, onCompleted: <#T##(() -> Void)?##(() -> Void)?##() -> Void#>, onDisposed: <#T##(() -> Void)?##(() -> Void)?##() -> Void#>)
+        
         if spotifySearchService.authService.authenticationIsNeeded {
             spotifySearchService.authService.performAuthentication()
         }

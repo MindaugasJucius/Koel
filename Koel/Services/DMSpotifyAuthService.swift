@@ -9,6 +9,8 @@
 import UIKit
 import SafariServices
 import os.log
+import RxSwift
+import RxOptional
 
 private let KoelSpotifySessionUserDefaultsKey = "koel_spotify_session"
 
@@ -19,6 +21,7 @@ class DMSpotifyAuthService: NSObject {
 
     let sceneCoordinator: SceneCoordinatorType
     
+    private let disposeBag = DisposeBag()
     private let auth: SPTAuth = SPTAuth.defaultInstance()
     //private let player: SPTAudioStreamingController = SPTAudioStreamingController.sharedInstance()
     
@@ -26,9 +29,11 @@ class DMSpotifyAuthService: NSObject {
         return auth.session == nil || !auth.session.isValid()
     }
     
-    var currentSession: SPTSession? {
-        return auth.session
+    private var sessionObservable: Observable<SPTSession> {
+        return currentSession.asObservable()
     }
+    
+    private var currentSession = ReplaySubject<SPTSession>.create(bufferSize: 1)
     
     init(sceneCoordinator: SceneCoordinatorType) {
         self.sceneCoordinator = sceneCoordinator
@@ -45,12 +50,38 @@ class DMSpotifyAuthService: NSObject {
             SPTAuthPlaylistReadPrivateScope
         ]
         
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(handleAuthNotification(notification:)),
-            name: SpotifyURLCallbackNotification,
-            object: nil
-        )
+        //currentSession.flatMap(<#T##selector: (SPTSession) throws -> ObservableConvertibleType##(SPTSession) throws -> ObservableConvertibleType#>)
+        
+        currentSession
+            .subscribe(
+                onNext: { [unowned self] session in
+                    self.auth.session = session
+                }
+            )
+            .disposed(by: disposeBag)
+        
+        NotificationCenter.default.rx.notification(SpotifyURLCallbackNotification)
+            .filter { (notification) -> Bool in
+                return notification.name == SpotifyURLCallbackNotification
+            }
+            .map { notification -> URL? in
+                guard let userInfo = notification.userInfo,
+                    let url = userInfo[SpotifyURLCallbackNotificationUserInfoURLKey] as? URL else {
+                        return nil
+                }
+                
+                return url
+            }
+            .filterNil()
+            
+        
+//        NotificationCenter.default.addObserver(
+//            self,
+//            selector: #selector(handle(authNotification:)),
+//            name: SpotifyURLCallbackNotification,
+//            object: nil
+//        )
+        
         
 //        do {
             //try player.start(withClientId: auth.clientID)
@@ -83,13 +114,15 @@ class DMSpotifyAuthService: NSObject {
 //                        os_log("renewed expiration date: %@", log: OSLog.default, type: .info, session?.expirationDate.description ?? "")
 //                    })
 
-                    self.auth.session = session
+                    //self.auth.session = session
+                    self.currentSession.onNext(session)
                     
                     os_log("access token: %@", log: OSLog.default, type: .info, session.accessToken)
                     os_log("expiration date: %@", log: OSLog.default, type: .info, session.expirationDate.description)
                 
                     //self.player.login(withAccessToken: self.auth.session.accessToken)
                 } else if let error = error {
+                    self.currentSession.onError(error)
                     os_log("spotify auth callback error: %@", log: OSLog.default, type: .error, error.localizedDescription)
                 }
             }
@@ -101,7 +134,7 @@ class DMSpotifyAuthService: NSObject {
 //MARK: - Notification handling
 extension DMSpotifyAuthService {
     
-    @objc private func handleAuthNotification(notification: Notification) {
+    @objc private func handle(authNotification notification: Notification) {
         guard notification.name == SpotifyURLCallbackNotification else {
             fatalError("wrong notification handler")
         }
