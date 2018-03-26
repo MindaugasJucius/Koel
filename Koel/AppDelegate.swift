@@ -57,6 +57,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
         //spotifyAuthService?.handle(callbackURL: url)
+        guard SPTAuth.defaultInstance().canHandle(url) else {
+            return false
+        }
         NotificationCenter.default.post(
             name: SpotifyURLCallbackNotification,
             object: nil,

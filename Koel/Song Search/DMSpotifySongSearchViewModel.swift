@@ -19,4 +19,13 @@ struct DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
     var sceneCoordinator: SceneCoordinatorType
     var spotifySearchService: DMSpotifySearchServiceType
     
+    init(sceneCoordinator: SceneCoordinatorType, spotifySearchService: DMSpotifySearchServiceType) {
+        self.sceneCoordinator = sceneCoordinator
+        self.spotifySearchService = spotifySearchService
+        
+        if spotifySearchService.authService.authenticationIsNeeded {
+            spotifySearchService.authService.performAuthentication()
+        }
+    }
+    
 }

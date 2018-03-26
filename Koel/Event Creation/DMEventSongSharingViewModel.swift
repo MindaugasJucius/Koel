@@ -84,12 +84,16 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
   
     lazy var onSongSearch: CocoaAction = {
         return CocoaAction { [unowned self] in
-            let song = DMEventSong()
-            song.title = "songy"
-            song.addedByUUID = self.selfPeer.primaryKeyRef
-            song.upvotedByUUIDs = [self.selfPeer.primaryKeyRef]
-            return self.createAction.execute(song)
-                .share(withMultipeerService: self.multipeerService, sharingService: self.songSharingService)
+            let spotifyAuthService = DMSpotifyAuthService(sceneCoordinator: self.sceneCoordinator)
+            let spotifySearchService = DMSpotifySearchService(authService: spotifyAuthService)
+            let spotifySongSearchViewModel = DMSpotifySongSearchViewModel(
+                sceneCoordinator: self.sceneCoordinator,
+                spotifySearchService: spotifySearchService
+            )
+            return self.sceneCoordinator.transition(
+                to: Scene.searchSpotify(spotifySongSearchViewModel),
+                type: .modal
+            )
         }
     }()
 

@@ -35,9 +35,9 @@ class DMSpotifyAuthService: NSObject {
         super.init()
         auth.clientID = "e693a6d7103f4d46ac64eebc6906f8f4"
         auth.sessionUserDefaultsKey = KoelSpotifySessionUserDefaultsKey
-        auth.redirectURL = URL(string: "Koel://returnAfterLogin")
-        auth.tokenRefreshURL = URL(string: "https://spotify-swap-refresh.herokuapp.com/refresh")
-        auth.tokenSwapURL = URL(string: "https://spotify-swap-refresh.herokuapp.com/swap")
+        auth.redirectURL = URL(string: "koel://returnafterlogin")
+        auth.tokenRefreshURL = URL(string: "https://koel-spotify-auth.herokuapp.com/refresh")
+        auth.tokenSwapURL = URL(string: "https://koel-spotify-auth.herokuapp.com/swap")
         auth.requestedScopes = [
             SPTAuthStreamingScope,
             SPTAuthUserReadTopScope,
@@ -80,9 +80,14 @@ class DMSpotifyAuthService: NSObject {
             callback: { [unowned self] (error, session) in
                 if let session = session {
 //                    self.auth.renewSession(session, callback: { (error, session) in
-//                        print(session)
+//                        os_log("renewed expiration date: %@", log: OSLog.default, type: .info, session?.expirationDate.description ?? "")
 //                    })
+
                     self.auth.session = session
+                    
+                    os_log("access token: %@", log: OSLog.default, type: .info, session.accessToken)
+                    os_log("expiration date: %@", log: OSLog.default, type: .info, session.expirationDate.description)
+                
                     //self.player.login(withAccessToken: self.auth.session.accessToken)
                 } else if let error = error {
                     os_log("spotify auth callback error: %@", log: OSLog.default, type: .error, error.localizedDescription)
@@ -102,7 +107,7 @@ extension DMSpotifyAuthService {
         }
         
         guard let userInfo = notification.userInfo,
-            let url = userInfo[SpotifyURLCallbackNotification] as? URL else {
+            let url = userInfo[SpotifyURLCallbackNotificationUserInfoURLKey] as? URL else {
             return
         }
     
