@@ -58,9 +58,8 @@ class DMSpotifyAuthService: NSObject {
             return Observable<SPTSession>.just(auth.session)
         }
         
-        let authenticationScene = Scene.authenticateSpotify(auth.spotifyWebAuthenticationURL())
-        
-        let notificationObservable = NotificationCenter.default.rx.notification(SpotifyURLCallbackNotification)
+        let notificationObservable = NotificationCenter.default.rx
+            .notification(SpotifyURLCallbackNotification)
             .filter { (notification) -> Bool in
                 return notification.name == SpotifyURLCallbackNotification
             }
@@ -77,12 +76,18 @@ class DMSpotifyAuthService: NSObject {
         if SPTAuth.supportsApplicationAuthentication() {
             UIApplication.shared.open(self.auth.spotifyAppAuthenticationURL(), options: [:])
         } else {
-            self.sceneCoordinator.transition(to: authenticationScene, type: .modal)
+            let authenticationScene = Scene.authenticateSpotify(auth.spotifyWebAuthenticationURL())
+            sceneCoordinator.transition(to: authenticationScene, type: .modal)
         }
         
         return
             notificationObservable
             .take(1)
+            .do(onNext: { [unowned self] _ in
+                if self.sceneCoordinator.currentViewController is SFSafariViewController {
+                    self.sceneCoordinator.pop()
+                }
+            })
             .flatMap { [unowned self] callbackURL -> Observable<SPTSession> in
                 Observable<SPTSession>.create { observer -> Disposable in
                     self.auth.handleAuthCallback(
@@ -101,71 +106,10 @@ class DMSpotifyAuthService: NSObject {
                     )
                     return Disposables.create()
                 }
-            }.do(onNext: { [unowned self] _ in
-                if self.sceneCoordinator.currentViewController is SFSafariViewController {
-                    self.sceneCoordinator.pop()
-                }
-            })
-    }
-    
-    func performAuthentication() {
-            //player.login(withAccessToken: auth.session.accessToken)
-        if SPTAuth.supportsApplicationAuthentication() {
-
-            UIApplication.shared.open(auth.spotifyAppAuthenticationURL(), options: [:])
-        } else {
-            let authenticationScene = Scene.authenticateSpotify(auth.spotifyWebAuthenticationURL())
-            sceneCoordinator.transition(to: authenticationScene, type: .modal)
-        }
-    }
-    
-    private func handle(callbackURL: URL) {
-        if sceneCoordinator.currentViewController is SFSafariViewController {
-            sceneCoordinator.pop()
-        }
-
-        auth.handleAuthCallback(
-            withTriggeredAuthURL: callbackURL,
-            callback: { [unowned self] (error, session) in
-                if let session = session {
-//                    self.auth.renewSession(session, callback: { (error, session) in
-//                        os_log("renewed expiration date: %@", log: OSLog.default, type: .info, session?.expirationDate.description ?? "")
-//                    })
-
-                    //self.auth.session = session
-                    self.currentSession.onNext(session)
-                    
-                    os_log("access token: %@", log: OSLog.default, type: .info, session.accessToken)
-                    os_log("expiration date: %@", log: OSLog.default, type: .info, session.expirationDate.description)
-                
-                    //self.player.login(withAccessToken: self.auth.session.accessToken)
-                } else if let error = error {
-                    self.currentSession.onError(error)
-                    os_log("spotify auth callback error: %@", log: OSLog.default, type: .error, error.localizedDescription)
-                }
             }
-        )
     }
-    
 }
 
-//MARK: - Notification handling
-extension DMSpotifyAuthService {
-    
-    @objc private func handle(authNotification notification: Notification) {
-        guard notification.name == SpotifyURLCallbackNotification else {
-            fatalError("wrong notification handler")
-        }
-        
-        guard let userInfo = notification.userInfo,
-            let url = userInfo[SpotifyURLCallbackNotificationUserInfoURLKey] as? URL else {
-            return
-        }
-    
-        handle(callbackURL: url)
-    }
-    
-}
 
 //extension DMSpotifyService: SPTAudioStreamingPlaybackDelegate {
 //
