@@ -13,6 +13,14 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
     typealias ViewModelType = DMSpotifySongSearchViewModelType
 
     var viewModel: DMSpotifySongSearchViewModelType
+
+    private lazy var searchButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.setTitle("Search", for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 25)
+        return button
+    }()
     
     required init(withViewModel viewModel: DMSpotifySongSearchViewModelType) {
         self.viewModel = viewModel
@@ -26,10 +34,20 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .green
+        
+        self.view.addSubview(searchButton)
+        
+        let buttonConstraints = [
+            searchButton.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: -20),
+            searchButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        ]
+        
+        NSLayoutConstraint.activate(buttonConstraints)
     }
     
     func bindViewModel() {
-        
+        searchButton.rx.action = viewModel.searchAction
+        //doneButton.rx.action =
     }
     
 }

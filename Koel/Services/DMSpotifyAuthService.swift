@@ -50,17 +50,17 @@ class DMSpotifyAuthService: NSObject {
             SPTAuthPlaylistReadPrivateScope
         ]
         
-        //currentSession.flatMap(<#T##selector: (SPTSession) throws -> ObservableConvertibleType##(SPTSession) throws -> ObservableConvertibleType#>)
+    }
+    
+    func authentication() -> Observable<SPTSession> {
         
-        currentSession
-            .subscribe(
-                onNext: { [unowned self] session in
-                    self.auth.session = session
-                }
-            )
-            .disposed(by: disposeBag)
+        if auth.session != nil && auth.session.isValid() {
+            return Observable<SPTSession>.just(auth.session)
+        }
         
-        NotificationCenter.default.rx.notification(SpotifyURLCallbackNotification)
+        let authenticationScene = Scene.authenticateSpotify(auth.spotifyWebAuthenticationURL())
+        
+        let notificationObservable = NotificationCenter.default.rx.notification(SpotifyURLCallbackNotification)
             .filter { (notification) -> Bool in
                 return notification.name == SpotifyURLCallbackNotification
             }
@@ -69,31 +69,49 @@ class DMSpotifyAuthService: NSObject {
                     let url = userInfo[SpotifyURLCallbackNotificationUserInfoURLKey] as? URL else {
                         return nil
                 }
-                
                 return url
             }
             .filterNil()
-            
         
-//        NotificationCenter.default.addObserver(
-//            self,
-//            selector: #selector(handle(authNotification:)),
-//            name: SpotifyURLCallbackNotification,
-//            object: nil
-//        )
+
+        if SPTAuth.supportsApplicationAuthentication() {
+            UIApplication.shared.open(self.auth.spotifyAppAuthenticationURL(), options: [:])
+        } else {
+            self.sceneCoordinator.transition(to: authenticationScene, type: .modal)
+        }
         
-        
-//        do {
-            //try player.start(withClientId: auth.clientID)
-            //player.delegate = self
-//        } catch let error {
-//            print("there was an error starting spotify sdk: \(error.localizedDescription)")
-//        }
+        return
+            notificationObservable
+            .take(1)
+            .flatMap { [unowned self] callbackURL -> Observable<SPTSession> in
+                Observable<SPTSession>.create { observer -> Disposable in
+                    self.auth.handleAuthCallback(
+                        withTriggeredAuthURL: callbackURL,
+                        callback: { (error, session) in
+                            if let error = error {
+                                os_log("spotify auth callback error: %@", log: OSLog.default, type: .error, error.localizedDescription)
+                                observer.onError(error)
+                            } else if let session = session {
+                                os_log("access token: %@", log: OSLog.default, type: .info, session.accessToken)
+                                os_log("expiration date: %@", log: OSLog.default, type: .info, session.expirationDate.description)
+                                observer.onNext(session)
+                            }
+                            observer.onCompleted()
+                        }
+                    )
+                    return Disposables.create()
+                }
+            }.do(onNext: { [unowned self] _ in
+                if self.sceneCoordinator.currentViewController is SFSafariViewController {
+                    self.sceneCoordinator.pop()
+                }
+            })
     }
     
     func performAuthentication() {
             //player.login(withAccessToken: auth.session.accessToken)
         if SPTAuth.supportsApplicationAuthentication() {
+
             UIApplication.shared.open(auth.spotifyAppAuthenticationURL(), options: [:])
         } else {
             let authenticationScene = Scene.authenticateSpotify(auth.spotifyWebAuthenticationURL())

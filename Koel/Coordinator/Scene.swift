@@ -56,6 +56,7 @@ extension Scene {
             return authenticationController
         case .searchSpotify(let viewModel):
             let searchViewController = DMSpotifySongSearchViewController(withViewModel: viewModel)
+            searchViewController.setupForViewModel()
             return searchViewController
         }
     }
