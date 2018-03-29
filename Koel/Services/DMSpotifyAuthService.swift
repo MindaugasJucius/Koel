@@ -19,6 +19,8 @@ let SpotifyURLCallbackNotificationUserInfoURLKey = "SpotifyURLCallbackNotificati
 
 class DMSpotifyAuthService: NSObject {
 
+    typealias SPTAuthCallbackObserver = (Error?, SPTSession?, AnyObserver<SPTSession>) -> ()
+    
     let sceneCoordinator: SceneCoordinatorType
     
     private let disposeBag = DisposeBag()
@@ -28,12 +30,6 @@ class DMSpotifyAuthService: NSObject {
     var authenticationIsNeeded: Bool {
         return auth.session == nil || !auth.session.isValid()
     }
-    
-    private var sessionObservable: Observable<SPTSession> {
-        return currentSession.asObservable()
-    }
-    
-    private var currentSession = ReplaySubject<SPTSession>.create(bufferSize: 1)
     
     init(sceneCoordinator: SceneCoordinatorType) {
         self.sceneCoordinator = sceneCoordinator
@@ -52,13 +48,22 @@ class DMSpotifyAuthService: NSObject {
         
     }
     
-    func authentication() -> Observable<SPTSession> {
-        
-        if auth.session != nil && auth.session.isValid() {
-            return Observable<SPTSession>.just(auth.session)
+    private var authCallback: SPTAuthCallbackObserver {
+        return { error, session, observer in
+            if let error = error {
+                os_log("spotify auth callback error: %@", log: OSLog.default, type: .error, error.localizedDescription)
+                observer.onError(error)
+            } else if let session = session {
+                os_log("access token: %@", log: OSLog.default, type: .info, session.accessToken)
+                os_log("expiration date: %@", log: OSLog.default, type: .info, session.expirationDate.description)
+                observer.onNext(session)
+            }
+            observer.onCompleted()
         }
-        
-        let notificationObservable = NotificationCenter.default.rx
+    }
+    
+    private var authURLNotificationObservable: Observable<URL> {
+        return NotificationCenter.default.rx
             .notification(SpotifyURLCallbackNotification)
             .filter { (notification) -> Bool in
                 return notification.name == SpotifyURLCallbackNotification
@@ -71,8 +76,28 @@ class DMSpotifyAuthService: NSObject {
                 return url
             }
             .filterNil()
+    }
+    
+    func currentSession() -> Observable<SPTSession> {
+        guard auth.session != nil else {
+            return performAuthenticationFlow()
+        }
         
-
+        if auth.session.isValid() {
+            return Observable<SPTSession>.just(auth.session)
+        } else {
+            return Observable<SPTSession>.create { [unowned self] observer -> Disposable in
+                os_log("renewing spt session", log: OSLog.default, type: .info)
+                self.auth.renewSession(self.auth.session, callback: { (error, session) in
+                        self.authCallback(error, session, observer)
+                    }
+                )
+                return Disposables.create()
+            }
+        }
+    }
+    
+    private func performAuthenticationFlow() -> Observable<SPTSession> {
         if SPTAuth.supportsApplicationAuthentication() {
             UIApplication.shared.open(self.auth.spotifyAppAuthenticationURL(), options: [:])
         } else {
@@ -80,8 +105,7 @@ class DMSpotifyAuthService: NSObject {
             sceneCoordinator.transition(to: authenticationScene, type: .modal)
         }
         
-        return
-            notificationObservable
+        return authURLNotificationObservable
             .take(1)
             .do(onNext: { [unowned self] _ in
                 if self.sceneCoordinator.currentViewController is SFSafariViewController {
@@ -93,20 +117,12 @@ class DMSpotifyAuthService: NSObject {
                     self.auth.handleAuthCallback(
                         withTriggeredAuthURL: callbackURL,
                         callback: { (error, session) in
-                            if let error = error {
-                                os_log("spotify auth callback error: %@", log: OSLog.default, type: .error, error.localizedDescription)
-                                observer.onError(error)
-                            } else if let session = session {
-                                os_log("access token: %@", log: OSLog.default, type: .info, session.accessToken)
-                                os_log("expiration date: %@", log: OSLog.default, type: .info, session.expirationDate.description)
-                                observer.onNext(session)
-                            }
-                            observer.onCompleted()
+                            self.authCallback(error, session, observer)
                         }
                     )
                     return Disposables.create()
-                }
             }
+        }
     }
 }
 
