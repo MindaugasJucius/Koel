@@ -11,6 +11,7 @@ import SafariServices
 import os.log
 import RxSwift
 import RxOptional
+import Spartan
 
 private let KoelSpotifySessionUserDefaultsKey = "koel_spotify_session"
 
@@ -31,6 +32,15 @@ class DMSpotifyAuthService: NSObject {
         return auth.session == nil || !auth.session.isValid()
     }
     
+    var currentSessionObservable: Observable<SPTSession> {
+        return currentSession()
+            .do(onNext: { [unowned self] session in
+                Spartan.authorizationToken = session.accessToken
+                self.auth.session = session
+            }
+        )
+    }
+    
     init(sceneCoordinator: SceneCoordinatorType) {
         self.sceneCoordinator = sceneCoordinator
         super.init()
@@ -45,7 +55,6 @@ class DMSpotifyAuthService: NSObject {
             SPTAuthUserLibraryReadScope,
             SPTAuthPlaylistReadPrivateScope
         ]
-        
     }
     
     private var authCallback: SPTAuthCallbackObserver {
@@ -78,7 +87,7 @@ class DMSpotifyAuthService: NSObject {
             .filterNil()
     }
     
-    func currentSession() -> Observable<SPTSession> {
+    private func currentSession() -> Observable<SPTSession> {
         guard auth.session != nil else {
             return performAuthenticationFlow()
         }
