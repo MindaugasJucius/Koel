@@ -29,7 +29,7 @@ struct DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
         self.spotifySearchService = spotifySearchService
        
         self.searchAction = CocoaAction(workFactory: { () -> Observable<Void> in
-            return spotifySearchService.savedTracks()
+            return spotifySearchService.savedTracks().map { _ in }
         })
         
         //spotifySearchService.authService.currentSession.subscribe(onNext: <#T##((SPTSession) -> Void)?##((SPTSession) -> Void)?##(SPTSession) -> Void#>, onError: <#T##((Error) -> Void)?##((Error) -> Void)?##(Error) -> Void#>, onCompleted: <#T##(() -> Void)?##(() -> Void)?##() -> Void#>, onDisposed: <#T##(() -> Void)?##(() -> Void)?##() -> Void#>)

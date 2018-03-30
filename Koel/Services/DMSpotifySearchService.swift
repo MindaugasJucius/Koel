@@ -15,7 +15,7 @@ protocol DMSpotifySearchServiceType {
     var authService: DMSpotifyAuthService { get }
     
     func playlists() -> Observable<Void>
-    func savedTracks() -> Observable<Void>
+    func savedTracks() -> Observable<[DMEventSong]>
     
 }
 
@@ -41,18 +41,31 @@ class DMSpotifySearchService: DMSpotifySearchServiceType {
             }
     }
     
-    func savedTracks() -> Observable<Void> {
+    func savedTracks() -> Observable<[DMEventSong]> {
         return authService
             .currentSessionObservable
-            .map { [unowned self] session in
-                _ = Spartan.getSavedTracks(limit: 20, offset: 0, market: Spartan.currentCountryCode, success: { (pagingObject) in
-                    print(pagingObject.toJSONString(prettyPrint: true))
-                    // Get the saved tracks via pagingObject.items
-                }, failure: { (error) in
-                    print(error)
-                })
+            .flatMap { _ -> Observable<PagingObject<SavedTrack>> in
+                return Observable<PagingObject<SavedTrack>>.create { observer -> Disposable in
+                    _ = Spartan.getSavedTracks(market: Spartan.currentCountryCode, success: { pagingObject in
+                        observer.onNext(pagingObject)
+                    }, failure: { error in
+                        if let error = error.nsError {
+                            observer.onError(error)
+                        }
+                    })
+                    return Disposables.create()
+                }
             }
-        
+            .map { pagingObject -> [DMEventSong] in
+                return pagingObject.items.map { savedTrack -> DMEventSong in
+                    let eventSong = DMEventSong()
+                    eventSong.spotifyURI = savedTrack.track.uri
+                    eventSong.title = "\(savedTrack.track.album.artists[0].name) - \(savedTrack.track.name)"
+                    return eventSong
+                }
+            }.do(onNext: { songs in
+                print(songs)
+            })
     }
     
 }
