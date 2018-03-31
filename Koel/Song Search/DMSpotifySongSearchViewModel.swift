@@ -14,23 +14,23 @@ protocol DMSpotifySongSearchViewModelType: ViewModelType {
     
     var spotifySearchService: DMSpotifySearchServiceType { get }
     
-    var searchAction: CocoaAction  { get }
+    var searchResults: Observable<[SongSection]> { get }
 }
 
-struct DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
+class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
     
     var sceneCoordinator: SceneCoordinatorType
     var spotifySearchService: DMSpotifySearchServiceType
-    
-    let searchAction: CocoaAction
+
+    lazy var searchResults: Observable<[SongSection]> = {
+        return spotifySearchService.savedTracks().map { songs in
+            [SongSection(model: "Results", items: songs)]
+        }
+    }()
     
     init(sceneCoordinator: SceneCoordinatorType, spotifySearchService: DMSpotifySearchServiceType) {
         self.sceneCoordinator = sceneCoordinator
         self.spotifySearchService = spotifySearchService
-       
-        self.searchAction = CocoaAction(workFactory: { () -> Observable<Void> in
-            return spotifySearchService.savedTracks().map { _ in }
-        })
         
         //spotifySearchService.authService.currentSession.subscribe(onNext: <#T##((SPTSession) -> Void)?##((SPTSession) -> Void)?##(SPTSession) -> Void#>, onError: <#T##((Error) -> Void)?##((Error) -> Void)?##(Error) -> Void#>, onCompleted: <#T##(() -> Void)?##(() -> Void)?##() -> Void#>, onDisposed: <#T##(() -> Void)?##(() -> Void)?##() -> Void#>)
         
