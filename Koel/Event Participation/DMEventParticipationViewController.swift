@@ -24,7 +24,7 @@ class DMEventParticipationViewController: UIViewController, BindableType {
     private let tableView: UITableView = {
         let tableView = UITableView()
         tableView.translatesAutoresizingMaskIntoConstraints = false
-        tableView.register(DMEventSongTableViewCell.self, forCellReuseIdentifier: DMEventSongTableViewCell.reuseIdentifier)
+        tableView.register(DMEventSongPersistedTableViewCell.self, forCellReuseIdentifier: DMEventSongPersistedTableViewCell.reuseIdentifier)
         return tableView
     }()
     

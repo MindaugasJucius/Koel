@@ -15,9 +15,9 @@ extension BindableType {
         return RxTableViewSectionedAnimatedDataSource<SongSection>(
             animationConfiguration: AnimationConfiguration(insertAnimation: .top, reloadAnimation: .fade, deleteAnimation: .left),
             configureCell: { (dataSource, tableView, indexPath, element) -> UITableViewCell in
-                let cell = tableView.dequeueReusableCell(withIdentifier: DMEventSongTableViewCell.reuseIdentifier, for: indexPath)
+                let cell = tableView.dequeueReusableCell(withIdentifier: DMEventSongPersistedTableViewCell.reuseIdentifier, for: indexPath)
                 
-                guard let songCell = cell as? DMEventSongTableViewCell else {
+                guard let songCell = cell as? DMEventSongPersistedTableViewCell else {
                     return cell
                 }
                 

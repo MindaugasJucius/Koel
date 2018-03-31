@@ -16,14 +16,13 @@ class DMEventManagementViewController: UIViewController, BindableType {
     typealias ViewModelType = DMEventManagementViewModel
 
     private let disposeBag = DisposeBag()
-    private let tableViewDataSource: RxTableViewSectionedAnimatedDataSource<SongSection>
     
     var viewModel: DMEventManagementViewModel
     
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
         tableView.translatesAutoresizingMaskIntoConstraints = false
-        tableView.register(DMEventSongTableViewCell.self, forCellReuseIdentifier: DMEventSongTableViewCell.reuseIdentifier)
+        tableView.register(DMEventSongPersistedTableViewCell.self, forCellReuseIdentifier: DMEventSongPersistedTableViewCell.reuseIdentifier)
         return tableView
     }()
     
@@ -45,7 +44,6 @@ class DMEventManagementViewController: UIViewController, BindableType {
     
     required init(withViewModel viewModel: DMEventManagementViewModel) {
         self.viewModel = viewModel
-        self.tableViewDataSource = DMEventManagementViewController.dataSource(withViewModel: viewModel)
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -91,8 +89,9 @@ class DMEventManagementViewController: UIViewController, BindableType {
     }
     
     func bindViewModel() {
+        let dataSource = DMEventManagementViewController.dataSource(withViewModel: viewModel)
         viewModel.songSharingViewModel.songsSectioned
-            .bind(to: tableView.rx.items(dataSource: tableViewDataSource))
+            .bind(to: tableView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
         
         tableView.rx
