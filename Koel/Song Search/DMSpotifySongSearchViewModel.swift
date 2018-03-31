@@ -25,7 +25,7 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
     lazy var searchResults: Observable<[SongSection]> = {
         return spotifySearchService.savedTracks().map { songs in
             [SongSection(model: "Results", items: songs)]
-        }
+        }.share()
     }()
     
     init(sceneCoordinator: SceneCoordinatorType, spotifySearchService: DMSpotifySearchServiceType) {
