@@ -26,3 +26,17 @@ enum DefaultStylesheet {
 
 }
 
+enum SongCellStylesheet {
+    
+    static let titleLabelStyle = Style<UILabel> {
+        $0.font = UIFont.systemFont(ofSize: 18, weight: .medium)
+        $0.numberOfLines = 1
+    }
+    
+    static let subtitleLabelStyle = Style<UILabel> {
+        $0.font = UIFont.systemFont(ofSize: 14, weight: .medium)
+        $0.numberOfLines = 1
+    }
+    
+}
+

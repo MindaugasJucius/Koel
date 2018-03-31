@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		031D904420566AE4007D1156 /* ReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 031D904320566AE4007D1156 /* ReusableView.swift */; };
 		031D904620566EB3007D1156 /* SongSharingViewModelType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 031D904520566EB3007D1156 /* SongSharingViewModelType.swift */; };
-		035596DA2066B4D20067A737 /* Bindable+SongTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035596D92066B4D20067A737 /* Bindable+SongTableView.swift */; };
+		035596DA2066B4D20067A737 /* Bindable+PersistedSongs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035596D92066B4D20067A737 /* Bindable+PersistedSongs.swift */; };
 		035596DC2067FA020067A737 /* DMSpotifySearchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035596DB2067FA020067A737 /* DMSpotifySearchService.swift */; };
 		035596DF206804330067A737 /* DMSpotifySongSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035596DE206804330067A737 /* DMSpotifySongSearchViewController.swift */; };
 		035596E1206804460067A737 /* DMSpotifySongSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035596E0206804460067A737 /* DMSpotifySongSearchViewModel.swift */; };
@@ -53,11 +53,12 @@
 		5F84FFA31FDAEC82003332B4 /* DMEventSong.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F84FFA21FDAEC82003332B4 /* DMEventSong.swift */; };
 		5F84FFA71FDAF0B8003332B4 /* DMEventSongPersistenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F84FFA61FDAF0B8003332B4 /* DMEventSongPersistenceService.swift */; };
 		5F84FFA91FDAF69E003332B4 /* DMEventSongPersistenceServiceType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F84FFA81FDAF69E003332B4 /* DMEventSongPersistenceServiceType.swift */; };
-		5F84FFAC1FDB33F3003332B4 /* DMEventSongTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F84FFAB1FDB33F3003332B4 /* DMEventSongTableViewCell.swift */; };
+		5F84FFAC1FDB33F3003332B4 /* DMEventSongPersistedTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F84FFAB1FDB33F3003332B4 /* DMEventSongPersistedTableViewCell.swift */; };
 		5F84FFAE1FDC2F3F003332B4 /* DMEventPeerPersistenceServiceType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F84FFAD1FDC2F3F003332B4 /* DMEventPeerPersistenceServiceType.swift */; };
 		5F84FFB01FDC3AB0003332B4 /* DMEventPeerPersistenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F84FFAF1FDC3AB0003332B4 /* DMEventPeerPersistenceService.swift */; };
 		5F9C2D231FDED1970067BDC4 /* DMKoelButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F9C2D221FDED1970067BDC4 /* DMKoelButton.swift */; };
 		5FA42B5C1FD6E6F600578EF5 /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FA42B5B1FD6E6F600578EF5 /* Notifications.swift */; };
+		5FAFD146206FF5BE00077E39 /* DMSpotifySongTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FAFD145206FF5BE00077E39 /* DMSpotifySongTableViewCell.swift */; };
 		5FB2C9381FE7F428001D532F /* CALayer+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB2C9371FE7F428001D532F /* CALayer+Extensions.swift */; };
 		5FB2C93A1FE7F534001D532F /* CAGradientLayer+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB2C9391FE7F534001D532F /* CAGradientLayer+Extensions.swift */; };
 		5FB2C93E1FE8073B001D532F /* Style.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB2C93D1FE8073B001D532F /* Style.swift */; };
@@ -81,7 +82,7 @@
 /* Begin PBXFileReference section */
 		031D904320566AE4007D1156 /* ReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReusableView.swift; sourceTree = "<group>"; };
 		031D904520566EB3007D1156 /* SongSharingViewModelType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongSharingViewModelType.swift; sourceTree = "<group>"; };
-		035596D92066B4D20067A737 /* Bindable+SongTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bindable+SongTableView.swift"; sourceTree = "<group>"; };
+		035596D92066B4D20067A737 /* Bindable+PersistedSongs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bindable+PersistedSongs.swift"; sourceTree = "<group>"; };
 		035596DB2067FA020067A737 /* DMSpotifySearchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMSpotifySearchService.swift; sourceTree = "<group>"; };
 		035596DE206804330067A737 /* DMSpotifySongSearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMSpotifySongSearchViewController.swift; sourceTree = "<group>"; };
 		035596E0206804460067A737 /* DMSpotifySongSearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMSpotifySongSearchViewModel.swift; sourceTree = "<group>"; };
@@ -132,11 +133,12 @@
 		5F84FFA21FDAEC82003332B4 /* DMEventSong.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventSong.swift; sourceTree = "<group>"; };
 		5F84FFA61FDAF0B8003332B4 /* DMEventSongPersistenceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventSongPersistenceService.swift; sourceTree = "<group>"; };
 		5F84FFA81FDAF69E003332B4 /* DMEventSongPersistenceServiceType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DMEventSongPersistenceServiceType.swift; sourceTree = "<group>"; };
-		5F84FFAB1FDB33F3003332B4 /* DMEventSongTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventSongTableViewCell.swift; sourceTree = "<group>"; };
+		5F84FFAB1FDB33F3003332B4 /* DMEventSongPersistedTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventSongPersistedTableViewCell.swift; sourceTree = "<group>"; };
 		5F84FFAD1FDC2F3F003332B4 /* DMEventPeerPersistenceServiceType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventPeerPersistenceServiceType.swift; sourceTree = "<group>"; };
 		5F84FFAF1FDC3AB0003332B4 /* DMEventPeerPersistenceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventPeerPersistenceService.swift; sourceTree = "<group>"; };
 		5F9C2D221FDED1970067BDC4 /* DMKoelButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMKoelButton.swift; sourceTree = "<group>"; };
 		5FA42B5B1FD6E6F600578EF5 /* Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
+		5FAFD145206FF5BE00077E39 /* DMSpotifySongTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMSpotifySongTableViewCell.swift; sourceTree = "<group>"; };
 		5FB2C9371FE7F428001D532F /* CALayer+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CALayer+Extensions.swift"; sourceTree = "<group>"; };
 		5FB2C9391FE7F534001D532F /* CAGradientLayer+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CAGradientLayer+Extensions.swift"; sourceTree = "<group>"; };
 		5FB2C93D1FE8073B001D532F /* Style.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Style.swift; sourceTree = "<group>"; };
@@ -178,6 +180,7 @@
 			children = (
 				035596DE206804330067A737 /* DMSpotifySongSearchViewController.swift */,
 				035596E0206804460067A737 /* DMSpotifySongSearchViewModel.swift */,
+				5FAFD145206FF5BE00077E39 /* DMSpotifySongTableViewCell.swift */,
 			);
 			path = "Song Search";
 			sourceTree = "<group>";
@@ -322,7 +325,7 @@
 				5FB2C9371FE7F428001D532F /* CALayer+Extensions.swift */,
 				5FB2C9391FE7F534001D532F /* CAGradientLayer+Extensions.swift */,
 				5FB2C9411FE92D25001D532F /* Realm+Extensions.swift */,
-				035596D92066B4D20067A737 /* Bindable+SongTableView.swift */,
+				035596D92066B4D20067A737 /* Bindable+PersistedSongs.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -386,7 +389,7 @@
 				5F54458C1FD198C40059A975 /* DMEventInvitationsViewController.swift */,
 				5F84FF991FD86350003332B4 /* DMEventManagementViewModel.swift */,
 				5F84FF9B1FD86367003332B4 /* DMEventManagementViewController.swift */,
-				5F84FFAB1FDB33F3003332B4 /* DMEventSongTableViewCell.swift */,
+				5F84FFAB1FDB33F3003332B4 /* DMEventSongPersistedTableViewCell.swift */,
 				5FD30C461FEE8ED100861353 /* DMEventSongSharingViewModel.swift */,
 			);
 			path = "Event Creation";
@@ -654,7 +657,7 @@
 				5F81861E1FD3FADB00477C71 /* UINavigationController+Rx.swift in Sources */,
 				5F5445951FD594460059A975 /* DMEventParticipationViewModel.swift in Sources */,
 				5FB2C93A1FE7F534001D532F /* CAGradientLayer+Extensions.swift in Sources */,
-				5F84FFAC1FDB33F3003332B4 /* DMEventSongTableViewCell.swift in Sources */,
+				5F84FFAC1FDB33F3003332B4 /* DMEventSongPersistedTableViewCell.swift in Sources */,
 				5F601D3D1FD04851003DE897 /* DMEventInvitationsViewModel.swift in Sources */,
 				5F84FFA71FDAF0B8003332B4 /* DMEventSongPersistenceService.swift in Sources */,
 				5F84FFAE1FDC2F3F003332B4 /* DMEventPeerPersistenceServiceType.swift in Sources */,
@@ -670,6 +673,7 @@
 				5F5445971FD594570059A975 /* DMEventParticipationViewController.swift in Sources */,
 				031D904620566EB3007D1156 /* SongSharingViewModelType.swift in Sources */,
 				5F37D88A1FF3D0A6002E0ACD /* DMSpotifyAuthService.swift in Sources */,
+				5FAFD146206FF5BE00077E39 /* DMSpotifySongTableViewCell.swift in Sources */,
 				5F014BD61FB9E29700079009 /* UIColor+Extensions.swift in Sources */,
 				5F81861C1FD3FAB000477C71 /* SceneCoordinator.swift in Sources */,
 				035596E1206804460067A737 /* DMSpotifySongSearchViewModel.swift in Sources */,
@@ -689,7 +693,7 @@
 				5FB2C9401FE8075F001D532F /* Stylesheet.swift in Sources */,
 				5F47B83B1FD4073F0053A0A5 /* ViewModelType.swift in Sources */,
 				037A47E3205923990030D25F /* DMEntitySharingService.swift in Sources */,
-				035596DA2066B4D20067A737 /* Bindable+SongTableView.swift in Sources */,
+				035596DA2066B4D20067A737 /* Bindable+PersistedSongs.swift in Sources */,
 				035596DF206804330067A737 /* DMSpotifySongSearchViewController.swift in Sources */,
 				5F84FF9C1FD86367003332B4 /* DMEventManagementViewController.swift in Sources */,
 				037A47E4205923990030D25F /* DMEntitySharingServiceType.swift in Sources */,
