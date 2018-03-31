@@ -14,7 +14,6 @@ protocol DMSpotifySearchServiceType {
     
     var authService: DMSpotifyAuthService { get }
     
-    func playlists() -> Observable<Void>
     func savedTracks() -> Observable<[DMEventSong]>
     
 }
@@ -27,30 +26,18 @@ class DMSpotifySearchService: DMSpotifySearchServiceType {
         self.authService = authService
     }
   
-    func playlists() -> Observable<Void> {
-        
-        return authService
-            .currentSessionObservable
-            .map { [unowned self] session in
-                _ = Spartan.getUsersPlaylists(userId: session.canonicalUsername, limit: 20, offset: 0, success: { (pagingObject) in
-                    print(pagingObject.toJSONString(prettyPrint: true))
-                    // Get the playlists via pagingObject.playlists
-                }, failure: { (error) in
-                    print(error)
-                })
-            }
-    }
-    
     func savedTracks() -> Observable<[DMEventSong]> {
         return authService
             .currentSessionObservable
             .flatMap { _ -> Observable<PagingObject<SavedTrack>> in
                 return Observable<PagingObject<SavedTrack>>.create { observer -> Disposable in
-                    _ = Spartan.getSavedTracks(market: Spartan.currentCountryCode, success: { pagingObject in
+                    _ = Spartan.getSavedTracks(offset: 20, market: Spartan.currentCountryCode, success: { pagingObject in
                         observer.onNext(pagingObject)
+                        observer.onCompleted()
                     }, failure: { error in
                         if let error = error.nsError {
                             observer.onError(error)
+                            observer.onCompleted()
                         }
                     })
                     return Disposables.create()
@@ -60,7 +47,12 @@ class DMSpotifySearchService: DMSpotifySearchServiceType {
                 return pagingObject.items.map { savedTrack -> DMEventSong in
                     let eventSong = DMEventSong()
                     eventSong.spotifyURI = savedTrack.track.uri
-                    eventSong.title = "\(savedTrack.track.album.artists[0].name) - \(savedTrack.track.name)"
+                    eventSong.title = savedTrack.track.name
+                    let artistTitle = savedTrack.track.album.artists.reduce("", { currentTitle, artist in
+                            return currentTitle.appending("\(artist.name) ")
+                        }
+                    )
+                    eventSong.artistTitle = artistTitle
                     return eventSong
                 }
             }.do(onNext: { songs in

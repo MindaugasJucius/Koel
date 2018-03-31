@@ -17,14 +17,14 @@ class DMEventSongTableViewCell: UITableViewCell, ReusableView {
 
     private var disposeBag = DisposeBag()
     
-    private let titleLabel: UILabel = {
+    private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.numberOfLines = 0
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    private var upvoteButton: UIButton = {
+    private lazy var upvoteButton: UIButton = {
         let button = UIButton(type: .system)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 20)
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -44,6 +44,7 @@ class DMEventSongTableViewCell: UITableViewCell, ReusableView {
         NSLayoutConstraint.activate(labelConstraints)
         
         contentView.addSubview(upvoteButton)
+        
         let buttonConstraints = [
             contentView.rightAnchor.constraint(equalTo: upvoteButton.rightAnchor, constant: 5),
             upvoteButton.widthAnchor.constraint(equalToConstant: 50),

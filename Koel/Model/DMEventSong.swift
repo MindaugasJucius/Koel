@@ -19,6 +19,7 @@ class DMEventSong: Object, Codable {
     
     private enum CodingKeys: String, CodingKey {
         case title
+        case artistTitle
         case added
         case addedByUUID
         case upvotedByUUIDs
@@ -30,6 +31,7 @@ class DMEventSong: Object, Codable {
     
     dynamic var uuid = NSUUID().uuidString
     dynamic var title: String = ""
+    dynamic var artistTitle: String = ""
     dynamic var spotifyURI: String = ""
     dynamic var added: Date? = nil
     dynamic var played: Date? = nil
@@ -55,6 +57,7 @@ class DMEventSong: Object, Codable {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
         try container.encode(uuid, forKey: .uuid)
+        try container.encode(artistTitle, forKey: .artistTitle)
         try container.encode(title, forKey: .title)
         try container.encode(added, forKey: .added)
         try container.encode(played, forKey: .played)
@@ -73,6 +76,7 @@ class DMEventSong: Object, Codable {
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let uuid = try container.decode(String.self, forKey: .uuid)
+        let artistTitle = try container.decode(String.self, forKey: .artistTitle)
         let title = try container.decode(String.self, forKey: .title)
         let added = try container.decode(Date.self, forKey: .added)
         let played = try container.decodeIfPresent(Date.self, forKey: .played)
@@ -90,6 +94,7 @@ class DMEventSong: Object, Codable {
         
         super.init()
         self.uuid = uuid
+        self.artistTitle = artistTitle
         self.title = title
         self.added = added
         self.played = played

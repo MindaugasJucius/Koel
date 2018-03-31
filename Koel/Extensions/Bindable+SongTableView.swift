@@ -27,10 +27,10 @@ extension BindableType {
                 )
                 
                 return cell
-        },
+            },
             titleForHeaderInSection: { dataSource, sectionIndex in
                 return dataSource[sectionIndex].model
-        }
+            }
         )
     }
     
