@@ -34,7 +34,7 @@ class DMEventParticipationViewController: UIViewController, BindableType {
     
     required init(withViewModel viewModel: DMEventParticipationViewModel) {
         self.viewModel = viewModel
-        self.tableViewDataSource = DMEventParticipationViewController.dataSource(withViewModel: viewModel)
+        self.tableViewDataSource = DMEventParticipationViewController.persistedSongDataSource(withViewModel: viewModel)
         super.init(nibName: nil, bundle: nil)
     }
     

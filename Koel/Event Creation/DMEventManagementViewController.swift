@@ -89,7 +89,7 @@ class DMEventManagementViewController: UIViewController, BindableType {
     }
     
     func bindViewModel() {
-        let dataSource = DMEventManagementViewController.dataSource(withViewModel: viewModel)
+        let dataSource = DMEventManagementViewController.persistedSongDataSource(withViewModel: viewModel)
         viewModel.songSharingViewModel.songsSectioned
             .bind(to: tableView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)

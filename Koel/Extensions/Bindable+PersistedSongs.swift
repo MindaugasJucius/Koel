@@ -11,7 +11,7 @@ import RxDataSources
 
 extension BindableType {
     
-    static func dataSource(withViewModel viewModel: SongSharingViewModelType) -> RxTableViewSectionedAnimatedDataSource<SongSection> {
+    static func persistedSongDataSource(withViewModel viewModel: SongSharingViewModelType) -> RxTableViewSectionedAnimatedDataSource<SongSection> {
         return RxTableViewSectionedAnimatedDataSource<SongSection>(
             animationConfiguration: AnimationConfiguration(insertAnimation: .top, reloadAnimation: .fade, deleteAnimation: .left),
             configureCell: { (dataSource, tableView, indexPath, element) -> UITableViewCell in
