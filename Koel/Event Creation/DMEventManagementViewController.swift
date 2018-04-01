@@ -70,19 +70,30 @@ class DMEventManagementViewController: UIViewController, BindableType {
         ]
         
         view.addSubview(invitationsButton)
+
+        let playbackControlsView = DMPlaybackControlsView(frame: .zero)
+        view.addSubview(playbackControlsView)
+        let playbackControlsViewConstraints = [
+            playbackControlsView.heightAnchor.constraint(equalToConstant: DMPlaybackControlsView.height),
+            playbackControlsView.leftAnchor.constraint(equalTo: view.leftAnchor),
+            playbackControlsView.rightAnchor.constraint(equalTo: view.rightAnchor),
+            playbackControlsView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        ]
         
         let invitationConstraints = [
             invitationsButton.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 20),
-            invitationsButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+            invitationsButton.bottomAnchor.constraint(equalTo: playbackControlsView.topAnchor)
         ]
         
         view.addSubview(addButton)
         
         let addButtonConstraints = [
             addButton.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: -20),
-            addButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+            addButton.bottomAnchor.constraint(equalTo: playbackControlsView.topAnchor)
         ]
         
+
+        NSLayoutConstraint.activate(playbackControlsViewConstraints)
         NSLayoutConstraint.activate(invitationConstraints)
         NSLayoutConstraint.activate(addButtonConstraints)
         NSLayoutConstraint.activate(tableViewConstraints)
