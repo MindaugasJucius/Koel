@@ -89,8 +89,8 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
                 return self.songPersistenceService.store(song: song)
             }
 
-            return Observable.from(storeObservables).merge().flatMap { (_) -> Observable<Void> in
-                return self.sceneCoordinator.pop(animated: true)
+            return self.sceneCoordinator.pop(animated: true).flatMap { _ -> Observable<Void> in
+                return Observable.from(storeObservables).merge().map{ _ in }
             }
         })
     }

@@ -111,6 +111,7 @@ class SceneCoordinator: NSObject, SceneCoordinatorType {
             // dismiss a modal controller
             currentViewController.dismiss(animated: animated) {
                 self.currentViewController = SceneCoordinator.actualViewController(for: presenter)
+                subject.onNext(())
                 subject.onCompleted()
             }
         } else if let navigationController = currentViewController.navigationController {
