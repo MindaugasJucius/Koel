@@ -24,19 +24,25 @@ class DMSpotifySongTableViewCell: UITableViewCell, ReusableView {
         return label
     }()
     
-    override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
+    private lazy var stackView: UIStackView = {
         let labelStackView = UIStackView()
         labelStackView.translatesAutoresizingMaskIntoConstraints = false
         labelStackView.axis = .vertical
         labelStackView.addArrangedSubview(titleLabel)
         labelStackView.addArrangedSubview(artistTitleLabel)
-        addSubview(labelStackView)
+        labelStackView.spacing = 3
+        return labelStackView
+    }()
+    
+    override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        addSubview(stackView)
         
-        let constraints = [labelStackView.leftAnchor.constraint(equalTo: safeAreaLayoutGuide.leftAnchor),
-                           labelStackView.rightAnchor.constraint(equalTo: safeAreaLayoutGuide.rightAnchor),
-                           labelStackView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
-                           labelStackView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor)]
+        let constraints = [stackView.leftAnchor.constraintEqualToSystemSpacingAfter(safeAreaLayoutGuide.leftAnchor, multiplier: 2),
+                           safeAreaLayoutGuide.rightAnchor.constraintEqualToSystemSpacingAfter(stackView.rightAnchor, multiplier: 1),
+                           stackView.topAnchor.constraintEqualToSystemSpacingBelow(safeAreaLayoutGuide.topAnchor, multiplier: 1),
+                           safeAreaLayoutGuide.bottomAnchor.constraintEqualToSystemSpacingBelow(stackView.bottomAnchor, multiplier: 1)
+                          ]
         
         NSLayoutConstraint.activate(constraints)
     }

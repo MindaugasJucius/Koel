@@ -49,15 +49,13 @@ class DMSpotifySearchService: DMSpotifySearchServiceType {
                     eventSong.spotifyURI = savedTrack.track.uri
                     eventSong.title = savedTrack.track.name
                     let artistTitle = savedTrack.track.album.artists.reduce("", { currentTitle, artist in
-                            return currentTitle.appending("\(artist.name) ")
+                            return currentTitle.appending("\(artist.name!) ")
                         }
                     )
                     eventSong.artistTitle = artistTitle
                     return eventSong
                 }
-            }.do(onNext: { songs in
-                print(songs)
-            })
+            }
     }
     
 }

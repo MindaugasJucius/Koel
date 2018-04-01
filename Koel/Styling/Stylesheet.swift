@@ -34,7 +34,7 @@ enum SongCellStylesheet {
     }
     
     static let subtitleLabelStyle = Style<UILabel> {
-        $0.font = UIFont.systemFont(ofSize: 14, weight: .medium)
+        $0.font = UIFont.systemFont(ofSize: 14, weight: .regular)
         $0.numberOfLines = 1
     }
     

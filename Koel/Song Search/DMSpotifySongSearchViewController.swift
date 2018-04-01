@@ -30,6 +30,7 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
         tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.allowsMultipleSelection = true
         tableView.register(DMSpotifySongTableViewCell.self, forCellReuseIdentifier: DMSpotifySongTableViewCell.reuseIdentifier)
         return tableView
     }()
@@ -69,7 +70,7 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
     }
     
     func bindViewModel() {
-        //
+
         rx.methodInvoked(#selector(UIViewController.viewDidAppear(_:)))
             .take(1)
             .do { [unowned self] in
@@ -80,6 +81,13 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
                     .disposed(by: self.disposeBag)
             }
             .subscribe()
+            .disposed(by: disposeBag)
+    
+        tableView.rx
+            .modelSelected(DMEventSong.self)
+            .subscribe { song in
+                print(song)
+            }
             .disposed(by: disposeBag)
     }
     
