@@ -19,10 +19,10 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
 
     private let disposeBag = DisposeBag()
     
-    private lazy var searchButton: UIButton = {
+    private lazy var doneButton: UIButton = {
         let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle("Search", for: .normal)
+        button.setTitle(UIConstants.strings.done, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 25)
         return button
     }()
@@ -59,11 +59,11 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
         
         NSLayoutConstraint.activate(tableViewConstraints)
         
-        self.view.addSubview(searchButton)
+        self.view.addSubview(doneButton)
         
         let buttonConstraints = [
-            searchButton.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: -20),
-            searchButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+            doneButton.leftAnchor.constraintEqualToSystemSpacingAfter(view.safeAreaLayoutGuide.leftAnchor, multiplier: 2),
+            doneButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ]
         
         NSLayoutConstraint.activate(buttonConstraints)
@@ -85,10 +85,15 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
     
         tableView.rx
             .modelSelected(DMEventSong.self)
-            .subscribe { song in
-                print(song)
-            }
+            .subscribe(viewModel.addSelectedSong.inputs)
             .disposed(by: disposeBag)
+        
+        tableView.rx
+            .modelDeselected(DMEventSong.self)
+            .subscribe(viewModel.removeSelectedSong.inputs)
+            .disposed(by: disposeBag)
+        
+        doneButton.rx.action = viewModel.onDone
     }
     
 }

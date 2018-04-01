@@ -80,7 +80,20 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
             .observeOn(MainScheduler.instance)
     }
     
-    //MARK: - Song creation
+    //MARK: - Song search
+    
+    private func onSearchClose() -> Action<[DMEventSong], Void> {
+        return Action<[DMEventSong], Void>(workFactory: { [unowned self] (songs) -> Observable<Void> in
+            
+            let storeObservables: [Observable<DMEventSong>] = songs.map { [unowned self] song -> Observable<DMEventSong> in
+                return self.songPersistenceService.store(song: song)
+            }
+
+            return Observable.from(storeObservables).merge().flatMap { (_) -> Observable<Void> in
+                return self.sceneCoordinator.pop(animated: true)
+            }
+        })
+    }
   
     lazy var onSongSearch: CocoaAction = {
         return CocoaAction { [unowned self] in
@@ -88,15 +101,20 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
             let spotifySearchService = DMSpotifySearchService(authService: spotifyAuthService)
             let spotifySongSearchViewModel = DMSpotifySongSearchViewModel(
                 sceneCoordinator: self.sceneCoordinator,
-                spotifySearchService: spotifySearchService
+                spotifySearchService: spotifySearchService,
+                onClose: self.onSearchClose()
             )
+            
+            
             return self.sceneCoordinator.transition(
                 to: Scene.searchSpotify(spotifySongSearchViewModel),
                 type: .modal
             )
         }
     }()
-
+    
+    //MARK: - Song creation
+  
     private lazy var createAction: Action<DMEventSong, DMEventSong> = {
         return Action(workFactory: { [unowned self] (song: DMEventSong) -> Observable<DMEventSong> in
             return self.songPersistenceService.store(song: song)
@@ -134,7 +152,7 @@ private extension Observable where Element: Codable {
     
     func share<SharingService: DMEntitySharingServiceType>(withMultipeerService multipeerService: DMEventMultipeerService, sharingService: SharingService) -> Observable<Void> where Element == SharingService.Entity {
         return self.withLatestFrom(multipeerService.connectedPeers()) { (entity, peers) -> Observable<Void> in
-            let availablePeerIDs = peers.flatMap { $0.peerID }
+            let availablePeerIDs = peers.compactMap { $0.peerID }
             let encodedEntity = try! sharingService.encode(entity: entity)
             return multipeerService.send(
                 toPeers: availablePeerIDs,
