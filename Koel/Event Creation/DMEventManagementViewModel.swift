@@ -127,15 +127,9 @@ class DMEventManagementViewModel: ViewModelType, MultipeerViewModelType, Backgro
     // MARK: - Playback bindables
 
     private func firstQueuedSong() -> Observable<DMEventSong> {
-        return self.songSharingViewModel.songsSectioned.map { sections -> SongSection in
-            return sections.filter { section -> Bool in
-                section.model == UIConstants.strings.queuedSongs
-                }.first!
-            }
-            .map { section -> DMEventSong in
-                return section.items.first!
-        }
-
+        return songSharingViewModel.queuedSongs
+            .map { $0.first }
+            .filterNil()
     }
     
     func onNext() -> CocoaAction {

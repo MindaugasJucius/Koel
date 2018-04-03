@@ -20,6 +20,8 @@ protocol DMEventSongSharingViewModelType: MultipeerViewModelType {
     var songPersistenceService: DMEventSongPersistenceServiceType { get }
 
     var songsSectioned: Observable<[SongSection]> { get }
+    var queuedSongs: Observable<[DMEventSong]> { get }
+    var playedSongs: Observable<[DMEventSong]> { get }
     
     var onSongSearch: CocoaAction { get }
     var onPlayed: Action<DMEventSong, Void> { get }
@@ -36,6 +38,11 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
     var multipeerService: DMEventMultipeerService
     var sceneCoordinator: SceneCoordinatorType
     
+    private let songSortDescriptors = [
+        SortDescriptor(keyPath: "upvoteCount", ascending: false),
+        SortDescriptor(keyPath: "added", ascending: true)
+    ]
+    
     init(songPersistenceService: DMEventSongPersistenceServiceType,
          songSharingService: DMEntitySharingService<DMEventSong>,
          multipeerService: DMEventMultipeerService,
@@ -50,7 +57,6 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
             .map { (peer, data) -> DMEventSong? in
                 do {
                     let song = try songSharingService.parse(fromData: data)
-                    print("retrieved a song: \(song), added uuid: \(song.addedByUUID), upvoted uuids: \(song.upvotedByUUIDs)")
                     return song
                 } catch _ {
                     return nil
@@ -62,11 +68,15 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
         
         multipeerService
             .receive()
-            .map { (peer, data) -> [DMEventSong] in
-                let songs = try DMEntitySharingService<[DMEventSong]>().parse(fromData: data)
-                print("retrieved songs: \(songs)")
-                return songs
+            .map { (peer, data) -> [DMEventSong]? in
+                do {
+                    let songs = try DMEntitySharingService<[DMEventSong]>().parse(fromData: data)
+                    return songs
+                } catch _ {
+                    return nil
+                }
             }
+            .filterNil()
             .flatMap { songs -> Observable<Observable<DMEventSong>> in
                 let storeObservables = songs.map { song in
                     return songPersistenceService.store(song: song)
@@ -78,29 +88,35 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
             .disposed(by: disposeBag)
     }
     
-    var songsSectioned: Observable<[SongSection]> {
-        return songPersistenceService.songs()
-            .map { results in
-                
-                let songSortDescriptors = [
-                    SortDescriptor(keyPath: "upvoteCount", ascending: false),
-                    SortDescriptor(keyPath: "added", ascending: true)
-                ]
+    var queuedSongs: Observable<[DMEventSong]> {
+        return songPersistenceService
+            .songs
+            .map { [unowned self] results in
 
-                let queuedSongs = results
+                return results
                     .filter("played == nil")
-                    .sorted(by: songSortDescriptors)
-                
-                let playedSongs = results
-                    .filter("played != nil")
-                    .sorted(byKeyPath: "played", ascending: false)
-                
-                return [
-                    SongSection(model: UIConstants.strings.queuedSongs, items: queuedSongs.toArray()),
-                    SongSection(model: UIConstants.strings.playedSongs, items: playedSongs.toArray())
-                ]
+                    .sorted(by: self.songSortDescriptors)
+                    .toArray()
             }
-            .observeOn(MainScheduler.instance)
+    }
+    
+    var playedSongs: Observable<[DMEventSong]> {
+        return songPersistenceService
+            .songs
+            .map { [unowned self] results in
+                return results
+                    .filter("played != nil")
+                    .sorted(by: self.songSortDescriptors)
+                    .toArray()
+        }
+    }
+    
+    var songsSectioned: Observable<[SongSection]> {
+        return Observable.zip(queuedSongs, playedSongs) { (queuedSongs, playedSongs) in
+            return [SongSection(model: UIConstants.strings.queuedSongs, items: queuedSongs),
+                    SongSection(model: UIConstants.strings.playedSongs, items: playedSongs)]
+        }
+        .observeOn(MainScheduler.instance)
     }
     
     //MARK: - Song search

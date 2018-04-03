@@ -120,13 +120,22 @@ class DMEventManagementViewController: UIViewController, BindableType {
         
         //DMPlaybackControlsView bindings
 
-        viewModel.songSharingViewModel.songsSectioned
-            .map { (songs) -> Bool in
-                return songs.count > 0 //TODO: sections
-            }
+        let queuedSongsAvailable = viewModel.songSharingViewModel.queuedSongs.map { songs in
+            return !songs.isEmpty
+        }.share()
+            
+        queuedSongsAvailable
             .bind(to: playbackControlsView.playPauseSongButton.rx.isEnabled)
             .disposed(by: disposeBag)
 
+        queuedSongsAvailable
+            .bind(to: playbackControlsView.nextSongButton.rx.isEnabled)
+            .disposed(by: disposeBag)
+        
+        queuedSongsAvailable
+            .bind(to: playbackControlsView.previousSongButton.rx.isEnabled)
+            .disposed(by: disposeBag)
+        
         playbackControlsView.nextSongButton.rx.action = viewModel.onNext()
         playbackControlsView.playPauseSongButton.rx.action = viewModel.onPlay()
     }
