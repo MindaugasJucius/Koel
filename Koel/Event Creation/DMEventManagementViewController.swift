@@ -10,6 +10,7 @@ import UIKit
 import RxDataSources
 import RxCocoa
 import RxSwift
+import Action
 
 class DMEventManagementViewController: UIViewController, BindableType {
     
@@ -42,6 +43,8 @@ class DMEventManagementViewController: UIViewController, BindableType {
         return button
     }()
     
+    private let playbackControlsView = DMPlaybackControlsView(frame: .zero)
+    
     required init(withViewModel viewModel: DMEventManagementViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -71,7 +74,7 @@ class DMEventManagementViewController: UIViewController, BindableType {
         
         view.addSubview(invitationsButton)
 
-        let playbackControlsView = DMPlaybackControlsView(frame: .zero)
+        
         view.addSubview(playbackControlsView)
         let playbackControlsViewConstraints = [
             playbackControlsView.heightAnchor.constraint(equalToConstant: DMPlaybackControlsView.height),
@@ -101,6 +104,7 @@ class DMEventManagementViewController: UIViewController, BindableType {
     
     func bindViewModel() {
         let dataSource = DMEventManagementViewController.persistedSongDataSource(withViewModel: viewModel)
+        
         viewModel.songSharingViewModel.songsSectioned
             .bind(to: tableView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
@@ -113,6 +117,18 @@ class DMEventManagementViewController: UIViewController, BindableType {
 
         addButton.rx.action = viewModel.songSharingViewModel.onSongSearch
         invitationsButton.rx.action = viewModel.onInvite()
+        
+        //DMPlaybackControlsView bindings
+
+        viewModel.songSharingViewModel.songsSectioned
+            .map { (songs) -> Bool in
+                return songs.count > 0 //TODO: sections
+            }
+            .bind(to: playbackControlsView.playPauseSongButton.rx.isEnabled)
+            .disposed(by: disposeBag)
+
+        playbackControlsView.nextSongButton.rx.action = viewModel.onNext()
+        playbackControlsView.playPauseSongButton.rx.action = viewModel.onPlay()
     }
     
 }
