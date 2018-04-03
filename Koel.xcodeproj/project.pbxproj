@@ -65,6 +65,8 @@
 		5FB2C9401FE8075F001D532F /* Stylesheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB2C93F1FE8075F001D532F /* Stylesheet.swift */; };
 		5FB2C9421FE92D26001D532F /* Realm+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB2C9411FE92D25001D532F /* Realm+Extensions.swift */; };
 		5FD30C471FEE8ED100861353 /* DMEventSongSharingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FD30C461FEE8ED100861353 /* DMEventSongSharingViewModel.swift */; };
+		5FD9306C2073DCEA00943D5C /* DMSpotifyPlaybackService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FD9306B2073DCEA00943D5C /* DMSpotifyPlaybackService.swift */; };
+		5FD9306E2073DD0700943D5C /* DMPlaybackControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FD9306D2073DD0700943D5C /* DMPlaybackControlsView.swift */; };
 		5FDEB6BA1F99235500070930 /* DMInitialLoadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FDEB6B81F99235500070930 /* DMInitialLoadingViewController.swift */; };
 		5FDEB6BB1F99235500070930 /* DMInitialLoadingViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5FDEB6B91F99235500070930 /* DMInitialLoadingViewController.xib */; };
 /* End PBXBuildFile section */
@@ -145,6 +147,8 @@
 		5FB2C93F1FE8075F001D532F /* Stylesheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stylesheet.swift; sourceTree = "<group>"; };
 		5FB2C9411FE92D25001D532F /* Realm+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Realm+Extensions.swift"; sourceTree = "<group>"; };
 		5FD30C461FEE8ED100861353 /* DMEventSongSharingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventSongSharingViewModel.swift; sourceTree = "<group>"; };
+		5FD9306B2073DCEA00943D5C /* DMSpotifyPlaybackService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DMSpotifyPlaybackService.swift; sourceTree = "<group>"; };
+		5FD9306D2073DD0700943D5C /* DMPlaybackControlsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DMPlaybackControlsView.swift; sourceTree = "<group>"; };
 		5FDEB6B81F99235500070930 /* DMInitialLoadingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMInitialLoadingViewController.swift; sourceTree = "<group>"; };
 		5FDEB6B91F99235500070930 /* DMInitialLoadingViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DMInitialLoadingViewController.xib; sourceTree = "<group>"; };
 		859C054680781DDB43D6FFC3 /* Pods_Koel.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Koel.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -281,6 +285,7 @@
 				5F84FFAD1FDC2F3F003332B4 /* DMEventPeerPersistenceServiceType.swift */,
 				5F84FFAF1FDC3AB0003332B4 /* DMEventPeerPersistenceService.swift */,
 				5F37D8891FF3D0A6002E0ACD /* DMSpotifyAuthService.swift */,
+				5FD9306B2073DCEA00943D5C /* DMSpotifyPlaybackService.swift */,
 				035596DB2067FA020067A737 /* DMSpotifySearchService.swift */,
 			);
 			path = Services;
@@ -385,6 +390,7 @@
 		5FDEB6B11F97C02C00070930 /* Event Creation */ = {
 			isa = PBXGroup;
 			children = (
+				5FD9306D2073DD0700943D5C /* DMPlaybackControlsView.swift */,
 				5F601D3C1FD04851003DE897 /* DMEventInvitationsViewModel.swift */,
 				5F54458C1FD198C40059A975 /* DMEventInvitationsViewController.swift */,
 				5F84FF991FD86350003332B4 /* DMEventManagementViewModel.swift */,
@@ -657,6 +663,7 @@
 				5F81861E1FD3FADB00477C71 /* UINavigationController+Rx.swift in Sources */,
 				5F5445951FD594460059A975 /* DMEventParticipationViewModel.swift in Sources */,
 				5FB2C93A1FE7F534001D532F /* CAGradientLayer+Extensions.swift in Sources */,
+				5FD9306C2073DCEA00943D5C /* DMSpotifyPlaybackService.swift in Sources */,
 				5F84FFAC1FDB33F3003332B4 /* DMEventSongPersistedTableViewCell.swift in Sources */,
 				5F601D3D1FD04851003DE897 /* DMEventInvitationsViewModel.swift in Sources */,
 				5F84FFA71FDAF0B8003332B4 /* DMEventSongPersistenceService.swift in Sources */,
@@ -684,6 +691,7 @@
 				5F84FFB01FDC3AB0003332B4 /* DMEventPeerPersistenceService.swift in Sources */,
 				5F84FFA91FDAF69E003332B4 /* DMEventSongPersistenceServiceType.swift in Sources */,
 				5FB2C93E1FE8073B001D532F /* Style.swift in Sources */,
+				5FD9306E2073DD0700943D5C /* DMPlaybackControlsView.swift in Sources */,
 				5F8186141FD2ADA800477C71 /* DMEventPeer.swift in Sources */,
 				5F01EBF81F8FD28400E47E6A /* AppDelegate.swift in Sources */,
 				5F54458B1FD1976D0059A975 /* DMEventSearchViewModel.swift in Sources */,
