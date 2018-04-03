@@ -181,16 +181,19 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
 private extension Observable where Element: Codable {
     
     func share<SharingService: DMEntitySharingServiceType>(withMultipeerService multipeerService: DMEventMultipeerService, sharingService: SharingService) -> Observable<Void> where Element == SharingService.Entity {
-        return self
-            .withLatestFrom(multipeerService.connectedPeers()) { (entity, peers) -> Observable<Void> in
+        
+        return self.withLatestFrom(multipeerService.connectedPeers()) { (entity, peers) -> Observable<Void> in
                 os_log("➡️➡️➡️ sharing %@", String(describing: entity.self))
                 let availablePeerIDs = peers.flatMap { $0.peerID }
                 let encodedEntity = try! sharingService.encode(entity: entity)
-                return multipeerService.send(
-                    toPeers: availablePeerIDs,
-                    data: encodedEntity,
-                    mode: MCSessionSendDataMode.reliable
-                )
+                return multipeerService
+                    .send(toPeers: availablePeerIDs,
+                          data: encodedEntity,
+                          mode: MCSessionSendDataMode.reliable)
+                    .catchError{ error in
+                        print(error)
+                        return .just(())
+                    }
             }
             .flatMap { $0 }
     }
