@@ -32,6 +32,6 @@ protocol DMEventSongPersistenceServiceType {
     @discardableResult
     func upvote(song: DMEventSong, forUser: String) -> Observable<DMEventSong>
     
-    func songs() -> Observable<Results<DMEventSong>>
+    var songs: Observable<Results<DMEventSong>> { get }
     
 }

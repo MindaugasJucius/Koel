@@ -14,10 +14,13 @@ import MultipeerConnectivity
 
 private let songPersistenceScheduler = ConcurrentDispatchQueueScheduler(qos: DispatchQoS.background)
 
-struct DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
+class DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
     
     var selfPeer: DMEventPeer
     
+    init(selfPeer: DMEventPeer) {
+        self.selfPeer = selfPeer
+    }
     
     @discardableResult
     func store(song: DMEventSong) -> Observable<DMEventSong> {
@@ -87,7 +90,7 @@ struct DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
         }
     }
     
-    func songs() -> Observable<Results<DMEventSong>> {
+    lazy var songs: Observable<Results<DMEventSong>> = {
         let result = Realm.withRealm(
             operation: "getting all songs",
             error: DMEventSongPersistenceServiceError.fetchingSongsFailed,
@@ -98,7 +101,7 @@ struct DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
             .flatMap { threadSafeSongs -> Observable<Results<DMEventSong>> in
                 return Observable.collection(from: threadSafeSongs)
             }
-        return result
-    }
+        return result.share()
+    }()
 
 }

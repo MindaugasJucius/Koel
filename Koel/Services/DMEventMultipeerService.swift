@@ -207,7 +207,7 @@ class DMEventMultipeerService: NSObject {
     //MARK: - Receiving
     
     func receive() -> Observable<(MCPeerID, Data)> {
-        return receivedData
+        return receivedData.share()
     }
     
 }
