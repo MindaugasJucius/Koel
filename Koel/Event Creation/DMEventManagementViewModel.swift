@@ -17,6 +17,7 @@ class DMEventManagementViewModel: ViewModelType, MultipeerViewModelType, Backgro
     var songSharingViewModel: DMEventSongSharingViewModelType
     
     private let disposeBag = DisposeBag()
+    private let sptPlaybackService: DMSpotifyPlaybackService
 
     let sceneCoordinator: SceneCoordinatorType
 
@@ -31,6 +32,9 @@ class DMEventManagementViewModel: ViewModelType, MultipeerViewModelType, Backgro
         
         self.sceneCoordinator = sceneCoordinator
         self.songSharingViewModel = songSharingViewModel
+        
+        let sptAuthService = DMSpotifyAuthService(sceneCoordinator: sceneCoordinator)
+        self.sptPlaybackService = DMSpotifyPlaybackService(authService: sptAuthService)
         
         multipeerService.startBrowsing()
         multipeerService.startAdvertising()
@@ -118,6 +122,36 @@ class DMEventManagementViewModel: ViewModelType, MultipeerViewModelType, Backgro
                 handler(true)
             })
             .disposed(by: disposeBag)
+    }
+    
+    // MARK: - Playback bindables
+
+    private func firstQueuedSong() -> Observable<DMEventSong> {
+        return self.songSharingViewModel.songsSectioned.map { sections -> SongSection in
+            return sections.filter { section -> Bool in
+                section.model == UIConstants.strings.queuedSongs
+                }.first!
+            }
+            .map { section -> DMEventSong in
+                return section.items.first!
+        }
+
+    }
+    
+    func onNext() -> CocoaAction {
+        return CocoaAction { [unowned self] in
+            return self.firstQueuedSong()
+            .map { _ in}
+        }
+    }
+    
+    func onPlay() -> CocoaAction {
+        return CocoaAction { [unowned self] in
+            return self.firstQueuedSong().flatMap { song in
+                return self.sptPlaybackService.play(song: song)
+            }
+            .map { _ in }
+        }
     }
     
     // MARK: - Connection bindables

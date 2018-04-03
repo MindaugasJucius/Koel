@@ -11,6 +11,7 @@ import Action
 import RxSwift
 import MultipeerConnectivity
 import RealmSwift
+import os.log
 
 protocol DMEventSongSharingViewModelType: MultipeerViewModelType {
     
@@ -85,13 +86,18 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
     private func onSearchClose() -> Action<[DMEventSong], Void> {
         return Action<[DMEventSong], Void>(workFactory: { [unowned self] (songs) -> Observable<Void> in
             
-            let storeObservables: [Observable<DMEventSong>] = songs.map { [unowned self] song -> Observable<DMEventSong> in
+            let storeObservables = songs.map { [unowned self] song -> Observable<Void> in
                 return self.songPersistenceService.store(song: song)
+                    .share(withMultipeerService: self.multipeerService, sharingService: self.songSharingService)
             }
 
-            return self.sceneCoordinator.pop(animated: true).flatMap { _ -> Observable<Void> in
-                return Observable.from(storeObservables).merge().map{ _ in }
-            }
+            return Observable.from(storeObservables)
+                .merge()
+                .map { _ in }
+                .do(onCompleted: { [unowned self] in
+                    self.sceneCoordinator.pop(animated: true)
+                }
+            )
         })
     }
   
@@ -104,7 +110,6 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
                 spotifySearchService: spotifySearchService,
                 onClose: self.onSearchClose()
             )
-            
             
             return self.sceneCoordinator.transition(
                 to: Scene.searchSpotify(spotifySongSearchViewModel),
@@ -152,6 +157,7 @@ private extension Observable where Element: Codable {
     
     func share<SharingService: DMEntitySharingServiceType>(withMultipeerService multipeerService: DMEventMultipeerService, sharingService: SharingService) -> Observable<Void> where Element == SharingService.Entity {
         return self.withLatestFrom(multipeerService.connectedPeers()) { (entity, peers) -> Observable<Void> in
+            os_log("➡️➡️➡️ sharing %@", String(describing: entity.self))
             let availablePeerIDs = peers.compactMap { $0.peerID }
             let encodedEntity = try! sharingService.encode(entity: entity)
             return multipeerService.send(
