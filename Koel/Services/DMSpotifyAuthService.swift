@@ -26,7 +26,6 @@ class DMSpotifyAuthService: NSObject {
     
     private let disposeBag = DisposeBag()
     private let auth: SPTAuth = SPTAuth.defaultInstance()
-    //private let player: SPTAudioStreamingController = SPTAudioStreamingController.sharedInstance()
     
     var authenticationIsNeeded: Bool {
         return auth.session == nil || !auth.session.isValid()
@@ -134,22 +133,3 @@ class DMSpotifyAuthService: NSObject {
         }
     }
 }
-
-
-//extension DMSpotifyService: SPTAudioStreamingPlaybackDelegate {
-//
-//}
-//
-//extension DMSpotifyService: SPTAudioStreamingDelegate {
-//
-//    func audioStreamingDidLogin(_ audioStreaming: SPTAudioStreamingController!) {
-//
-//        player.playSpotifyURI("spotify:track:58s6EuEYJdlb0kO7awm3Vp", startingWith: 0, startingWithPosition: 0) { error in
-//            guard let error = error else {
-//                return
-//            }
-//            print("audio playing failed due to an error: \(error.localizedDescription)")
-//        }
-//    }
-//}
-

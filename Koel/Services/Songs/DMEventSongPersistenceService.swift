@@ -21,7 +21,7 @@ struct DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
     
     @discardableResult
     func store(song: DMEventSong) -> Observable<DMEventSong> {
-        let result = Realm.withRealm(
+        return Realm.withRealm(
             operation: "persisting a song with id: \(song.uuid)",
             error: DMEventSongPersistenceServiceError.creationFailed,
             scheduler: songPersistenceScheduler) { realm -> DMEventSong in
@@ -45,10 +45,8 @@ struct DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
                     
                     realm.add(song, update: true)
                 }
-                 return song
-            }
-    
-        return result
+            return song
+        }
     }
     
     @discardableResult
