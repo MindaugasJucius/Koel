@@ -88,7 +88,7 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
             .disposed(by: disposeBag)
     }
     
-    var queuedSongs: Observable<[DMEventSong]> {
+    lazy var queuedSongs: Observable<[DMEventSong]> = {
         return songPersistenceService
             .songs
             .map { [unowned self] results in
@@ -97,10 +97,10 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
                     .filter("played == nil")
                     .sorted(by: self.songSortDescriptors)
                     .toArray()
-            }
-    }
+            }.share(replay: 1, scope: .whileConnected)
+    }()
     
-    var playedSongs: Observable<[DMEventSong]> {
+    lazy var playedSongs: Observable<[DMEventSong]> = {
         return songPersistenceService
             .songs
             .map { [unowned self] results in
@@ -108,8 +108,8 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
                     .filter("played != nil")
                     .sorted(by: self.songSortDescriptors)
                     .toArray()
-        }
-    }
+            }
+    }()
     
     var songsSectioned: Observable<[SongSection]> {
         return Observable.zip(queuedSongs, playedSongs) { (queuedSongs, playedSongs) in

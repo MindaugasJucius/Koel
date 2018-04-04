@@ -130,12 +130,15 @@ class DMEventManagementViewModel: ViewModelType, MultipeerViewModelType, Backgro
         return songSharingViewModel.queuedSongs
             .map { $0.first }
             .filterNil()
+            .take(1)
     }
     
     func onNext() -> CocoaAction {
         return CocoaAction { [unowned self] in
             return self.firstQueuedSong()
-            .map { _ in}
+                .flatMap { [unowned self] song in
+                return self.songSharingViewModel.onPlayed.execute(song)
+            }
         }
     }
     
