@@ -126,30 +126,30 @@ class DMEventManagementViewModel: ViewModelType, MultipeerViewModelType, Backgro
     
     // MARK: - Playback bindables
 
-    private func firstQueuedSong() -> Observable<DMEventSong> {
+    lazy var firstQueuedSong: Observable<DMEventSong> = {
         return songSharingViewModel.queuedSongs
             .map { $0.first }
             .filterNil()
             .take(1)
-    }
+    }()
     
-    func onNext() -> CocoaAction {
-        return CocoaAction { [unowned self] in
-            return self.firstQueuedSong()
-                .flatMap { [unowned self] song in
-                return self.songSharingViewModel.onPlayed.execute(song)
-            }
-        }
-    }
+    lazy var onNext: CocoaAction = {
+        return Action(enabledIf: songSharingViewModel.queuedSongs.map { $0.first != nil }, workFactory: { [unowned self] in
+            return self.firstQueuedSong.flatMap { song in
+                    return self.songSharingViewModel.onPlayed.execute(song)
+                }
+                .map { _ in }
+        })
+    }()
     
-    func onPlay() -> CocoaAction {
+    lazy var onPlay: CocoaAction = {
         return CocoaAction { [unowned self] in
-            return self.firstQueuedSong().flatMap { song in
+            return self.firstQueuedSong.flatMap { song in
                 return self.sptPlaybackService.play(song: song)
             }
             .map { _ in }
         }
-    }
+    }()
     
     // MARK: - Connection bindables
     

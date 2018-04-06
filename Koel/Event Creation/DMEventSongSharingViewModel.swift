@@ -97,7 +97,8 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
                     .filter("played == nil")
                     .sorted(by: self.songSortDescriptors)
                     .toArray()
-            }.share(replay: 1, scope: .whileConnected)
+            }
+            .share(replay: 1, scope: .whileConnected)
     }()
     
     lazy var playedSongs: Observable<[DMEventSong]> = {
@@ -133,6 +134,7 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
                 .reduce([], accumulator: { (array, song) -> [DMEventSong] in
                     return array + [song]
                 })
+                .filter { !$0.isEmpty }
                 .share(withMultipeerService: self.multipeerService, sharingService: DMEntitySharingService<[DMEventSong]>())
                 .map { _ in }
                 .do(onCompleted: { [unowned self] in

@@ -127,17 +127,13 @@ class DMEventManagementViewController: UIViewController, BindableType {
         queuedSongsAvailable
             .bind(to: playbackControlsView.playPauseSongButton.rx.isEnabled)
             .disposed(by: disposeBag)
-
-        queuedSongsAvailable
-            .bind(to: playbackControlsView.nextSongButton.rx.isEnabled)
-            .disposed(by: disposeBag)
         
         queuedSongsAvailable
             .bind(to: playbackControlsView.previousSongButton.rx.isEnabled)
             .disposed(by: disposeBag)
         
-        playbackControlsView.nextSongButton.rx.action = viewModel.onNext()
-        playbackControlsView.playPauseSongButton.rx.action = viewModel.onPlay()
+        playbackControlsView.nextSongButton.rx.action = viewModel.onNext
+        playbackControlsView.playPauseSongButton.rx.action = viewModel.onPlay
     }
     
 }
