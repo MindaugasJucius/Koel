@@ -83,14 +83,6 @@ class DMEventSongPersistedTableViewCell: UITableViewCell, ReusableView {
             .bind(to: titleLabel.rx.text)
             .disposed(by: disposeBag)
         
-        playedObservable
-            .map { [unowned self] _ in
-                self.upvoteButton.rx.action = nil
-                return false
-            }
-            .bind(to: upvoteButton.rx.isEnabled)
-            .disposed(by: disposeBag)
-        
         upvoteButton.rx.action = upvoteAction
         
         song.rx.observe(Int.self, "upvoteCount")

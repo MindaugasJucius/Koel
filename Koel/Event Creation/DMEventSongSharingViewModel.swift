@@ -172,12 +172,19 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
     //MARK: - Created song management
     
     func onUpvote(song: DMEventSong) -> CocoaAction {
-        let availableForUpvote = song.rx.observe(Bool.self, "upvotedBySelfPeer")
-            .filterNil()
+        let canBeUpvotedBySelf = song.rx.observe(Bool.self, "upvotedBySelfPeer")
+            .filterNil() //never nil (default value in DMEventSong = false)
             .map { !$0 }
+
+        let songNotPlayed = song.rx.observe(Date.self, "played")
+            .map { $0 == nil }
+        
+        let canBeUpvoted = Observable
+            .combineLatest(canBeUpvotedBySelf, songNotPlayed)
+            .map { $0 && $1 }
         
         return CocoaAction(
-            enabledIf: availableForUpvote,
+            enabledIf: canBeUpvoted,
             workFactory: { [unowned self] in
                 return self.songPersistenceService
                     .upvote(song: song, forUser: self.selfPeer.primaryKeyRef)
