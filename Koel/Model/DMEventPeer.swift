@@ -14,7 +14,7 @@ import RealmSwift
 typealias EventPeerSection = AnimatableSectionModel<String, DMEventPeer>
 
 @objcMembers
-class DMEventPeer: Object, Codable {
+class DMEventPeer: Object, Codable, DMEntity {
 
     private enum CodingKeys: String, CodingKey {
         case fullName
@@ -36,7 +36,7 @@ class DMEventPeer: Object, Codable {
     var primaryKeyRef = ""
     
     override static func ignoredProperties() -> [String] {
-        return ["peerID"]
+        return ["peerID", "primaryKeyRef"]
     }
     
     override class func primaryKey() -> String? {
@@ -90,8 +90,6 @@ extension DMEventPeer {
     }
     
 }
-
-
 
 extension DMEventPeer: IdentifiableType {
     var identity: String {

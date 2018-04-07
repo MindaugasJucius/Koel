@@ -15,7 +15,7 @@ import RxSwift
 typealias SongSection = AnimatableSectionModel<String, DMEventSong>
 
 @objcMembers
-class DMEventSong: Object, Codable {
+class DMEventSong: Object, Codable, DMEntity {
     
     private enum CodingKeys: String, CodingKey {
         case title
@@ -43,13 +43,14 @@ class DMEventSong: Object, Codable {
     
     var addedByUUID: String? = nil
     var upvotedByUUIDs: [String] = []
+    var primaryKeyRef = ""
     
     override class func primaryKey() -> String? {
         return "uuid"
     }
     
     override static func ignoredProperties() -> [String] {
-        return ["peerID", "addedByUUID", "upvotedByUUIDs"]
+        return ["peerID", "addedByUUID", "upvotedByUUIDs", "primaryKeyRef"]
     }
     
     func encode(to encoder: Encoder) throws {
@@ -124,13 +125,6 @@ class DMEventSong: Object, Codable {
     }
     
 }
-
-//func == (lhs: DMEventSong, rhs: DMEventSong) -> Bool {
-//    // Here you should compare all the values you want to trigger reload of the cell
-//    // If `id` is changed cell will be removed and inserted (because `id` is our identity)
-//    // If `data` is changed cell will be reloaded
-//    return lhs.uuid == rhs.uuid && lhs.upvoteCount == rhs.upvoteCount
-//}
 
 extension DMEventSong: IdentifiableType {
     var identity: String {
