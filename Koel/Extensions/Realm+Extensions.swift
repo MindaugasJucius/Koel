@@ -11,6 +11,10 @@ import RealmSwift
 import RxSwift
 import os.log
 
+enum DMEntityError: Error {
+    case updateFailed(DMEntity)
+}
+
 private let concurrentScheduler = ConcurrentDispatchQueueScheduler(qos: DispatchQoS.background)
 
 extension Realm {
@@ -68,6 +72,44 @@ extension Realm {
             return Disposables.create()
         }
         .subscribeOn(resolveOnScheduler)
+    }
+    
+    static func clearRealm() -> Observable<Void> {
+        return Observable<Void>.create { observer in
+            do {
+                let realm = try Realm()
+                try realm.write {
+                    realm.deleteAll()
+                }
+            } catch let error {
+                observer.onError(error)
+            }
+            return Disposables.create()
+        }
+    }
+    
+    static func update<T>(entity: T,
+                          onScheduler scheduler: SchedulerType = concurrentScheduler,
+                          updateBlock: @escaping (T) -> (T)) -> Observable<T> where T: DMEntity, T: Object {
+        return Realm.withRealm(
+            operation: "updating entity: \(T.self)",
+            error: DMEntityError.updateFailed(entity),
+            scheduler: scheduler) { realm -> T in
+                guard let retrievedEntity = realm.object(ofType: T.self, forPrimaryKey: entity.primaryKeyRef) else {
+                    throw DMEntityError.updateFailed(entity)
+                }
+                
+                try realm.write {
+                    realm.add(updateBlock(retrievedEntity), update: true)
+                }
+                
+                return retrievedEntity
+            }
+            .flatMap { resolvedEntity -> Observable<T> in
+                var entity = resolvedEntity
+                entity.primaryKeyRef = resolvedEntity.uuid
+                return Observable.just(entity)
+        }
     }
     
 }

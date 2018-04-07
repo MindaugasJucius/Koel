@@ -72,25 +72,14 @@ struct DMEventPeerPersistenceService: DMEventPeerPersistenceServiceType {
     // MARK: - Retrieved object updates
     @discardableResult
     func update(peer: DMEventPeer, updateBlock: @escaping PeerUpdate) -> Observable<DMEventPeer> {
-        return Realm.withRealm(
-            operation: "updating peer",
-            error: DMEventPeerPersistenceServiceError.updateFailed(peer),
-            scheduler: peerPersistenceScheduler) { realm -> DMEventPeer in
-                guard let retrievedPeer = realm.object(ofType: DMEventPeer.self, forPrimaryKey: peer.primaryKeyRef) else {
-                    throw DMEventPeerPersistenceServiceError.updateFailed(peer)
-                }
-                
-                try realm.write {
-                    realm.add(updateBlock(retrievedPeer), update: true)
-                }
-                
-                return retrievedPeer
-            }
-            .flatMap { (resolvedPeer) -> Observable<DMEventPeer> in
-                resolvedPeer.peerID = peer.peerID
-                resolvedPeer.primaryKeyRef = resolvedPeer.uuid
-                return Observable.just(resolvedPeer)
-            }
+        return Realm.update(entity: peer,
+                            onScheduler: peerPersistenceScheduler,
+                            updateBlock: updateBlock)
+                    .flatMap { eventPeer -> Observable<DMEventPeer> in
+                        eventPeer.peerID = peer.peerID
+                        return Observable.just(eventPeer)
+                    }
+        
     }
     
 }
