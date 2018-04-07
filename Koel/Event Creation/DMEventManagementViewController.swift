@@ -134,6 +134,7 @@ class DMEventManagementViewController: UIViewController, BindableType {
         
         playbackControlsView.nextSongButton.rx.action = viewModel.onNext
         playbackControlsView.playPauseSongButton.rx.action = viewModel.onPlay
+        playbackControlsView.previousSongButton.rx.action = viewModel.onPrevious
     }
     
 }

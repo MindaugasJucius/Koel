@@ -89,10 +89,11 @@ extension Realm {
     }
     
     static func update<T>(entity: T,
+                          operation: String = "updating entity: \(T.self)",
                           onScheduler scheduler: SchedulerType = concurrentScheduler,
                           updateBlock: @escaping (T) -> (T)) -> Observable<T> where T: DMEntity, T: Object {
         return Realm.withRealm(
-            operation: "updating entity: \(T.self)",
+            operation: operation,
             error: DMEntityError.updateFailed(entity),
             scheduler: scheduler) { realm -> T in
                 guard let retrievedEntity = realm.object(ofType: T.self, forPrimaryKey: entity.primaryKeyRef) else {

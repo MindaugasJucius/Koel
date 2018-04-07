@@ -48,8 +48,9 @@ class DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
                     
                     realm.add(song, update: true)
                 }
-            return song
-        }
+                song.primaryKeyRef = song.uuid
+                return song
+            }
     }
     
     @discardableResult
@@ -61,13 +62,23 @@ class DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
             scheduler: songPersistenceScheduler) { realm -> DMEventSong? in
                 let resolvedSong = realm.resolve(threadSafeSongReference)
                 try realm.write {
-                    if resolvedSong?.played == nil {
-                        resolvedSong?.played = Date()
-                    }
+                    resolvedSong?.played = Date()
                 }
                 return resolvedSong
             }
 
+    }
+    
+    @discardableResult
+    func enqueueAlreadyPlayedSong(song: DMEventSong) -> Observable<DMEventSong> {
+        song.primaryKeyRef = song.uuid
+        return Realm.update(entity: song,
+                            operation: "enqueueing already played song: \(song.title)",
+                            onScheduler: songPersistenceScheduler) { song in
+                                song.played = nil
+                                song.added = Date()
+                                return song
+                            }
     }
     
     @discardableResult
@@ -95,7 +106,7 @@ class DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
             operation: "getting all songs",
             error: DMEventSongPersistenceServiceError.fetchingSongsFailed,
             scheduler: songPersistenceScheduler) { realm -> Results<DMEventSong> in
-                let songs = realm.objects(DMEventSong.self)
+                let songs: Results<DMEventSong> = realm.objects(DMEventSong.self)
                 return songs
             }
             .flatMap { threadSafeSongs -> Observable<Results<DMEventSong>> in

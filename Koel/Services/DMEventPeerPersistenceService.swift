@@ -31,9 +31,9 @@ struct DMEventPeerPersistenceService: DMEventPeerPersistenceServiceType {
                         peer.peerIDData = NSKeyedArchiver.archivedData(withRootObject: peerID)
                     }
                     
-                    peer.primaryKeyRef = peer.uuid
                     realm.add(peer, update: true)
                 }
+                peer.primaryKeyRef = peer.uuid
                 return peer
             }
         

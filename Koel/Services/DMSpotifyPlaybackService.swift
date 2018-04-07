@@ -8,6 +8,8 @@
 
 import Foundation
 import RxSwift
+import AVKit
+import MediaPlayer
 
 protocol DMSpotifyPlaybackServiceType {
     
@@ -30,6 +32,8 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
         self.authService = authService
         super.init()
         player.delegate = self
+        player.playbackDelegate = self
+        //MPRemoteCommandCenter.shared().playCommand
         try! player.start(withClientId: SPTAuth.defaultInstance().clientID)
     }
     
@@ -62,9 +66,28 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
 }
 
 extension DMSpotifyPlaybackService: SPTAudioStreamingPlaybackDelegate {
+    
+    func audioStreaming(_ audioStreaming: SPTAudioStreamingController!, didChangePlaybackStatus isPlaying: Bool) {
+        self.isPlaying.onNext(isPlaying)
+        if isPlaying {
+            activateAudioSession()
+        } else {
+            deactivateAudioSession()
+        }
+    }
+    
+    func audioStreaming(_ audioStreaming: SPTAudioStreamingController!, didStartPlayingTrack trackUri: String!) {
+        print(trackUri)
+    }
+    
+    func audioStreaming(_ audioStreaming: SPTAudioStreamingController!, didStopPlayingTrack trackUri: String!) {
+        print(trackUri)
+    }
+    
+    func audioStreaming(_ audioStreaming: SPTAudioStreamingController!, didChange metadata: SPTPlaybackMetadata!) {
+        print(metadata)
+    }
 
-    
-    
 }
 
 extension DMSpotifyPlaybackService: SPTAudioStreamingDelegate {
@@ -91,15 +114,16 @@ extension DMSpotifyPlaybackService: SPTAudioStreamingDelegate {
         print(error)
     }
     
-    func audioStreaming(_ audioStreaming: SPTAudioStreamingController!, didChangePlaybackStatus isPlaying: Bool) {
-        self.isPlaying.onNext(isPlaying)
+    // MARK: Activate audio session
+    
+    func activateAudioSession() {
+        try? AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
+        try? AVAudioSession.sharedInstance().setActive(true)
     }
     
-    func audioStreaming(_ audioStreaming: SPTAudioStreamingController!, didStartPlayingTrack trackUri: String!) {
-        print(trackUri)
-    }
+    // MARK: Deactivate audio session
     
-    func audioStreaming(_ audioStreaming: SPTAudioStreamingController!, didStopPlayingTrack trackUri: String!) {
-        print(trackUri)
+    func deactivateAudioSession() {
+        try? AVAudioSession.sharedInstance().setActive(false)
     }
 }

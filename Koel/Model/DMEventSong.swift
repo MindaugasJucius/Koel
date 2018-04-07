@@ -50,7 +50,7 @@ class DMEventSong: Object, Codable, DMEntity {
     }
     
     override static func ignoredProperties() -> [String] {
-        return ["peerID", "addedByUUID", "upvotedByUUIDs", "primaryKeyRef"]
+    return ["peerID", "addedByUUID", "upvotedByUUIDs", "primaryKeyRef"]
     }
     
     func encode(to encoder: Encoder) throws {

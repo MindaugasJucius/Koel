@@ -25,6 +25,7 @@ protocol DMEventSongSharingViewModelType: MultipeerViewModelType {
     
     var onSongSearch: CocoaAction { get }
     var onPlayed: Action<DMEventSong, Void> { get }
+    var onRepeatEnqueue: Action<DMEventSong, Void> { get }
     
     func onUpvote(song: DMEventSong) -> CocoaAction
 }
@@ -110,6 +111,7 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
                     .sorted(by: self.songSortDescriptors)
                     .toArray()
             }
+            .share(replay: 1, scope: .whileConnected)
     }()
     
     var songsSectioned: Observable<[SongSection]> {
@@ -201,6 +203,14 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
         })
     }()
  
+    lazy var onRepeatEnqueue: Action<DMEventSong, Void> = {
+        return Action(workFactory: { [unowned self] (song: DMEventSong) -> Observable<Void> in
+            return self.songPersistenceService
+                .enqueueAlreadyPlayedSong(song: song)
+                .share(withMultipeerService: self.multipeerService, sharingService: self.songSharingService)
+        })
+    }()
+    
 }
 
 private extension Observable where Element: Codable {

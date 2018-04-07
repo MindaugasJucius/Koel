@@ -126,8 +126,15 @@ class DMEventManagementViewModel: ViewModelType, MultipeerViewModelType, Backgro
     
     // MARK: - Playback bindables
 
-    lazy var firstQueuedSong: Observable<DMEventSong> = {
+    private lazy var firstQueuedSong: Observable<DMEventSong> = {
         return songSharingViewModel.queuedSongs
+            .map { $0.first }
+            .filterNil()
+            .take(1)
+    }()
+    
+    private lazy var firstPlayedSong: Observable<DMEventSong> = {
+        return songSharingViewModel.playedSongs
             .map { $0.first }
             .filterNil()
             .take(1)
@@ -136,9 +143,18 @@ class DMEventManagementViewModel: ViewModelType, MultipeerViewModelType, Backgro
     lazy var onNext: CocoaAction = {
         return Action(enabledIf: songSharingViewModel.queuedSongs.map { $0.first != nil }, workFactory: { [unowned self] in
             return self.firstQueuedSong.flatMap { song in
-                    return self.songSharingViewModel.onPlayed.execute(song)
-                }
-                .map { _ in }
+                return self.songSharingViewModel.onPlayed.execute(song)
+            }
+            .map { _ in }
+        })
+    }()
+    
+    lazy var onPrevious: CocoaAction = {
+        return Action(enabledIf: songSharingViewModel.playedSongs.map { $0.first != nil }, workFactory: { [unowned self] in
+            return self.firstPlayedSong.flatMap { song in
+                return self.songSharingViewModel.onRepeatEnqueue.execute(song)
+            }
+            .map { _ in }
         })
     }()
     
@@ -150,6 +166,8 @@ class DMEventManagementViewModel: ViewModelType, MultipeerViewModelType, Backgro
             .map { _ in }
         }
     }()
+    
+
     
     // MARK: - Connection bindables
     

@@ -30,6 +30,9 @@ protocol DMEventSongPersistenceServiceType {
     func markAsPlayed(song: DMEventSong) -> Observable<DMEventSong>
 
     @discardableResult
+    func enqueueAlreadyPlayedSong(song: DMEventSong) -> Observable<DMEventSong>
+    
+    @discardableResult
     func upvote(song: DMEventSong, forUser: String) -> Observable<DMEventSong>
     
     var songs: Observable<Results<DMEventSong>> { get }
