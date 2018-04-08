@@ -25,6 +25,8 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
     
     private let player: SPTAudioStreamingController = SPTAudioStreamingController.sharedInstance()
     
+    private var currentSong: DMEventSong?
+    
     let isLoggedIn: BehaviorSubject<Bool> = BehaviorSubject(value: false)
     let isPlaying: BehaviorSubject<Bool> = BehaviorSubject(value: false)
     
@@ -35,6 +37,7 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
         player.playbackDelegate = self
         //MPRemoteCommandCenter.shared().playCommand
         try! player.start(withClientId: SPTAuth.defaultInstance().clientID)
+        
     }
     
     private func login() -> Observable<Bool> {
@@ -51,16 +54,63 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
         }
     }
     
-    func play(song: DMEventSong) -> Observable<Void> {
-        return login()
-        .map { _ in }
-        .do(onNext: { [unowned self] in
-            self.player.playSpotifyURI(song.spotifyURI, startingWith: 0, startingWithPosition: 0, callback: { (error) in
-                        print(error)
-                    }
-                )
+    func togglePlayback(forSong song: DMEventSong) -> Observable<Void> {
+        return isPlaying.asObserver()
+            .take(1)
+            .flatMap { [unowned self] playing -> Observable<Void> in
+                guard self.currentSong != nil else {
+                    return self.play(song: song)
+                }
+                return self.toggleState(isPlaying: !playing)
             }
-        )
+            .take(1)
+    }
+    
+    private func play(song: DMEventSong) -> Observable<Void> {
+        let playObservable = login()
+            .map { _ in }
+            .flatMap { [unowned self] _ in
+                return Observable<Void>.create { observer in
+                    self.player.playSpotifyURI(
+                        song.spotifyURI,
+                        startingWith: 0,
+                        startingWithPosition: 0,
+                        callback: { error in
+                            guard error == nil else {
+                                observer.onError(error!)
+                                return
+                            }
+                            self.currentSong = song
+                            observer.onNext(())
+                            observer.onCompleted()
+                        }
+                    )
+                    return Disposables.create()
+                }
+        }
+        
+        let playingStatus = isPlaying
+            .asObservable()
+            .skip(1) // skip current value
+            .map { _ in }
+        
+        return Observable
+            .zip([playObservable, playingStatus])
+            .map { _ in }
+    }
+    
+    private func toggleState(isPlaying playing: Bool) -> Observable<Void> {
+        return Observable.create { [unowned self] observer -> Disposable in
+            self.player.setIsPlaying(playing) { error in
+                guard error == nil else {
+                    observer.onError(error!)
+                    return
+                }
+                observer.onNext(())
+                observer.onCompleted()
+            }
+            return Disposables.create()
+        }
     }
     
 }
@@ -68,6 +118,7 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
 extension DMSpotifyPlaybackService: SPTAudioStreamingPlaybackDelegate {
     
     func audioStreaming(_ audioStreaming: SPTAudioStreamingController!, didChangePlaybackStatus isPlaying: Bool) {
+        print("isPlaying \(isPlaying)")
         self.isPlaying.onNext(isPlaying)
         if isPlaying {
             activateAudioSession()
@@ -76,12 +127,17 @@ extension DMSpotifyPlaybackService: SPTAudioStreamingPlaybackDelegate {
         }
     }
     
+    func audioStreaming(_ audioStreaming: SPTAudioStreamingController!, didChangePosition position: TimeInterval) {
+        //print(position)
+    }
+    
     func audioStreaming(_ audioStreaming: SPTAudioStreamingController!, didStartPlayingTrack trackUri: String!) {
-        print(trackUri)
+        print("start playing: \(trackUri)")
     }
     
     func audioStreaming(_ audioStreaming: SPTAudioStreamingController!, didStopPlayingTrack trackUri: String!) {
-        print(trackUri)
+        print("stop playing: \(trackUri)")
+        currentSong = nil
     }
     
     func audioStreaming(_ audioStreaming: SPTAudioStreamingController!, didChange metadata: SPTPlaybackMetadata!) {
@@ -94,12 +150,6 @@ extension DMSpotifyPlaybackService: SPTAudioStreamingDelegate {
 
     func audioStreamingDidLogin(_ audioStreaming: SPTAudioStreamingController!) {
         isLoggedIn.onNext(true)
-//        player.playSpotifyURI("spotify:track:58s6EuEYJdlb0kO7awm3Vp", startingWith: 0, startingWithPosition: 0) { error in
-//            guard let error = error else {
-//                return
-//            }
-//            print("audio playing failed due to an error: \(error.localizedDescription)")
-//        }
     }
     
     func audioStreamingDidLogout(_ audioStreaming: SPTAudioStreamingController!) {

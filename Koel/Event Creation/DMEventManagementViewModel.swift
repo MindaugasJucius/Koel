@@ -161,13 +161,14 @@ class DMEventManagementViewModel: ViewModelType, MultipeerViewModelType, Backgro
     lazy var onPlay: CocoaAction = {
         return CocoaAction { [unowned self] in
             return self.firstQueuedSong.flatMap { song in
-                return self.sptPlaybackService.play(song: song)
+                return self.sptPlaybackService.togglePlayback(forSong: song)
             }
-            .map { _ in }
         }
     }()
     
-
+    lazy var isPlaying: Observable<Bool> = {
+        return sptPlaybackService.isPlaying.asObservable()
+    }()
     
     // MARK: - Connection bindables
     
