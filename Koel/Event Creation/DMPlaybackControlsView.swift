@@ -29,7 +29,6 @@ class DMPlaybackControlsView: UIView {
         let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitle("play".uppercased(), for: .normal)
-        //button.setTitleColor(.darkGray, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 20)
         return button
     }()
@@ -38,7 +37,6 @@ class DMPlaybackControlsView: UIView {
         let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitle("prev".uppercased(), for: .normal)
-        //button.setTitleColor(.darkGray, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 20)
         return button
     }()
@@ -47,7 +45,6 @@ class DMPlaybackControlsView: UIView {
         let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitle("next".uppercased(), for: .normal)
-        //button.setTitleColor(.darkGray, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 20)
         return button
     }()

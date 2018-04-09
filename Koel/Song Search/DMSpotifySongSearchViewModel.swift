@@ -69,14 +69,4 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
         })
     }()
     
-    
-//    lazy var inviteAction: Action<(DMEventPeer), Void> = { this in
-//        return Action(
-//            workFactory: { (eventPeer: DMEventPeer) in
-//                let hostContext = ContextKeys.isHost.dictionary
-//                return this.multipeerService.connect(eventPeer.peerID, context: hostContext)
-//        }
-//        )
-//    }(self)
-    
 }

@@ -17,7 +17,7 @@ class DMEventManagementViewModel: ViewModelType, MultipeerViewModelType, Backgro
     var songSharingViewModel: DMEventSongSharingViewModelType
     
     private let disposeBag = DisposeBag()
-    private let sptPlaybackService: DMSpotifyPlaybackService
+    private let sptPlaybackService: DMSpotifyPlaybackServiceType
 
     let sceneCoordinator: SceneCoordinatorType
 
@@ -34,7 +34,9 @@ class DMEventManagementViewModel: ViewModelType, MultipeerViewModelType, Backgro
         self.songSharingViewModel = songSharingViewModel
         
         let sptAuthService = DMSpotifyAuthService(sceneCoordinator: sceneCoordinator)
-        self.sptPlaybackService = DMSpotifyPlaybackService(authService: sptAuthService)
+        self.sptPlaybackService = DMSpotifyPlaybackService(authService: sptAuthService,
+                                                           songPersistenceService: songSharingViewModel.songPersistenceService,
+                                                           queuedSongs: songSharingViewModel.queuedSongs)
         
         multipeerService.startBrowsing()
         multipeerService.startAdvertising()
@@ -125,49 +127,46 @@ class DMEventManagementViewModel: ViewModelType, MultipeerViewModelType, Backgro
     }
     
     // MARK: - Playback bindables
-
-    private lazy var firstQueuedSong: Observable<DMEventSong> = {
-        return songSharingViewModel.queuedSongs
-            .map { $0.first }
-            .filterNil()
-            .take(1)
-    }()
-    
-    private lazy var firstPlayedSong: Observable<DMEventSong> = {
-        return songSharingViewModel.playedSongs
-            .map { $0.first }
-            .filterNil()
-            .take(1)
-    }()
     
     lazy var onNext: CocoaAction = {
-        return Action(enabledIf: songSharingViewModel.queuedSongs.map { $0.first != nil }, workFactory: { [unowned self] in
-            return self.firstQueuedSong.flatMap { song in
-                return self.songSharingViewModel.onPlayed.execute(song)
+        return Action(
+            enabledIf: sptPlaybackService.nextEnabled(),
+            workFactory: { [unowned self] in
+                return self.sptPlaybackService.nextSong()
+                    .flatMap {
+                        return self.songSharingViewModel.queuedSongs
+                                .map { $0.first }
+                                .filterNil()
+                    }
+                    .flatMap { song in
+                        return self.songSharingViewModel.onPlayed.execute(song)
+                    }
             }
-            .map { _ in }
-        })
+        )
+
     }()
     
     lazy var onPrevious: CocoaAction = {
         return Action(enabledIf: songSharingViewModel.playedSongs.map { $0.first != nil }, workFactory: { [unowned self] in
-            return self.firstPlayedSong.flatMap { song in
-                return self.songSharingViewModel.onRepeatEnqueue.execute(song)
-            }
-            .map { _ in }
+            return .just(())
+            //            return self.firstPlayedSong.flatMap { song in
+//                return self.songSharingViewModel.onRepeatEnqueue.execute(song)
+//            }
+//            .map { _ in }
         })
     }()
     
     lazy var onPlay: CocoaAction = {
         return CocoaAction { [unowned self] in
-            return self.firstQueuedSong.flatMap { song in
-                return self.sptPlaybackService.togglePlayback(forSong: song)
-            }
+            return self.sptPlaybackService.togglePlayback()
+            //            return self.firstQueuedSong.flatMap { song in
+//                return self.sptPlaybackService.togglePlayback(forSong: song)
+//            }
         }
     }()
     
     lazy var isPlaying: Observable<Bool> = {
-        return sptPlaybackService.isPlaying.asObservable()
+        return sptPlaybackService.isPlaying
     }()
     
     // MARK: - Connection bindables

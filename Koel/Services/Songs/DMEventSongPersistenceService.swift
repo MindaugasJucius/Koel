@@ -71,7 +71,7 @@ class DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
     
     @discardableResult
     func enqueueAlreadyPlayedSong(song: DMEventSong) -> Observable<DMEventSong> {
-        song.primaryKeyRef = song.uuid
+        song.primaryKeyRef = song.uuid //why?
         return Realm.update(entity: song,
                             operation: "enqueueing already played song: \(song.title)",
                             onScheduler: songPersistenceScheduler) { song in
@@ -79,6 +79,24 @@ class DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
                                 song.added = Date()
                                 return song
                             }
+    }
+    
+    @discardableResult
+    func mark(song: DMEventSong, asQueued queued: Bool) -> Observable<DMEventSong> {
+        song.queued = queued
+        print("marking song as spt queued")
+        return .just(song)
+        //        let threadSafeSongReference = ThreadSafeReference(to: song)
+//        return Realm.withRealm(
+//            operation: "marking song as spt queued",
+//            error: DMEventSongPersistenceServiceError.toggleFailed(song),
+//            scheduler: songPersistenceScheduler) { realm -> DMEventSong? in
+//                let resolvedSong = realm.resolve(threadSafeSongReference)
+//                try realm.write {
+//                    resolvedSong?.queued = queued
+//                }
+//                return resolvedSong
+//        }
     }
     
     @discardableResult
