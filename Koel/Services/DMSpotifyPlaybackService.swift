@@ -80,14 +80,14 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
         
         try! player.start(withClientId: SPTAuth.defaultInstance().clientID)
         
-//        secondQueuedSong
-//            .skipUntil(isPlaying.filter { $0 })
-//            .flatMap { song -> Observable<DMEventSong> in
-//                print("init enqueueing next song: \(song.title) \(song.spotifyURI)")
-//                return self.sptEnqueue(song: song)
-//            }
-//            .subscribe()
-//            .disposed(by: disposeBag)
+        secondQueuedSong
+            .skipUntil(isPlaying.filter { $0 })
+            .flatMap { song -> Observable<DMEventSong> in
+                print("init enqueueing next song: \(song.title) \(song.spotifyURI)")
+                return self.enqueue(song: song)
+            }
+            .subscribe()
+            .disposed(by: disposeBag)
     }
     
     //MARK: - Queue Helpers
@@ -154,7 +154,7 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
                     self.player.playSpotifyURI(
                         song.spotifyURI,
                         startingWith: 0,
-                        startingWithPosition: 290,
+                        startingWithPosition: 0,
                         callback: self.sptObservableCallback(withObserver: observer)
                     )
                     return Disposables.create()
@@ -182,25 +182,21 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
         }
     }
     
-    private func sptEnqueue(song: DMEventSong) -> Observable<DMEventSong> {
-        func enqueue(song: DMEventSong) -> Observable<DMEventSong> {
-            return Observable.create { [unowned self] observer -> Disposable in
-                self.player.queueSpotifyURI(song.spotifyURI, callback: { error in
-                    guard error == nil else {
-                        observer.onError(error!)
-                        return
-                    }
-                    observer.onNext(song)
-                    observer.onCompleted()
-                })
+    private func enqueue(song: DMEventSong) -> Observable<DMEventSong> {
+        return Observable.create { [unowned self] observer -> Disposable in
+            self.player.queueSpotifyURI(song.spotifyURI, callback: { error in
+                guard error == nil else {
+                    observer.onError(error!)
+                    return
+                }
+                observer.onNext(song)
+                observer.onCompleted()
+            })
                 return Disposables.create()
             }
             .flatMap { [unowned self] song in
                 return self.songPersistenceService.mark(song: song, asQueued: true)
             }
-        }
-        
-        return enqueue(song: song)
     }
     
     private func sptObservableCallback(withObserver observer: AnyObserver<Void>) -> SPTErrorableOperationCallback {
@@ -235,13 +231,13 @@ extension DMSpotifyPlaybackService: SPTAudioStreamingPlaybackDelegate {
     
     func audioStreaming(_ audioStreaming: SPTAudioStreamingController!, didStartPlayingTrack trackUri: String!) {
         print("start playing: \(trackUri)")
-        secondQueuedSong
-            .flatMap { song -> Observable<DMEventSong> in
-                print("enqueueing next song: \(song.title) \(song.spotifyURI)")
-                return self.sptEnqueue(song: song)
-            }
-            .subscribe()
-            .dispose()
+//        secondQueuedSong
+//            .flatMap { song -> Observable<DMEventSong> in
+//                print("enqueueing next song: \(song.title) \(song.spotifyURI)")
+//                return self.enqueue(song: song)
+//            }
+//            .subscribe()
+//            .dispose()
     }
     
     func audioStreaming(_ audioStreaming: SPTAudioStreamingController!, didStopPlayingTrack trackUri: String!) {

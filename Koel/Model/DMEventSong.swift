@@ -38,20 +38,20 @@ class DMEventSong: Object, Codable, DMEntity {
     dynamic var addedBy: DMEventPeer? = nil
     dynamic var upvoteCount: Int = 0
     dynamic var upvotedBySelfPeer: Bool = false
-
+    dynamic var queued = false
+    
     let upvotees = List<DMEventPeer>()
     
     var addedByUUID: String? = nil
     var upvotedByUUIDs: [String] = []
     var primaryKeyRef = ""
-    var queued = false
     
     override class func primaryKey() -> String? {
         return "uuid"
     }
     
     override static func ignoredProperties() -> [String] {
-        return ["peerID", "addedByUUID", "upvotedByUUIDs", "primaryKeyRef", "queued"]
+        return ["peerID", "addedByUUID", "upvotedByUUIDs", "primaryKeyRef"]
     }
     
     func encode(to encoder: Encoder) throws {
