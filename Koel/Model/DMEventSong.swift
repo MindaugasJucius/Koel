@@ -14,6 +14,14 @@ import RxSwift
 
 typealias SongSection = AnimatableSectionModel<String, DMEventSong>
 
+@objc enum DMEventSongState: Int {
+    case added
+    case queued
+    case upNext
+    case playing
+    case played
+}
+
 @objcMembers
 class DMEventSong: Object, Codable, DMEntity {
     
@@ -38,7 +46,7 @@ class DMEventSong: Object, Codable, DMEntity {
     dynamic var addedBy: DMEventPeer? = nil
     dynamic var upvoteCount: Int = 0
     dynamic var upvotedBySelfPeer: Bool = false
-    dynamic var queued = false
+    dynamic var state: DMEventSongState = .added
     
     let upvotees = List<DMEventPeer>()
     

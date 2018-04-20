@@ -20,7 +20,7 @@ protocol DMEventSongSharingViewModelType: MultipeerViewModelType {
     var songPersistenceService: DMEventSongPersistenceServiceType { get }
 
     var songsSectioned: Observable<[SongSection]> { get }
-    var queuedSongs: Observable<[DMEventSong]> { get }
+    var addedSongs: Observable<[DMEventSong]> { get }
     var playedSongs: Observable<[DMEventSong]> { get }
     
     var onSongSearch: CocoaAction { get }
@@ -89,13 +89,13 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
             .disposed(by: disposeBag)
     }
     
-    lazy var queuedSongs: Observable<[DMEventSong]> = {
+    lazy var addedSongs: Observable<[DMEventSong]> = {
         return songPersistenceService
             .songs
             .map { [unowned self] results in
 
                 return results
-                    .filter("played == nil")
+                    .filter(forSongState: .added)
                     .sorted(by: self.songSortDescriptors)
                     .toArray()
             }
@@ -107,7 +107,7 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
             .songs
             .map { [unowned self] results in
                 return results
-                    .filter("played != nil")
+                    .filter(forSongState: .played)
                     .sorted(by: self.songSortDescriptors)
                     .toArray()
             }
@@ -115,7 +115,7 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
     }()
     
     var songsSectioned: Observable<[SongSection]> {
-        return Observable.zip(queuedSongs, playedSongs) { (queuedSongs, playedSongs) in
+        return Observable.zip(addedSongs, playedSongs) { (queuedSongs, playedSongs) in
             return [SongSection(model: UIConstants.strings.queuedSongs, items: queuedSongs),
                     SongSection(model: UIConstants.strings.playedSongs, items: playedSongs)]
         }
@@ -210,6 +210,14 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
                 .share(withMultipeerService: self.multipeerService, sharingService: self.songSharingService)
         })
     }()
+    
+}
+
+private extension Results where Element: DMEventSong {
+    
+    func filter(forSongState state: DMEventSongState) -> Results<Element> {
+        return filter("state == \(state.rawValue)")
+    }
     
 }
 

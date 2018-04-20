@@ -120,7 +120,7 @@ class DMEventManagementViewController: UIViewController, BindableType {
         
         //DMPlaybackControlsView bindings
 
-        let queuedSongsAvailable = viewModel.songSharingViewModel.queuedSongs.map { songs in
+        let queuedSongsAvailable = viewModel.songSharingViewModel.addedSongs.map { songs in
             return !songs.isEmpty
         }.share()
             

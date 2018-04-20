@@ -12,6 +12,38 @@ import RealmSwift
 import RxRealm
 import MultipeerConnectivity
 
+enum DMEventSongPersistenceServiceError: Error {
+    case creationFailed
+    case fetchingSongsFailed
+    case updateFailed(DMEventSong)
+    case deletionFailed(DMEventSong)
+    case toggleFailed(DMEventSong)
+    case upvoteFailed(DMEventSong)
+}
+
+protocol DMEventSongPersistenceServiceType {
+    
+    var selfPeer: DMEventPeer { get }
+    
+    @discardableResult
+    func store(song: DMEventSong) -> Observable<DMEventSong>
+    
+    @discardableResult
+    func markAsPlayed(song: DMEventSong) -> Observable<DMEventSong>
+    
+    @discardableResult
+    func enqueueAlreadyPlayedSong(song: DMEventSong) -> Observable<DMEventSong>
+    
+    @discardableResult
+    func update(song: DMEventSong, toState state: DMEventSongState) -> Observable<DMEventSong> 
+    
+    @discardableResult
+    func upvote(song: DMEventSong, forUser: String) -> Observable<DMEventSong>
+    
+    var songs: Observable<Results<DMEventSong>> { get }
+    
+}
+
 private let songPersistenceScheduler = ConcurrentDispatchQueueScheduler(qos: DispatchQoS.background)
 
 class DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
@@ -63,6 +95,7 @@ class DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
                 let resolvedSong = realm.resolve(threadSafeSongReference)
                 try realm.write {
                     resolvedSong?.played = Date()
+                    resolvedSong?.state = .played
                 }
                 return resolvedSong
             }
@@ -82,7 +115,7 @@ class DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
     }
     
     @discardableResult
-    func mark(song: DMEventSong, asQueued queued: Bool) -> Observable<DMEventSong> {
+    func update(song: DMEventSong, toState state: DMEventSongState) -> Observable<DMEventSong> {
         let threadSafeSongReference = ThreadSafeReference(to: song)
         return Realm.withRealm(
             operation: "marking song: \(song.title) as spt queued",
@@ -90,7 +123,7 @@ class DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
             scheduler: songPersistenceScheduler) { realm -> DMEventSong? in
                 let resolvedSong = realm.resolve(threadSafeSongReference)
                 try realm.write {
-                    resolvedSong?.queued = queued
+                    resolvedSong?.state = state
                 }
                 return resolvedSong
         }

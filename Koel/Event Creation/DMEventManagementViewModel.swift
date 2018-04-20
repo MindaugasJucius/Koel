@@ -36,7 +36,7 @@ class DMEventManagementViewModel: ViewModelType, MultipeerViewModelType, Backgro
         let sptAuthService = DMSpotifyAuthService(sceneCoordinator: sceneCoordinator)
         self.sptPlaybackService = DMSpotifyPlaybackService(authService: sptAuthService,
                                                            songPersistenceService: songSharingViewModel.songPersistenceService,
-                                                           queuedSongs: songSharingViewModel.queuedSongs)
+                                                           queuedSongs: songSharingViewModel.addedSongs)
         
         multipeerService.startBrowsing()
         multipeerService.startAdvertising()
@@ -134,7 +134,7 @@ class DMEventManagementViewModel: ViewModelType, MultipeerViewModelType, Backgro
             workFactory: { [unowned self] in
                 return self.sptPlaybackService.nextSong()
                     .flatMap {
-                        return self.songSharingViewModel.queuedSongs
+                        return self.songSharingViewModel.addedSongs
                                 .map { $0.first }
                                 .filterNil()
                     }
