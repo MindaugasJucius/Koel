@@ -51,6 +51,46 @@ extension Realm {
             }
     }
     
+    static func withRealmArray<T>(
+        operation: String,
+        error: Swift.Error,
+        scheduler: SchedulerType = concurrentScheduler,
+        nilResultHandler: ((AnyObserver<[ThreadSafeReference<T>]>) -> ())? = nil,
+        action: @escaping (Realm) throws -> [T]?) -> Observable<[T]> {
+        return Observable<[ThreadSafeReference<T>]>
+            .create { observer -> Disposable in
+                os_log("performing operation: %@", log: OSLog.default, type: OSLogType.info, operation)
+                do {
+                    let realm = try Realm()
+                    if let result = try action(realm) {
+                        let threadSafeReferenceArray = result.map { ThreadSafeReference(to: $0) }
+                        observer.onNext(threadSafeReferenceArray)
+                    } else {
+                        nilResultHandler?(observer)
+                    }
+                } catch {
+                    observer.onError(error)
+                }
+                observer.onCompleted()
+                return Disposables.create()
+            }
+            .subscribeOn(scheduler)
+            .flatMap { threadSafeReferenceArray -> Observable<T> in
+                let observables = threadSafeReferenceArray.map { (threadSafeReference) -> Observable<T> in
+                    Realm.safeObject(
+                        resolveOnScheduler: MainScheduler.instance,
+                        fromReference: threadSafeReference,
+                        errorOnFailure: error
+                    )
+                }
+                return Observable.merge(observables)
+            }
+            .reduce([], accumulator: { (array, song) -> [T] in
+                return array + [song]
+            })
+
+    }
+    
     // resolves safe object reference on scheduler
     static func safeObject<T>(
         resolveOnScheduler: SchedulerType,

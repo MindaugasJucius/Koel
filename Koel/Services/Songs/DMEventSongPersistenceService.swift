@@ -26,6 +26,9 @@ protocol DMEventSongPersistenceServiceType {
     var selfPeer: DMEventPeer { get }
     
     @discardableResult
+    func store(songs: [DMEventSong]) -> Observable<[DMEventSong]>
+    
+    @discardableResult
     func store(song: DMEventSong) -> Observable<DMEventSong>
     
     @discardableResult
@@ -56,32 +59,43 @@ class DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
     
     @discardableResult
     func store(song: DMEventSong) -> Observable<DMEventSong> {
-        return Realm.withRealm(
-            operation: "persisting a song with id: \(song.uuid)",
+        return store(songs: [song])
+            .flatMap{ songs -> Observable<DMEventSong> in
+                .just(songs.first!)
+            }
+    }
+    
+    @discardableResult
+    func store(songs: [DMEventSong]) -> Observable<[DMEventSong]> {
+        return Realm.withRealmArray(
+            operation: "persisting songs with: \(songs)",
             error: DMEventSongPersistenceServiceError.creationFailed,
-            scheduler: songPersistenceScheduler) { realm -> DMEventSong in
+            scheduler: songPersistenceScheduler) { realm -> [DMEventSong] in
                 try realm.write {
-                    // Parse peer which added song that's being persisted
-                    if let addedPeerUUID = song.addedByUUID {
-                        let uuidPredicate = NSPredicate(format: "uuid = %@", addedPeerUUID)
-                        song.addedBy = realm.objects(DMEventPeer.self).filter(uuidPredicate).first
+                    songs.forEach { song in
+                        // Parse peer which added song that's being persisted
+                        if let addedPeerUUID = song.addedByUUID {
+                            let uuidPredicate = NSPredicate(format: "uuid = %@", addedPeerUUID)
+                            song.addedBy = realm.objects(DMEventPeer.self).filter(uuidPredicate).first
+                        }
+                        
+                        if song.added == .none {
+                            song.added = Date()
+                        }
+                        
+                        // Parse peers who upvoted song that's being persisted
+                        let uuidPredicate = NSPredicate(format: "uuid IN %@", song.upvotedByUUIDs)
+                        let upvotees = realm.objects(DMEventPeer.self).filter(uuidPredicate)
+                        song.upvotees.append(objectsIn: upvotees)
+                        song.upvoteCount = upvotees.count
+                        song.upvotedBySelfPeer = song.upvotedByUUIDs.contains(self.selfPeer.primaryKeyRef)
+                        song.primaryKeyRef = song.uuid
                     }
-                    
-                    if song.added == .none {
-                        song.added = Date()
-                    }
-                    
-                    // Parse peers who upvoted song that's being persisted
-                    let uuidPredicate = NSPredicate(format: "uuid IN %@", song.upvotedByUUIDs)
-                    let upvotees = realm.objects(DMEventPeer.self).filter(uuidPredicate)
-                    song.upvotees.append(objectsIn: upvotees)
-                    song.upvoteCount = upvotees.count
-                    song.upvotedBySelfPeer = song.upvotedByUUIDs.contains(self.selfPeer.primaryKeyRef)
-                    
-                    realm.add(song, update: true)
+
+                    realm.add(songs, update: true)
                 }
-                song.primaryKeyRef = song.uuid
-                return song
+
+                return songs
             }
     }
     
@@ -118,7 +132,7 @@ class DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
     func update(song: DMEventSong, toState state: DMEventSongState) -> Observable<DMEventSong> {
         let threadSafeSongReference = ThreadSafeReference(to: song)
         return Realm.withRealm(
-            operation: "marking song: \(song.title) as \(state)",
+            operation: "marking song: \(song.title) as \(state) \(state.rawValue)",
             error: DMEventSongPersistenceServiceError.toggleFailed(song),
             scheduler: songPersistenceScheduler) { realm -> DMEventSong? in
                 let resolvedSong = realm.resolve(threadSafeSongReference)
