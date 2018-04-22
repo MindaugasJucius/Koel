@@ -110,9 +110,14 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
     //MARK: - Public
     
     func togglePlayback() -> Observable<Void> {
+        
+        // naudoti upNext daina
+        // arba playing 
         return Observable.zip(isPlaying, firstQueuedSong)
+            .take(1)
             .flatMap { [unowned self] (playing, song) -> Observable<Void> in
-                guard song.state == .upNext else {
+                print(song.title)
+                guard song.state == .playing else {
                     return self.play(song: song)
                 }
                 return self.togglePlaybackState(isPlaying: !playing)
@@ -161,7 +166,7 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
                 }
             }
             .flatMap { [unowned self] in
-                return self.songPersistenceService.update(song: song, toState: .queued)
+                return self.songPersistenceService.update(song: song, toState: .playing)
             }
             .map { _ in }
         

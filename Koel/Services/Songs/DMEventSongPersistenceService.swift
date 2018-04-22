@@ -118,7 +118,7 @@ class DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
     func update(song: DMEventSong, toState state: DMEventSongState) -> Observable<DMEventSong> {
         let threadSafeSongReference = ThreadSafeReference(to: song)
         return Realm.withRealm(
-            operation: "marking song: \(song.title) as spt queued",
+            operation: "marking song: \(song.title) as \(state)",
             error: DMEventSongPersistenceServiceError.toggleFailed(song),
             scheduler: songPersistenceScheduler) { realm -> DMEventSong? in
                 let resolvedSong = realm.resolve(threadSafeSongReference)

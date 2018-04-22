@@ -17,7 +17,6 @@ typealias SongSection = AnimatableSectionModel<String, DMEventSong>
 @objc enum DMEventSongState: Int {
     case added
     case queued
-    case upNext
     case playing
     case played
 }

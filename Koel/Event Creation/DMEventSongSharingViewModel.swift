@@ -93,7 +93,6 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
         return songPersistenceService
             .songs
             .map { [unowned self] results in
-
                 return results
                     .filter(forSongState: .added)
                     .sorted(by: self.songSortDescriptors)
@@ -114,10 +113,46 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
             .share(replay: 1, scope: .whileConnected)
     }()
     
+    lazy var upNextSong: Observable<DMEventSong?> = {
+        return songPersistenceService
+            .songs
+            .map { [unowned self] results in
+                return results
+                    .filter(forSongState: .queued)
+                    .first
+            }
+            .startWith(nil)
+            .share(replay: 1, scope: .whileConnected)
+    }()
+    
+    lazy var playingSong: Observable<DMEventSong?> = {
+        return songPersistenceService
+            .songs
+            .map { [unowned self] results in
+                return results
+                    .filter(forSongState: .playing)
+                    .first
+            }
+            .startWith(nil)
+            .share(replay: 1, scope: .whileConnected)
+    }()
+    
     var songsSectioned: Observable<[SongSection]> {
-        return Observable.zip(addedSongs, playedSongs) { (queuedSongs, playedSongs) in
-            return [SongSection(model: UIConstants.strings.queuedSongs, items: queuedSongs),
-                    SongSection(model: UIConstants.strings.playedSongs, items: playedSongs)]
+        return Observable.combineLatest(addedSongs, playedSongs, playingSong) { (addedSongs, playedSongs, playingSong) in
+            var sectionedSongs: [SongSection] = []
+            var added = addedSongs
+            if let playing = playingSong {
+                sectionedSongs.append(SongSection(model: "Playing", items: [playing]))
+            }
+            
+//            if let upNext = upNextSong {
+//                sectionedSongs.append(SongSection(model: "Up next", items: [upNext]))
+//            }
+            
+            sectionedSongs.append(contentsOf:  [
+                SongSection(model: UIConstants.strings.queuedSongs, items: added),
+                SongSection(model: UIConstants.strings.playedSongs, items: playedSongs)])
+            return sectionedSongs
         }
         .observeOn(MainScheduler.instance)
     }
