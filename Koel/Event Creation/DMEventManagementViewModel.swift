@@ -34,10 +34,13 @@ class DMEventManagementViewModel: ViewModelType, MultipeerViewModelType, Backgro
         self.songSharingViewModel = songSharingViewModel
         
         let sptAuthService = DMSpotifyAuthService(sceneCoordinator: sceneCoordinator)
+
         self.sptPlaybackService = DMSpotifyPlaybackService(authService: sptAuthService,
                                                            songPersistenceService: songSharingViewModel.songPersistenceService,
-                                                           queuedSongs: songSharingViewModel.addedSongs)
-        
+                                                           addedSongs: songSharingViewModel.addedSongs,
+                                                           playingSong: songSharingViewModel.playingSong,
+                                                           upNextSong: songSharingViewModel.upNextSong)
+
         multipeerService.startBrowsing()
         multipeerService.startAdvertising()
         
