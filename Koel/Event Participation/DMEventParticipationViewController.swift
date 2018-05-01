@@ -28,7 +28,7 @@ class DMEventParticipationViewController: UIViewController, BindableType {
         return tableView
     }()
     
-    private let tableViewDataSource: RxTableViewSectionedAnimatedDataSource<SongSection>
+    private let tableViewDataSource: RxTableViewSectionedReloadDataSource<SongSection>
     
     private let label = UILabel()
     

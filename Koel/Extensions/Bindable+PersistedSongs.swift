@@ -11,9 +11,8 @@ import RxDataSources
 
 extension BindableType {
     
-    static func persistedSongDataSource(withViewModel viewModel: SongSharingViewModelType) -> RxTableViewSectionedAnimatedDataSource<SongSection> {
-        return RxTableViewSectionedAnimatedDataSource<SongSection>(
-            animationConfiguration: AnimationConfiguration(insertAnimation: .top, reloadAnimation: .fade, deleteAnimation: .left),
+    static func persistedSongDataSource(withViewModel viewModel: SongSharingViewModelType) -> RxTableViewSectionedReloadDataSource<SongSection> {
+        return RxTableViewSectionedReloadDataSource<SongSection>(
             configureCell: { (dataSource, tableView, indexPath, element) -> UITableViewCell in
                 let cell = tableView.dequeueReusableCell(withIdentifier: DMEventSongPersistedTableViewCell.reuseIdentifier, for: indexPath)
                 

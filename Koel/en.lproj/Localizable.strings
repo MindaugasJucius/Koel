@@ -15,6 +15,7 @@
 "NEARBY_PEERS_SECTION_TITLE" = "Nearby";
 "JOINED_PEERS_SECTION_TITLE" = "Joined";
 "ADD_SONG" = "Add a Song";
+"DELETE_SONGS" = "Delete All Songs";
 "INVITE" = "Invite";
 "MANAGEMENT_TITLE" = "Manage";
 

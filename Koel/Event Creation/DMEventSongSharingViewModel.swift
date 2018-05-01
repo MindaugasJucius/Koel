@@ -27,6 +27,7 @@ protocol DMEventSongSharingViewModelType: MultipeerViewModelType {
     var playingSong: Observable<DMEventSong?> { get }
     
     var onSongSearch: CocoaAction { get }
+    var onSongsDelete: CocoaAction { get }
     var onPlayed: Action<DMEventSong, Void> { get }
     var onRepeatEnqueue: Action<DMEventSong, Void> { get }
     
@@ -141,17 +142,17 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
             .share(replay: 1, scope: .forever)
     }()
     
-    lazy var upNextSongs: Observable<[DMEventSong]?> = {
-        return songPersistenceService
-            .songs
-            .map { [unowned self] results in
-                return results
-                    .filter(forSongState: .queued)
-                    .toArray()
-            }
-            .startWith(nil)
-            .share(replay: 1, scope: .forever)
-    }()
+//    lazy var upNextSongs: Observable<[DMEventSong]?> = {
+//        return songPersistenceService
+//            .songs
+//            .map { [unowned self] results in
+//                return results
+//                    .filter(forSongState: .queued)
+//                    .toArray()
+//            }
+//            .startWith(nil)
+//            .share(replay: 1, scope: .forever)
+//    }()
     
     lazy var playingSong: Observable<DMEventSong?> = {
         return songPersistenceService
@@ -166,7 +167,7 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
     }()
     
     var songsSectioned: Observable<[SongSection]> {
-        return Observable.combineLatest(addedSongs, playedSongs, playingSong, upNextSongs) { (addedSongs, playedSongs, playingSong, upNextSong) in
+        return Observable.combineLatest(addedSongs, playedSongs, playingSong, upNextSong) { (addedSongs, playedSongs, playingSong, upNextSong) in
             var sectionedSongs: [SongSection] = []
             
             if let playing = playingSong {
@@ -174,7 +175,7 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
             }
             
             if let upNext = upNextSong {
-                sectionedSongs.append(SongSection(model: "Up next", items: upNext))
+                sectionedSongs.append(SongSection(model: "Up next", items: [upNext]))
             }
             
             sectionedSongs.append(contentsOf:  [
@@ -264,6 +265,12 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
             return self.songPersistenceService
                 .enqueueAlreadyPlayedSong(song: song)
                 .share(withMultipeerService: self.multipeerService, sharingService: self.songSharingService)
+        })
+    }()
+    
+    lazy var onSongsDelete: CocoaAction = {
+        return CocoaAction(workFactory: { [unowned self] in
+            return self.songPersistenceService.deleteAllSongs()
         })
     }()
     

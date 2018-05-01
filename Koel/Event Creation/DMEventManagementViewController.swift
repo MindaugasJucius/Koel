@@ -43,6 +43,14 @@ class DMEventManagementViewController: UIViewController, BindableType {
         return button
     }()
     
+    private lazy var deleteSongsButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.setTitle(UIConstants.strings.deleteSongs, for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 25)
+        return button
+    }()
+    
     private let playbackControlsView = DMPlaybackControlsView(frame: .zero)
     
     required init(withViewModel viewModel: DMEventManagementViewModel) {
@@ -95,10 +103,16 @@ class DMEventManagementViewController: UIViewController, BindableType {
             addButton.bottomAnchor.constraint(equalTo: playbackControlsView.topAnchor)
         ]
         
+        view.addSubview(deleteSongsButton)
+        let deleteSongsButtonConstraints = [
+            deleteSongsButton.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: -20),
+            deleteSongsButton.bottomAnchor.constraint(equalTo: addButton.topAnchor)
+        ]
 
         NSLayoutConstraint.activate(playbackControlsViewConstraints)
         NSLayoutConstraint.activate(invitationConstraints)
         NSLayoutConstraint.activate(addButtonConstraints)
+        NSLayoutConstraint.activate(deleteSongsButtonConstraints)
         NSLayoutConstraint.activate(tableViewConstraints)
     }
     
@@ -116,6 +130,7 @@ class DMEventManagementViewController: UIViewController, BindableType {
             .disposed(by: disposeBag)
 
         addButton.rx.action = viewModel.songSharingViewModel.onSongSearch
+        deleteSongsButton.rx.action = viewModel.songSharingViewModel.onSongsDelete
         invitationsButton.rx.action = viewModel.onInvite()
         
         //DMPlaybackControlsView bindings

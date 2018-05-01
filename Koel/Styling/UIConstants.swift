@@ -35,6 +35,7 @@ struct UIConstants {
         
         // Management
         static let addSong = NSLocalizedString("ADD_SONG", comment: "")
+        static let deleteSongs = NSLocalizedString("DELETE_SONGS", comment: "")
         static let invite = NSLocalizedString("INVITE", comment: "")
         static let managementTitle = NSLocalizedString("MANAGEMENT_TITLE", comment: "")
         static let nearbyPeers = NSLocalizedString("NEARBY_PEERS_SECTION_TITLE", comment: "")

@@ -19,6 +19,7 @@ enum DMEventSongPersistenceServiceError: Error {
     case deletionFailed(DMEventSong)
     case toggleFailed(DMEventSong)
     case upvoteFailed(DMEventSong)
+    case deleteAllSongsFailed
 }
 
 protocol DMEventSongPersistenceServiceType {
@@ -44,6 +45,9 @@ protocol DMEventSongPersistenceServiceType {
     func upvote(song: DMEventSong, forUser: String) -> Observable<DMEventSong>
     
     var songs: Observable<Results<DMEventSong>> { get }
+    
+    @discardableResult
+    func deleteAllSongs() -> Observable<Void>
     
 }
 
@@ -162,6 +166,23 @@ class DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
                 return resolvedSong
         }
     }
+
+    func deleteAllSongs() -> Observable<Void> {
+        return Observable<Void>.create { (observer) -> Disposable in
+            do {
+                let realm = try Realm()
+                let songsResult = realm.objects(DMEventSong.self)
+                try realm.write {
+                    realm.delete(songsResult)
+                }
+                observer.onNext(())
+                observer.onCompleted()
+            } catch let error {
+                observer.onError(error)
+            }
+            return Disposables.create()
+        }
+    }
     
     lazy var songs: Observable<Results<DMEventSong>> = {
         let result = Realm.withRealm(
@@ -176,5 +197,5 @@ class DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
             }
         return result.share()
     }()
-
+    
 }
