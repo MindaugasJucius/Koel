@@ -92,28 +92,35 @@ class DMEventManagementViewController: UIViewController, BindableType {
         ]
         
         let invitationConstraints = [
-            invitationsButton.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 20),
+            invitationsButton.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor,
+                                                    constant: 20),
             invitationsButton.bottomAnchor.constraint(equalTo: playbackControlsView.topAnchor)
         ]
         
         view.addSubview(addButton)
         
         let addButtonConstraints = [
-            addButton.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: -20),
+            addButton.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor,
+                                             constant: -20),
             addButton.bottomAnchor.constraint(equalTo: playbackControlsView.topAnchor)
-        ]
-        
-        view.addSubview(deleteSongsButton)
-        let deleteSongsButtonConstraints = [
-            deleteSongsButton.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: -20),
-            deleteSongsButton.bottomAnchor.constraint(equalTo: addButton.topAnchor)
         ]
 
         NSLayoutConstraint.activate(playbackControlsViewConstraints)
         NSLayoutConstraint.activate(invitationConstraints)
         NSLayoutConstraint.activate(addButtonConstraints)
-        NSLayoutConstraint.activate(deleteSongsButtonConstraints)
         NSLayoutConstraint.activate(tableViewConstraints)
+        
+        
+        #if DEBUG
+            view.addSubview(deleteSongsButton)
+            let deleteSongsButtonConstraints = [
+                deleteSongsButton.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor,
+                                                         constant: -20),
+                deleteSongsButton.bottomAnchor.constraint(equalTo: addButton.topAnchor)
+            ]
+        
+            NSLayoutConstraint.activate(deleteSongsButtonConstraints)
+        #endif
     }
     
     func bindViewModel() {
