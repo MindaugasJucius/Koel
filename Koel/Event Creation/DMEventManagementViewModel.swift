@@ -152,19 +152,12 @@ class DMEventManagementViewModel: ViewModelType, MultipeerViewModelType, Backgro
     lazy var onPrevious: CocoaAction = {
         return Action(enabledIf: songSharingViewModel.playedSongs.map { $0.first != nil }, workFactory: { [unowned self] in
             return .just(())
-            //            return self.firstPlayedSong.flatMap { song in
-//                return self.songSharingViewModel.onRepeatEnqueue.execute(song)
-//            }
-//            .map { _ in }
         })
     }()
     
     lazy var onPlay: CocoaAction = {
         return CocoaAction { [unowned self] in
-            return self.sptPlaybackService.togglePlayback()
-            //            return self.firstQueuedSong.flatMap { song in
-//                return self.sptPlaybackService.togglePlayback(forSong: song)
-//            }
+            return self.sptPlaybackService.togglePlayback
         }
     }()
     

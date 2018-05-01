@@ -91,19 +91,6 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
             .merge()
             .subscribe()
             .disposed(by: disposeBag)
-
-        addedSongs.withLatestFrom(upNextSong) { (songs, upNext) -> Observable<DMEventSong>? in
-            guard upNext == nil, let firstAddedSong = songs.first else {
-                return nil
-            }
-            return songPersistenceService.update(song: firstAddedSong,
-                                                 toState: .queued)
-        }
-        .filterNil()
-        .flatMap { $0 }
-        .subscribe()
-        .disposed(by: disposeBag)
-
     }
     
     lazy var addedSongs: Observable<[DMEventSong]> = {
