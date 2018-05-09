@@ -135,15 +135,23 @@ class DMEventManagementViewModel: ViewModelType, MultipeerViewModelType, Backgro
         return Action(
             enabledIf: sptPlaybackService.nextEnabled(),
             workFactory: { [unowned self] in
+                let upNext = self.songSharingViewModel.upNextSong.filterNil()
                 return self.sptPlaybackService.nextSong()
-                    .flatMap {
-                        return self.songSharingViewModel.addedSongs
-                                .map { $0.first }
-                                .filterNil()
+                    .flatMap { [unowned self] in
+                        return self.songSharingViewModel.playingSong
                     }
-                    .flatMap { song in
-                        return self.songSharingViewModel.onPlayed.execute(song)
-                    }
+                    .withLatestFrom(upNext,
+                                    resultSelector: { [unowned self] playingSong, upNextSong -> Observable<DMEventSong> in
+                        var markAsPlayedIfNeeded: Observable<DMEventSong> = .empty()
+                        if let playingSong = playingSong {
+                            markAsPlayedIfNeeded = self.songSharingViewModel.songPersistenceService
+                                .markAsPlayed(song: playingSong)
+                        }
+                        let markUpNextAsPlaying = self.songSharingViewModel.songPersistenceService
+                            .update(song: upNextSong, toState: .playing)
+                        return Observable.merge([markAsPlayedIfNeeded, markUpNextAsPlaying])
+                    })
+                    .map { _ in }
             }
         )
 
