@@ -152,7 +152,6 @@ class DMEventManagementViewModel: ViewModelType, MultipeerViewModelType, Backgro
                             .update(song: upNextSong, toState: .playing)
                     }
                     .map { _ in }
-                    .take(1)
                 }
         )
 

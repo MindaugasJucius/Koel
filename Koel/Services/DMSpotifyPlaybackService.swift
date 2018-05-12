@@ -47,7 +47,7 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
     
     private let metadataCurrentURISubject: BehaviorSubject<String?> = BehaviorSubject(value: .none)
 
-    var playingTrackIsCurrent: Observable<Bool> {
+    private var metadataMatchesPlayingTrackURI: Observable<Bool> {
         let currentURI = metadataCurrentURISubject
             .asObservable()
             .filterNil()
@@ -56,7 +56,6 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
             return currentURI == playing.spotifyURI
         }
         .distinctUntilChanged()
-
     }
     
     init(authService: DMSpotifyAuthService,
@@ -78,20 +77,26 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
         
         try! player.start(withClientId: SPTAuth.defaultInstance().clientID)
         
-        //only queue next song when didChangeMetadata fired for currently playing song URI
-        playingTrackIsCurrent
-            .filter { $0 }
-            .withLatestFrom(addedSongs)
-            .map { addedSongs in
-                return addedSongs.first
-            }
+        let distinctFirstAddedSong = addedSongs
+            .map { $0.first }
             .filterNil()
-            .flatMap { [unowned self] upNextSong -> Observable<DMEventSong> in
-                return self.enqueue(song: upNextSong)
+            .distinctUntilChanged()
+            .skip(1) // initial added song is played by calling `playSpotifyURI`
+        
+        // only queue distinctFirstAddedSong when didChangeMetadata is
+        // fired for currently playing song URI
+        
+        // there's no case when both of zipped observables
+        // are fired for the same index and
+        // upNextSong is not nil, thus
+        // skipUntil { upNextSong.filter { $0 == nil }) } is not needed
+        Observable.zip(distinctFirstAddedSong, metadataMatchesPlayingTrackURI.filter { $0 })
+            .map { $0.0 }
+            .flatMap { [unowned self] distinctFirstAddedSong in
+                return self.enqueue(song: distinctFirstAddedSong)
             }
             .subscribe()
             .disposed(by: disposeBag)
-
     }
     
     //MARK: - Public
@@ -143,6 +148,9 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
     private func play(song: DMEventSong) -> Observable<Void> {
         let playObservable = login()
             .map { _ in }
+            .flatMap { [unowned self] in
+                return self.songPersistenceService.update(song: song, toState: .playing)
+            }
             .flatMap { [unowned self] _ in
                 return Observable<Void>.create { observer in
                     self.player.playSpotifyURI(
@@ -153,9 +161,6 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
                     )
                     return Disposables.create()
                 }
-            }
-            .flatMap { [unowned self] in
-                return self.songPersistenceService.update(song: song, toState: .playing)
             }
             .map { _ in }
         

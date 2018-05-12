@@ -129,7 +129,7 @@ class DMEventSong: Object, Codable, DMEntity {
         guard let anotherSong = object as? DMEventSong else {
             return false
         }
-        return uuid == anotherSong.uuid && upvoteCount == anotherSong.upvoteCount
+        return uuid == anotherSong.uuid
     }
     
 }

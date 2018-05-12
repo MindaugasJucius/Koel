@@ -141,16 +141,20 @@ class DMEventManagementViewController: UIViewController, BindableType {
         invitationsButton.rx.action = viewModel.onInvite()
         
         //DMPlaybackControlsView bindings
+        let queuedSongsAvailable = viewModel.songSharingViewModel
+            .addedSongs
+            .map { !$0.isEmpty }
 
-        let queuedSongsAvailable = viewModel.songSharingViewModel.addedSongs.map { songs in
-            return !songs.isEmpty
-        }.share()
-            
-        queuedSongsAvailable
+        let playingSongAvailable = viewModel.songSharingViewModel
+            .playingSong
+            .map { $0 != nil }
+        
+        Observable
+            .combineLatest(queuedSongsAvailable, playingSongAvailable) { $0 || $1 }
             .bind(to: playbackControlsView.playPauseSongButton.rx.isEnabled)
             .disposed(by: disposeBag)
-        
-        queuedSongsAvailable
+
+        Observable.just(false)
             .bind(to: playbackControlsView.previousSongButton.rx.isEnabled)
             .disposed(by: disposeBag)
         
