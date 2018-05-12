@@ -45,29 +45,20 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
         return isPlayingSubject.asObservable()
     }
     
-    //PROBLEMS
+    private let metadataCurrentURISubject: BehaviorSubject<String?> = BehaviorSubject(value: .none)
+
+    var playingTrackIsCurrent: Observable<Bool> {
+        let currentURI = metadataCurrentURISubject
+            .asObservable()
+            .filterNil()
+        
+        return Observable.combineLatest(currentURI, playingSong.filterNil()) { (currentURI, playing) -> Bool in
+            return currentURI == playing.spotifyURI
+        }
+        .distinctUntilChanged()
+
+    }
     
-    //1. If there's one song and a second one is added, it is not queued
-    // maybe move to didStartPlaying
-    // add isSpotifyQueued to song
-    
-    //2. Multiple taps of NEXT doesn't stop playback
-    // solution:
-        // pause on second tap
-        // throttle for 0.3 sec
-        // if taps > 1 just ```play(song: DMEventSong) -> Observable<Void>```
-    
-    
-    // case
-    // ijungi screena dainu > 1
-    // spaudi play, kita daina queueinama
-    
-    // ijungi screena dainu == 0
-    // pridedi, spaudi play daina groja, kitos dainos nera
-    
-    // ijungi screena dainu == 1,
-    // pridedi daina
-    // next nieko nedaro
     init(authService: DMSpotifyAuthService,
          songPersistenceService: DMEventSongPersistenceServiceType,
          addedSongs: Observable<[DMEventSong]>,
@@ -87,9 +78,9 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
         
         try! player.start(withClientId: SPTAuth.defaultInstance().clientID)
         
-        playingSong
-            .filterNil()
-            .distinctUntilChanged()
+        //only queue next song when didChangeMetadata fired for currently playing song URI
+        playingTrackIsCurrent
+            .filter { $0 }
             .withLatestFrom(addedSongs)
             .map { addedSongs in
                 return addedSongs.first
@@ -100,6 +91,7 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
             }
             .subscribe()
             .disposed(by: disposeBag)
+
     }
     
     //MARK: - Public
@@ -188,6 +180,7 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
         return Observable.create { [unowned self] observer -> Disposable in
                 self.player.queueSpotifyURI(song.spotifyURI, callback: { error in
                     guard error == nil else {
+                        print(error?.localizedDescription)
                         observer.onError(error!)
                         return
                     }
@@ -219,7 +212,7 @@ extension DMSpotifyPlaybackService: SPTAudioStreamingPlaybackDelegate {
     
     func audioStreaming(_ audioStreaming: SPTAudioStreamingController!, didChangePlaybackStatus isPlaying: Bool) {
         print("isPlaying \(isPlaying)")
-        self.isPlayingSubject.onNext(isPlaying)
+        isPlayingSubject.onNext(isPlaying)
         if isPlaying {
             activateAudioSession()
         } else {
@@ -250,6 +243,8 @@ extension DMSpotifyPlaybackService: SPTAudioStreamingPlaybackDelegate {
         print("metadata")
         print("current track: \(metadata.currentTrack?.name)")
         print("next track: \(metadata.nextTrack?.name)")
+
+        metadataCurrentURISubject.onNext(metadata.currentTrack?.uri)
     }
     
     func audioStreamingDidPopQueue(_ audioStreaming: SPTAudioStreamingController!) {
