@@ -107,7 +107,7 @@ class DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
     func markAsPlayed(song: DMEventSong) -> Observable<DMEventSong> {
         let threadSafeSongReference = ThreadSafeReference(to: song)
         return Realm.withRealm(
-            operation: "marking song as played",
+            operation: "marking \(song.title) as played",
             error: DMEventSongPersistenceServiceError.toggleFailed(song),
             scheduler: songPersistenceScheduler) { realm -> DMEventSong? in
                 let resolvedSong = realm.resolve(threadSafeSongReference)

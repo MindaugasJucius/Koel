@@ -136,23 +136,24 @@ class DMEventManagementViewModel: ViewModelType, MultipeerViewModelType, Backgro
             enabledIf: sptPlaybackService.nextEnabled(),
             workFactory: { [unowned self] in
                 let upNext = self.songSharingViewModel.upNextSong.filterNil()
-                return self.sptPlaybackService.nextSong()
-                    .flatMap { [unowned self] in
-                        return self.songSharingViewModel.playingSong
+                
+                return self.songSharingViewModel.playingSong.filterNil()
+                    .take(1)
+                    .flatMap { playingSong in
+                        return self.songSharingViewModel.songPersistenceService
+                            .markAsPlayed(song: playingSong)
                     }
-                    .withLatestFrom(upNext,
-                                    resultSelector: { [unowned self] playingSong, upNextSong -> Observable<DMEventSong> in
-                        var markAsPlayedIfNeeded: Observable<DMEventSong> = .empty()
-                        if let playingSong = playingSong {
-                            markAsPlayedIfNeeded = self.songSharingViewModel.songPersistenceService
-                                .markAsPlayed(song: playingSong)
-                        }
-                        let markUpNextAsPlaying = self.songSharingViewModel.songPersistenceService
+                    .flatMap { _ -> Observable<Void> in
+                        return self.sptPlaybackService.nextSong()
+                    }
+                    .withLatestFrom(upNext)
+                    .flatMap { upNextSong in
+                        return self.songSharingViewModel.songPersistenceService
                             .update(song: upNextSong, toState: .playing)
-                        return Observable.merge([markAsPlayedIfNeeded, markUpNextAsPlaying])
-                    })
+                    }
                     .map { _ in }
-            }
+                    .take(1)
+                }
         )
 
     }()

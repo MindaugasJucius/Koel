@@ -161,7 +161,7 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
         
         let playingStatus = isPlaying
             .asObservable()
-            .skip(1) // skip current value
+            .skip(1) // skip default value
             .map { _ in }
         
         return Observable
@@ -226,13 +226,6 @@ extension DMSpotifyPlaybackService: SPTAudioStreamingPlaybackDelegate {
     
     func audioStreaming(_ audioStreaming: SPTAudioStreamingController!, didStartPlayingTrack trackUri: String!) {
         print("start playing: \(trackUri)")
-//        secondQueuedSong
-//            .flatMap { song -> Observable<DMEventSong> in
-//                print("enqueueing next song: \(song.title) \(song.spotifyURI)")
-//                return self.enqueue(song: song)
-//            }
-//            .subscribe()
-//            .dispose()
     }
     
     func audioStreaming(_ audioStreaming: SPTAudioStreamingController!, didStopPlayingTrack trackUri: String!) {
