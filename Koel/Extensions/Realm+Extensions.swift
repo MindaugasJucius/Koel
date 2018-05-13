@@ -85,8 +85,8 @@ extension Realm {
                 }
                 return Observable.merge(observables)
             }
-            .reduce([], accumulator: { (array, song) -> [T] in
-                return array + [song]
+            .reduce([], accumulator: { (array, entity) -> [T] in
+                return array + [entity]
             })
 
     }

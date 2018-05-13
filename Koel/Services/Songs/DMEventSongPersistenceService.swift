@@ -36,9 +36,6 @@ protocol DMEventSongPersistenceServiceType {
     func markAsPlayed(song: DMEventSong) -> Observable<DMEventSong>
     
     @discardableResult
-    func enqueueAlreadyPlayedSong(song: DMEventSong) -> Observable<DMEventSong>
-    
-    @discardableResult
     func update(song: DMEventSong, toState state: DMEventSongState) -> Observable<DMEventSong> 
     
     @discardableResult
@@ -118,18 +115,6 @@ class DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
                 return resolvedSong
             }
 
-    }
-    
-    @discardableResult
-    func enqueueAlreadyPlayedSong(song: DMEventSong) -> Observable<DMEventSong> {
-        song.primaryKeyRef = song.uuid //why?
-        return Realm.update(entity: song,
-                            operation: "enqueueing already played song: \(song.title)",
-                            onScheduler: songPersistenceScheduler) { song in
-                                song.played = nil
-                                song.added = Date()
-                                return song
-                            }
     }
     
     @discardableResult

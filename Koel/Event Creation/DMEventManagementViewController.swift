@@ -153,14 +153,9 @@ class DMEventManagementViewController: UIViewController, BindableType {
             .combineLatest(queuedSongsAvailable, playingSongAvailable) { $0 || $1 }
             .bind(to: playbackControlsView.playPauseSongButton.rx.isEnabled)
             .disposed(by: disposeBag)
-
-        Observable.just(false)
-            .bind(to: playbackControlsView.previousSongButton.rx.isEnabled)
-            .disposed(by: disposeBag)
         
         playbackControlsView.nextSongButton.rx.action = viewModel.onNext
         playbackControlsView.playPauseSongButton.rx.action = viewModel.onPlay
-        playbackControlsView.previousSongButton.rx.action = viewModel.onPrevious
         
         viewModel.isPlaying.map { $0 ? "PAUSE" : "PLAY" }
             .bind(to: playbackControlsView.playPauseSongButton.rx.title())

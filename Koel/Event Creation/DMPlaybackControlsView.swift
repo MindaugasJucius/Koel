@@ -19,7 +19,6 @@ class DMPlaybackControlsView: UIView {
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.axis = .horizontal
         stackView.spacing = 10
-        stackView.addArrangedSubview(previousSongButton)
         stackView.addArrangedSubview(playPauseSongButton)
         stackView.addArrangedSubview(nextSongButton)
         return stackView
@@ -29,14 +28,6 @@ class DMPlaybackControlsView: UIView {
         let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitle("play".uppercased(), for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 20)
-        return button
-    }()
-    
-    lazy var previousSongButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle("prev".uppercased(), for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 20)
         return button
     }()

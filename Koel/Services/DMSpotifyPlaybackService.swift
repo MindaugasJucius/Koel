@@ -94,13 +94,13 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
         // 2. These observables are zipped, thus `distinctFirstAddedSong` waits
         //    for `metadataMatchesPlayingTrackURI` to fire for current
         //    index. It only does when `metadata.currentTrack.uri` == `playingSong.spotifyURI`.
-        // 3. `distinctFirstAddedSong` becomes enqueued.
+        // 3. `distinctFirstAddedSong` becomes `.queued`.
         
         // Song skipping flow:
         // 1. On next tap, the queued song becomes `.playing`, and `distinctFirstAddedSong`
         //    fires with a new value.
         // 2. It waits for `metadata.currentTrack.uri` to match the now `.playing` song's uri.
-        // 3. `distinctFirstAddedSong` becomes enqueued.
+        // 3. `distinctFirstAddedSong` becomes `.queued`.
         Observable.zip(distinctFirstAddedSong, metadataMatchesPlayingTrackURI.filter { $0 })
             .map { $0.0 }
             .flatMap { [unowned self] distinctFirstAddedSong in
