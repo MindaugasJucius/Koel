@@ -128,18 +128,6 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
             .share(replay: 1, scope: .forever)
     }()
     
-//    lazy var upNextSongs: Observable<[DMEventSong]?> = {
-//        return songPersistenceService
-//            .songs
-//            .map { [unowned self] results in
-//                return results
-//                    .filter(forSongState: .queued)
-//                    .toArray()
-//            }
-//            .startWith(nil)
-//            .share(replay: 1, scope: .forever)
-//    }()
-    
     lazy var playingSong: Observable<DMEventSong?> = {
         return songPersistenceService
             .songs

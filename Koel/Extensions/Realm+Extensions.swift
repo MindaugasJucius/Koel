@@ -114,20 +114,6 @@ extension Realm {
         .subscribeOn(resolveOnScheduler)
     }
     
-    static func clearRealm() -> Observable<Void> {
-        return Observable<Void>.create { observer in
-            do {
-                let realm = try Realm()
-                try realm.write {
-                    realm.deleteAll()
-                }
-            } catch let error {
-                observer.onError(error)
-            }
-            return Disposables.create()
-        }
-    }
-    
     static func update<T>(entity: T,
                           operation: String = "updating entity: \(T.self)",
                           onScheduler scheduler: SchedulerType = concurrentScheduler,

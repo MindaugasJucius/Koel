@@ -9,6 +9,15 @@
 import Foundation
 import RxSwift
 
+protocol DMEntitySharingServiceType {
+    
+    associatedtype Entity
+    
+    func encode(entity: Entity) throws -> Data
+    func parse(fromData data: Data) throws -> Entity
+    
+}
+
 struct DMEntitySharingService<T: Codable>: DMEntitySharingServiceType {
     
     typealias Entity = T

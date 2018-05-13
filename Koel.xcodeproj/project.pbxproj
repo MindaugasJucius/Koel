@@ -14,7 +14,6 @@
 		035596DF206804330067A737 /* DMSpotifySongSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035596DE206804330067A737 /* DMSpotifySongSearchViewController.swift */; };
 		035596E1206804460067A737 /* DMSpotifySongSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035596E0206804460067A737 /* DMSpotifySongSearchViewModel.swift */; };
 		037A47E3205923990030D25F /* DMEntitySharingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 037A47E1205923980030D25F /* DMEntitySharingService.swift */; };
-		037A47E4205923990030D25F /* DMEntitySharingServiceType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 037A47E2205923980030D25F /* DMEntitySharingServiceType.swift */; };
 		039A2C6C2078AAE100C58BE5 /* DMEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 039A2C6B2078AAE100C58BE5 /* DMEntity.swift */; };
 		039A2C6E207A438A00C58BE5 /* Array+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 039A2C6D207A438A00C58BE5 /* Array+Extensions.swift */; };
 		33CD43033F2349BABFA21363 /* Pods_Koel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 859C054680781DDB43D6FFC3 /* Pods_Koel.framework */; };
@@ -90,7 +89,6 @@
 		035596DE206804330067A737 /* DMSpotifySongSearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMSpotifySongSearchViewController.swift; sourceTree = "<group>"; };
 		035596E0206804460067A737 /* DMSpotifySongSearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMSpotifySongSearchViewModel.swift; sourceTree = "<group>"; };
 		037A47E1205923980030D25F /* DMEntitySharingService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DMEntitySharingService.swift; path = Koel/Services/DMEntitySharingService.swift; sourceTree = SOURCE_ROOT; };
-		037A47E2205923980030D25F /* DMEntitySharingServiceType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DMEntitySharingServiceType.swift; path = Koel/Services/DMEntitySharingServiceType.swift; sourceTree = SOURCE_ROOT; };
 		039A2C6B2078AAE100C58BE5 /* DMEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEntity.swift; sourceTree = "<group>"; };
 		039A2C6D207A438A00C58BE5 /* Array+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Extensions.swift"; sourceTree = "<group>"; };
 		1EEEA22101255BEC78867464 /* Pods-Koel.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Koel.release.xcconfig"; path = "Pods/Target Support Files/Pods-Koel/Pods-Koel.release.xcconfig"; sourceTree = "<group>"; };
@@ -316,7 +314,6 @@
 			isa = PBXGroup;
 			children = (
 				037A47E1205923980030D25F /* DMEntitySharingService.swift */,
-				037A47E2205923980030D25F /* DMEntitySharingServiceType.swift */,
 				5F84FFA61FDAF0B8003332B4 /* DMEventSongPersistenceService.swift */,
 			);
 			path = Songs;
@@ -708,7 +705,6 @@
 				035596DA2066B4D20067A737 /* Bindable+PersistedSongs.swift in Sources */,
 				035596DF206804330067A737 /* DMSpotifySongSearchViewController.swift in Sources */,
 				5F84FF9C1FD86367003332B4 /* DMEventManagementViewController.swift in Sources */,
-				037A47E4205923990030D25F /* DMEntitySharingServiceType.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -13,7 +13,6 @@ import CloudKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var window: UIWindow? = UIWindow(frame: UIScreen.main.bounds)
-    //var spotifyAuthService: DMSpotifyAuthService? = nil
     
     private var backgroundTaskID = UIBackgroundTaskInvalid
     
@@ -29,7 +28,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         sceneCoordinator.transition(to: eventSearchScene, type: .rootWithNavigationVC)
         
-        //self.spotifyAuthService = DMSpotifyAuthService(sceneCoordinator: sceneCoordinator)
         return true
     }
 
