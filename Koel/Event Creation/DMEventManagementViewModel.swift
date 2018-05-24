@@ -36,7 +36,7 @@ class DMEventManagementViewModel: ViewModelType, MultipeerViewModelType, Backgro
         let sptAuthService = DMSpotifyAuthService(sceneCoordinator: sceneCoordinator)
 
         self.sptPlaybackService = DMSpotifyPlaybackService(authService: sptAuthService,
-                                                           songPersistenceService: songSharingViewModel.songPersistenceService,
+                                                           onUpdateSongToState: songSharingViewModel.onUpdateSongToState,
                                                            addedSongs: songSharingViewModel.addedSongs,
                                                            playingSong: songSharingViewModel.playingSong,
                                                            upNextSong: songSharingViewModel.upNextSong)
@@ -141,7 +141,7 @@ class DMEventManagementViewModel: ViewModelType, MultipeerViewModelType, Backgro
                     .take(1)
                     .flatMap { playingSong in
                         return self.songSharingViewModel.songPersistenceService
-                            .markAsPlayed(song: playingSong)
+                            .update(song: playingSong, toState: .played)
                     }
                     .flatMap { _ -> Observable<Void> in
                         return self.sptPlaybackService.nextSong()

@@ -28,7 +28,7 @@ protocol DMEventSongSharingViewModelType: MultipeerViewModelType {
     
     var onSongSearch: CocoaAction { get }
     var onSongsDelete: CocoaAction { get }
-    var onPlayed: Action<DMEventSong, Void> { get }
+    var onUpdateSongToState: Action<(DMEventSong, DMEventSongState), Void> { get }
     
     func onUpvote(song: DMEventSong) -> CocoaAction
 }
@@ -226,13 +226,14 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
         )
     }
     
-    lazy var onPlayed: Action<DMEventSong, Void> = {
-        return Action(workFactory: { [unowned self] (song: DMEventSong) -> Observable<Void> in
-            return self.songPersistenceService
-                .markAsPlayed(song: song)
-                .share(withMultipeerService: self.multipeerService, sharingService: self.songSharingService)
+    var onUpdateSongToState: Action<(DMEventSong, DMEventSongState), Void> {
+        return Action(workFactory: { [unowned self] (song: DMEventSong, state: DMEventSongState) -> Observable<Void> in
+            return self.songPersistenceService.update(song: song,
+                                                      toState: state)
+                .share(withMultipeerService: self.multipeerService,
+                       sharingService: self.songSharingService)
         })
-    }()
+    }
     
     lazy var onSongsDelete: CocoaAction = {
         return CocoaAction(workFactory: { [unowned self] in

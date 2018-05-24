@@ -33,9 +33,6 @@ protocol DMEventSongPersistenceServiceType {
     func store(song: DMEventSong) -> Observable<DMEventSong>
     
     @discardableResult
-    func markAsPlayed(song: DMEventSong) -> Observable<DMEventSong>
-    
-    @discardableResult
     func update(song: DMEventSong, toState state: DMEventSongState) -> Observable<DMEventSong> 
     
     @discardableResult
@@ -101,23 +98,6 @@ class DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
     }
     
     @discardableResult
-    func markAsPlayed(song: DMEventSong) -> Observable<DMEventSong> {
-        let threadSafeSongReference = ThreadSafeReference(to: song)
-        return Realm.withRealm(
-            operation: "marking \(song.title) as played",
-            error: DMEventSongPersistenceServiceError.toggleFailed(song),
-            scheduler: songPersistenceScheduler) { realm -> DMEventSong? in
-                let resolvedSong = realm.resolve(threadSafeSongReference)
-                try realm.write {
-                    resolvedSong?.played = Date()
-                    resolvedSong?.state = .played
-                }
-                return resolvedSong
-            }
-
-    }
-    
-    @discardableResult
     func update(song: DMEventSong, toState state: DMEventSongState) -> Observable<DMEventSong> {
         let threadSafeSongReference = ThreadSafeReference(to: song)
         return Realm.withRealm(
@@ -127,6 +107,9 @@ class DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
                 let resolvedSong = realm.resolve(threadSafeSongReference)
                 try realm.write {
                     resolvedSong?.state = state
+                    if state == .played {
+                        resolvedSong?.played = Date()
+                    }
                 }
                 return resolvedSong
         }
