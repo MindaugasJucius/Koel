@@ -140,16 +140,14 @@ class DMEventManagementViewModel: ViewModelType, MultipeerViewModelType, Backgro
                 return self.songSharingViewModel.playingSong.filterNil()
                     .take(1)
                     .flatMap { playingSong in
-                        return self.songSharingViewModel.songPersistenceService
-                            .update(song: playingSong, toState: .played)
+                        return self.songSharingViewModel.onUpdateSongToState.execute((playingSong, .played))
                     }
                     .flatMap { _ -> Observable<Void> in
                         return self.sptPlaybackService.nextSong()
                     }
                     .withLatestFrom(upNext)
                     .flatMap { upNextSong in
-                        return self.songSharingViewModel.songPersistenceService
-                            .update(song: upNextSong, toState: .playing)
+                        return self.songSharingViewModel.onUpdateSongToState.execute((upNextSong, .playing))
                     }
                     .map { _ in }
                 }

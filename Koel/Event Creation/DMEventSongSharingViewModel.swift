@@ -17,7 +17,6 @@ protocol DMEventSongSharingViewModelType: MultipeerViewModelType {
     
     var sceneCoordinator: SceneCoordinatorType { get }
     var songSharingService: DMEntitySharingService<DMEventSong> { get }
-    var songPersistenceService: DMEventSongPersistenceServiceType { get }
 
     var songsSectioned: Observable<[SongSection]> { get }
     var addedSongs: Observable<[DMEventSong]> { get }
@@ -36,9 +35,9 @@ protocol DMEventSongSharingViewModelType: MultipeerViewModelType {
 class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
     
     private let disposeBag = DisposeBag()
-
+    private var songPersistenceService: DMEventSongPersistenceServiceType
+    
     var songSharingService: DMEntitySharingService<DMEventSong>
-    var songPersistenceService: DMEventSongPersistenceServiceType
     var multipeerService: DMEventMultipeerService
     var sceneCoordinator: SceneCoordinatorType
     
