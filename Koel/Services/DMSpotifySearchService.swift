@@ -31,7 +31,7 @@ class DMSpotifySearchService: DMSpotifySearchServiceType {
             .currentSessionObservable
             .flatMap { _ -> Observable<PagingObject<SavedTrack>> in
                 return Observable<PagingObject<SavedTrack>>.create { observer -> Disposable in
-                    _ = Spartan.getSavedTracks(offset: 20, market: Spartan.currentCountryCode, success: { pagingObject in
+                    _ = Spartan.getSavedTracks(offset: 20, success: { pagingObject in
                         observer.onNext(pagingObject)
                         observer.onCompleted()
                     }, failure: { error in
