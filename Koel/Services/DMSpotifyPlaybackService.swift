@@ -21,8 +21,6 @@ protocol DMSpotifyPlaybackServiceType {
     
     var togglePlayback: Observable<Void> { get }
     
-    var onUpdateSongToState: Action<(DMEventSong, DMEventSongState), Void> { get }
-    
     func nextSong() -> Observable<Void>
     func nextEnabled() -> Observable<Bool>
 }
@@ -37,7 +35,7 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
     var playingSong: Observable<DMEventSong?>
     var upNextSong: Observable<DMEventSong?>
 
-    var onUpdateSongToState: Action<(DMEventSong, DMEventSongState), Void>
+    var updateSongToState: (DMEventSong, DMEventSongState) -> (Observable<Void>)
     
     private let player: SPTAudioStreamingController = SPTAudioStreamingController.sharedInstance()
     
@@ -62,13 +60,13 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
     }
     
     init(authService: DMSpotifyAuthService,
-         onUpdateSongToState: Action<(DMEventSong, DMEventSongState), Void>,
+         updateSongToState: @escaping (DMEventSong, DMEventSongState) -> (Observable<Void>),
          addedSongs: Observable<[DMEventSong]>,
          playingSong: Observable<DMEventSong?>,
          upNextSong: Observable<DMEventSong?>) {
         
         self.authService = authService
-        self.onUpdateSongToState = onUpdateSongToState
+        self.updateSongToState = updateSongToState
         self.addedSongs = addedSongs
         self.playingSong = playingSong
         self.upNextSong = upNextSong
@@ -103,8 +101,8 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
         //    fires with a new value.
         // 2. It waits for `metadata.currentTrack.uri` to match the now `.playing` song's uri.
         // 3. `distinctFirstAddedSong` becomes `.queued`.
-        Observable.zip(metadataMatchesPlayingTrackURI.filter { $0 }, distinctFirstAddedSong)
-            .map { $0.1 }
+        Observable.zip(distinctFirstAddedSong, metadataMatchesPlayingTrackURI.filter { $0 })
+            .map { $0.0 }
             .flatMap { [unowned self] distinctFirstAddedSong in
                 return self.enqueue(song: distinctFirstAddedSong)
             }
@@ -117,7 +115,7 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
     lazy var togglePlayback: Observable<Void> = {
         return Observable
             .combineLatest(playingSong, addedSongs, isPlaying)
-            .take(1)
+            .take(1) // addedSongs changes on toggling, causing combineLatest to fire multiple times
             .flatMap { (playingSong, addedSongs, playing) -> Observable<Void> in
                 if let firstAdded = addedSongs.first, playingSong == nil {
                     return self.play(song: firstAdded)
@@ -129,7 +127,6 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
                 
                 return Observable.just(())
             }
-            .take(1)
     }()
     
     func nextSong() -> Observable<Void> {
@@ -173,7 +170,7 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
                 }
             }
             .flatMap { [unowned self] in
-                return self.onUpdateSongToState.execute((song, .playing))
+                return self.updateSongToState(song, .playing)
             }
             .map { _ in }
         
@@ -200,7 +197,7 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
             return Disposables.create()
         }
         .flatMap { [unowned self] in
-            return self.onUpdateSongToState.execute((song, .queued))
+            return self.updateSongToState(song, .queued)
         }
     }
     

@@ -36,7 +36,7 @@ class DMEventManagementViewModel: ViewModelType, MultipeerViewModelType, Backgro
         let sptAuthService = DMSpotifyAuthService(sceneCoordinator: sceneCoordinator)
 
         self.sptPlaybackService = DMSpotifyPlaybackService(authService: sptAuthService,
-                                                           onUpdateSongToState: songSharingViewModel.onUpdateSongToState,
+                                                           updateSongToState: songSharingViewModel.updateSongToState,
                                                            addedSongs: songSharingViewModel.addedSongs,
                                                            playingSong: songSharingViewModel.playingSong,
                                                            upNextSong: songSharingViewModel.upNextSong)
@@ -139,17 +139,16 @@ class DMEventManagementViewModel: ViewModelType, MultipeerViewModelType, Backgro
                 
                 return self.songSharingViewModel.playingSong.filterNil()
                     .take(1)
-                    .flatMap { playingSong in
-                        return self.songSharingViewModel.onUpdateSongToState.execute((playingSong, .played))
+                    .flatMap { song in
+                        return self.songSharingViewModel.updateSongToState(song, .played)
                     }
                     .flatMap { _ -> Observable<Void> in
                         return self.sptPlaybackService.nextSong()
                     }
                     .withLatestFrom(upNext)
                     .flatMap { upNextSong in
-                        return self.songSharingViewModel.onUpdateSongToState.execute((upNextSong, .playing))
+                        return self.songSharingViewModel.updateSongToState(upNextSong, .playing)
                     }
-                    .map { _ in }
                 }
         )
 
@@ -173,7 +172,7 @@ class DMEventManagementViewModel: ViewModelType, MultipeerViewModelType, Backgro
         }
     }
     
-    func onInvite() -> CocoaAction {
+    lazy var onInvite: CocoaAction = {
         return CocoaAction { [unowned self] _ in
             
             let invitationsViewModel = DMEventInvitationsViewModel(
@@ -187,6 +186,7 @@ class DMEventManagementViewModel: ViewModelType, MultipeerViewModelType, Backgro
                 type: .modal
             )
         }
-    }
+    }()
     
 }
+

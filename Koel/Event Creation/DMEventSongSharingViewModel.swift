@@ -27,7 +27,8 @@ protocol DMEventSongSharingViewModelType: MultipeerViewModelType {
     
     var onSongSearch: CocoaAction { get }
     var onSongsDelete: CocoaAction { get }
-    var onUpdateSongToState: Action<(DMEventSong, DMEventSongState), Void> { get }
+    
+    var updateSongToState: (DMEventSong, DMEventSongState) -> (Observable<Void>) { get }
     
     func onUpvote(song: DMEventSong) -> CocoaAction
 }
@@ -225,14 +226,13 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
         )
     }
     
-    var onUpdateSongToState: Action<(DMEventSong, DMEventSongState), Void> {
-        return Action(workFactory: { [unowned self] (song: DMEventSong, state: DMEventSongState) -> Observable<Void> in
-            return self.songPersistenceService.update(song: song,
-                                                      toState: state)
-                .share(withMultipeerService: self.multipeerService,
-                       sharingService: self.songSharingService)
-        })
-    }
+    lazy var updateSongToState: (DMEventSong, DMEventSongState) -> (Observable<Void>) = {
+        return { song, state in
+            self.songPersistenceService
+                .update(song: song, toState: state)
+                .share(withMultipeerService: self.multipeerService, sharingService: self.songSharingService)
+        }
+    }()
     
     lazy var onSongsDelete: CocoaAction = {
         return CocoaAction(workFactory: { [unowned self] in
@@ -257,7 +257,7 @@ private extension Observable where Element: Codable {
         return self.withLatestFrom(multipeerService.connectedPeers()) { (entity, peers) -> Observable<Void> in
             if peers.isEmpty {
                 os_log("No peers to share with: %@", String(describing: entity.self))
-                return Observable<Void>.empty()
+                return .just(())
             }
             os_log("➡️➡️➡️ sharing %@", String(describing: entity.self))
             let availablePeerIDs = peers.flatMap { $0.peerID }

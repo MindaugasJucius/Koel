@@ -133,13 +133,15 @@ class DMEventManagementViewController: UIViewController, BindableType {
         tableView.rx
             .modelSelected(DMEventSong.self)
             .filter { $0.played == .none }
-            .map { ($0, .played) }
-            .subscribe(viewModel.songSharingViewModel.onUpdateSongToState.inputs)
+            .flatMap { [unowned self] song in
+                return self.viewModel.songSharingViewModel.updateSongToState(song, .played)
+            }
+            .subscribe()
             .disposed(by: disposeBag)
-
+        
         addButton.rx.action = viewModel.songSharingViewModel.onSongSearch
         deleteSongsButton.rx.action = viewModel.songSharingViewModel.onSongsDelete
-        invitationsButton.rx.action = viewModel.onInvite()
+        invitationsButton.rx.action = viewModel.onInvite
         
         //DMPlaybackControlsView bindings
         let queuedSongsAvailable = viewModel.songSharingViewModel
