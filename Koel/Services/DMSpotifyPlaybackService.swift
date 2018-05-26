@@ -39,15 +39,19 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
     
     private let player: SPTAudioStreamingController = SPTAudioStreamingController.sharedInstance()
     
-    let isLoggedIn: BehaviorSubject<Bool> = BehaviorSubject(value: false)
+    private let isLoggedIn: BehaviorSubject<Bool> = BehaviorSubject(value: false)
     private let isPlayingSubject: BehaviorSubject<Bool> = BehaviorSubject(value: false)
-        
+    private let playingURISubject: BehaviorSubject<String?> = BehaviorSubject(value: .none)
+    private let metadataCurrentURISubject: BehaviorSubject<String?> = BehaviorSubject(value: .none)
+    
+    private var playingURI: Observable<String?> {
+        return playingURISubject.asObservable()
+    }
+    
     var isPlaying: Observable<Bool> {
         return isPlayingSubject.asObservable()
     }
     
-    private let metadataCurrentURISubject: BehaviorSubject<String?> = BehaviorSubject(value: .none)
-
     private var metadataMatchesPlayingTrackURI: Observable<Bool> {
         let currentURI = metadataCurrentURISubject
             .asObservable()
@@ -114,20 +118,22 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
     
     lazy var togglePlayback: Observable<Void> = {
         return Observable
-            .combineLatest(playingSong, addedSongs, isPlaying)
+            .combineLatest(playingSong, addedSongs, isPlaying, playingURI)
             .take(1) // addedSongs changes on toggling, causing combineLatest to fire multiple times
-            .flatMap { (playingSong, addedSongs, playing) -> Observable<Void> in
+            .flatMap { (playingSong, addedSongs, isPlaying, playingURI) -> Observable<Void> in
                 if let firstAdded = addedSongs.first, playingSong == nil {
                     return self.play(song: firstAdded)
                 }
                 
-                if let _ = playingSong {
-                    return self.togglePlaybackState(isPlaying: !playing)
+                if let playingSong = playingSong {
+                    if playingURI == nil { // playback hasn't been started yet
+                        return self.play(song: playingSong)
+                    }
+                    return self.togglePlaybackState(isPlaying: !isPlaying)
                 }
                 
-                return Observable.just(())
+                return .just(())
             }
-            .debug("toggle", trimOutput: true)
     }()
     
     func nextSong() -> Observable<Void> {
@@ -173,15 +179,13 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
             .flatMap { [unowned self] in
                 return self.updateSongToState(song, .playing)
             }
-            .map { _ in }
         
         let playingStatus = isPlaying
             .asObservable()
             .skip(1) // skip default value
-            .map { _ in }
         
         return Observable
-            .zip([playObservable, playingStatus])
+            .zip(playObservable, playingStatus)
             .map { _ in }
             .take(1)
     }
@@ -234,10 +238,12 @@ extension DMSpotifyPlaybackService: SPTAudioStreamingPlaybackDelegate {
     }
     
     func audioStreaming(_ audioStreaming: SPTAudioStreamingController!, didStartPlayingTrack trackUri: String!) {
+        playingURISubject.onNext(trackUri)
         print("start playing: \(trackUri)")
     }
     
     func audioStreaming(_ audioStreaming: SPTAudioStreamingController!, didStopPlayingTrack trackUri: String!) {
+        playingURISubject.onNext(nil)
         print("stop playing: \(trackUri)")
     }
     
