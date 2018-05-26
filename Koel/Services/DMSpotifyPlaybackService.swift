@@ -127,6 +127,7 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
                 
                 return Observable.just(())
             }
+            .debug("toggle", trimOutput: true)
     }()
     
     func nextSong() -> Observable<Void> {
@@ -182,6 +183,7 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
         return Observable
             .zip([playObservable, playingStatus])
             .map { _ in }
+            .take(1)
     }
     
     private func togglePlaybackState(isPlaying playing: Bool) -> Observable<Void> {
