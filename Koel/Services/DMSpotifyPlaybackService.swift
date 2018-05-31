@@ -85,12 +85,7 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
             .map { $0.first }
             .filterNil()
             .distinctUntilChanged()
-            .skip(1) // initial added song is played by calling `playSpotifyURI`
-
-        // there's no case when both of zipped observables
-        // are fired for the same index and
-        // upNextSong is not nil, thus
-        // skipUntil { upNextSong.filter { $0 == nil }) } is not needed
+            .skip(1)
         
         // Start playback flow:
         // 1. `distinctFirstAddedSong` fires only after initial song has had
@@ -105,10 +100,11 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
         //    fires with a new value.
         // 2. It waits for `metadata.currentTrack.uri` to match the now `.playing` song's uri.
         // 3. `distinctFirstAddedSong` becomes `.queued`.
+        
         Observable.zip(distinctFirstAddedSong, metadataMatchesPlayingTrackURI.filter { $0 })
             .map { $0.0 }
-            .flatMap { [unowned self] distinctFirstAddedSong in
-                return self.enqueue(song: distinctFirstAddedSong)
+            .flatMap { [unowned self] songToEnqueue in
+                return self.enqueue(song: songToEnqueue)
             }
             .subscribe()
             .disposed(by: disposeBag)
