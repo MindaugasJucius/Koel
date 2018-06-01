@@ -11,7 +11,7 @@ import RxDataSources
 
 extension BindableType {
     
-    static func persistedSongDataSource(withViewModel viewModel: SongSharingViewModelType) -> RxTableViewSectionedReloadDataSource<SongSection> {
+    static func persistedSongDataSource(withViewModel viewModel: DMEventParticipantSongsEditable) -> RxTableViewSectionedReloadDataSource<SongSection> {
         return RxTableViewSectionedReloadDataSource<SongSection>(
             configureCell: { (dataSource, tableView, indexPath, element) -> UITableViewCell in
                 let cell = tableView.dequeueReusableCell(withIdentifier: DMEventSongPersistedTableViewCell.reuseIdentifier, for: indexPath)
@@ -22,7 +22,7 @@ extension BindableType {
                 
                 songCell.configure(
                     withSong: element,
-                    upvoteAction: viewModel.songSharingViewModel.onUpvote(song: element)
+                    upvoteAction: viewModel.onUpvote(song: element)
                 )
                 
                 return cell

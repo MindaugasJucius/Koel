@@ -14,11 +14,11 @@ import Action
 
 class DMEventManagementViewController: UIViewController, BindableType {
     
-    typealias ViewModelType = DMEventManagementViewModel
+    typealias ViewModelType = DMEventManagementViewModelType
 
     private let disposeBag = DisposeBag()
     
-    var viewModel: DMEventManagementViewModel
+    var viewModel: DMEventManagementViewModelType
     
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
@@ -53,7 +53,7 @@ class DMEventManagementViewController: UIViewController, BindableType {
     
     private let playbackControlsView = DMPlaybackControlsView(frame: .zero)
     
-    required init(withViewModel viewModel: DMEventManagementViewModel) {
+    required init(withViewModel viewModel: DMEventManagementViewModelType) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
@@ -124,27 +124,19 @@ class DMEventManagementViewController: UIViewController, BindableType {
     }
     
     func bindViewModel() {
-        let dataSource = DMEventManagementViewController.persistedSongDataSource(withViewModel: viewModel)
+
+        let songsDataSource = DMEventManagementViewController.persistedSongDataSource(withViewModel: viewModel)
         
-        viewModel.songSharingViewModel.songsSectioned
-            .bind(to: tableView.rx.items(dataSource: dataSource))
+        viewModel.songsSectioned
+            .bind(to: tableView.rx.items(dataSource: songsDataSource))
             .disposed(by: disposeBag)
         
-        addButton.rx.action = viewModel.songSharingViewModel.onSongSearch
-        deleteSongsButton.rx.action = viewModel.songSharingViewModel.onSongsDelete
+        addButton.rx.action = viewModel.onSongSearch
+        deleteSongsButton.rx.action = viewModel.onSongsDelete
         invitationsButton.rx.action = viewModel.onInvite
         
         //DMPlaybackControlsView bindings
-        let queuedSongsAvailable = viewModel.songSharingViewModel
-            .addedSongs
-            .map { !$0.isEmpty }
-
-        let playingSongAvailable = viewModel.songSharingViewModel
-            .playingSong
-            .map { $0 != nil }
-        
-        Observable
-            .combineLatest(queuedSongsAvailable, playingSongAvailable) { $0 || $1 }
+        self.viewModel.playbackEnabled
             .bind(to: playbackControlsView.playPauseSongButton.rx.isEnabled)
             .disposed(by: disposeBag)
         

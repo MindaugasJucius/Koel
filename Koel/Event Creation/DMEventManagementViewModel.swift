@@ -11,36 +11,75 @@ import Action
 import RxSwift
 import RealmSwift
 import MultipeerConnectivity
+import RxDataSources
 
-class DMEventManagementViewModel: ViewModelType, MultipeerViewModelType, BackgroundDisconnectType, SongSharingViewModelType {
+protocol DMEventManagementViewModelType: ViewModelType, DMEventSongsRepresentable, DMEventParticipantSongsEditable, DMEventHostSongsEditable {
     
-    var songSharingViewModel: DMEventSongSharingViewModelType
+    init(multipeerService: DMEventMultipeerService,
+         sceneCoordinator: SceneCoordinatorType,
+         songsRepresenter: DMEventSongsRepresentable & DMEventSongsManagerSeparatable,
+         songsEditor: DMEventParticipantSongsEditable & DMEventHostSongsEditable)
+    
+    var onInvite: CocoaAction { get }
+    
+    var playbackEnabled: Observable<Bool> { get }
+    var isPlaying: Observable<Bool> { get }
+    
+    var onNext: CocoaAction { get }
+    var onPlay: CocoaAction { get }
+    
+}
+
+class DMEventManagementViewModel: DMEventManagementViewModelType, MultipeerViewModelType, BackgroundDisconnectType {
+    
+    let updateSongToState: (DMEventSong, DMEventSongState) -> (Observable<Void>)
+    
+    let songsSectioned: Observable<[SongSection]>
+    
+    let onSongSearch: CocoaAction
+    let onSongsDelete: CocoaAction
+    
+    //TODO: make this lazy var action
+    func onUpvote(song: DMEventSong) -> CocoaAction {
+        return self.songsEditor.onUpvote(song: song)
+    }
     
     private let disposeBag = DisposeBag()
     private let sptPlaybackService: DMSpotifyPlaybackServiceType
 
     let sceneCoordinator: SceneCoordinatorType
 
-    var backgroundTaskID = UIBackgroundTaskInvalid
-
-    var multipeerService: DMEventMultipeerService {
-        return songSharingViewModel.multipeerService
-    }
+    private let songsRepresenter: DMEventSongsManagerSeparatable & DMEventSongsRepresentable
+    private let songsEditor: DMEventHostSongsEditable & DMEventParticipantSongsEditable
     
-    init(sceneCoordinator: SceneCoordinatorType,
-         songSharingViewModel: DMEventSongSharingViewModelType) {
+    var backgroundTaskID = UIBackgroundTaskInvalid
+    var multipeerService: DMEventMultipeerService
+
+    required init(multipeerService: DMEventMultipeerService,
+                  sceneCoordinator: SceneCoordinatorType,
+                  songsRepresenter: DMEventSongsManagerSeparatable & DMEventSongsRepresentable,
+                  songsEditor: DMEventHostSongsEditable & DMEventParticipantSongsEditable) {
         
+        self.multipeerService = multipeerService
+        self.songsRepresenter = songsRepresenter
+        self.songsEditor = songsEditor
         self.sceneCoordinator = sceneCoordinator
-        self.songSharingViewModel = songSharingViewModel
         
         let sptAuthService = DMSpotifyAuthService(sceneCoordinator: sceneCoordinator)
-
+        
         self.sptPlaybackService = DMSpotifyPlaybackService(authService: sptAuthService,
-                                                           updateSongToState: songSharingViewModel.updateSongToState,
-                                                           addedSongs: songSharingViewModel.addedSongs,
-                                                           playingSong: songSharingViewModel.playingSong,
-                                                           upNextSong: songSharingViewModel.upNextSong)
-
+                                                           updateSongToState: songsEditor.updateSongToState,
+                                                           addedSongs: songsRepresenter.addedSongs,
+                                                           playingSong: songsRepresenter.playingSong,
+                                                           upNextSong: songsRepresenter.upNextSong)
+        
+        
+        self.onSongsDelete = self.songsEditor.onSongsDelete
+        self.onSongSearch = self.songsEditor.onSongSearch
+        self.updateSongToState = self.songsEditor.updateSongToState
+        
+        self.songsSectioned = songsRepresenter.songsSectioned
+        
         multipeerService.startBrowsing()
         multipeerService.startAdvertising()
         
@@ -135,19 +174,19 @@ class DMEventManagementViewModel: ViewModelType, MultipeerViewModelType, Backgro
         return Action(
             enabledIf: sptPlaybackService.nextEnabled(),
             workFactory: { [unowned self] in
-                let upNext = self.songSharingViewModel.upNextSong.filterNil()
+                let upNext = self.songsRepresenter.upNextSong.filterNil()
                 
-                return self.songSharingViewModel.playingSong.filterNil()
+                return self.songsRepresenter.playingSong.filterNil()
                     .take(1)
                     .flatMap { song in
-                        return self.songSharingViewModel.updateSongToState(song, .played)
+                        return self.songsEditor.updateSongToState(song, .played)
                     }
                     .flatMap { _ -> Observable<Void> in
                         return self.sptPlaybackService.nextSong()
                     }
                     .withLatestFrom(upNext)
                     .flatMap { upNextSong in
-                        return self.songSharingViewModel.updateSongToState(upNextSong, .playing)
+                        return self.songsEditor.updateSongToState(upNextSong, .playing)
                     }
                 }
         )
@@ -158,6 +197,18 @@ class DMEventManagementViewModel: ViewModelType, MultipeerViewModelType, Backgro
         return CocoaAction { [unowned self] in
             return self.sptPlaybackService.togglePlayback
         }
+    }()
+    
+    lazy var playbackEnabled: Observable<Bool> = {
+        let queuedSongsAvailable = songsRepresenter
+            .addedSongs
+            .map { !$0.isEmpty }
+        
+        let playingSongAvailable = songsRepresenter
+            .playingSong
+            .map { $0 != nil }
+        
+        return  Observable.combineLatest(queuedSongsAvailable, playingSongAvailable) { $0 || $1 }
     }()
     
     lazy var isPlaying: Observable<Bool> = {
