@@ -13,27 +13,33 @@ import MultipeerConnectivity
 import RealmSwift
 import os.log
 
-protocol DMEventSongSharingViewModelType: MultipeerViewModelType {
-    
-    var sceneCoordinator: SceneCoordinatorType { get }
-    var songSharingService: DMEntitySharingService<DMEventSong> { get }
-
+protocol DMEventSongsRepresentable {
     var songsSectioned: Observable<[SongSection]> { get }
-    var addedSongs: Observable<[DMEventSong]> { get }
-    var playedSongs: Observable<[DMEventSong]> { get }
-    
-    var upNextSong: Observable<DMEventSong?> { get }
-    var playingSong: Observable<DMEventSong?> { get }
-    
+}
+
+protocol DMEventParticipantSongsEditable {
     var onSongSearch: CocoaAction { get }
-    var onSongsDelete: CocoaAction { get }
-    
-    var updateSongToState: (DMEventSong, DMEventSongState) -> (Observable<Void>) { get }
-    
     func onUpvote(song: DMEventSong) -> CocoaAction
 }
 
-class DMEventSongSharingViewModel: DMEventSongSharingViewModelType {
+protocol DMEventHostSongsEditable {
+    var onSongsDelete: CocoaAction { get }
+    var updateSongToState: (DMEventSong, DMEventSongState) -> (Observable<Void>) { get }
+}
+
+protocol DMEventSongsManagerSeparatable {
+    var addedSongs: Observable<[DMEventSong]> { get }
+    var playedSongs: Observable<[DMEventSong]> { get }
+    var upNextSong: Observable<DMEventSong?> { get }
+    var playingSong: Observable<DMEventSong?> { get }
+}
+
+protocol DMEventSongSharingViewModelType {
+    var sceneCoordinator: SceneCoordinatorType { get }
+    var songSharingService: DMEntitySharingService<DMEventSong> { get }
+}
+
+class DMEventSongSharingViewModel: DMEventSongSharingViewModelType, MultipeerViewModelType, DMEventSongsRepresentable, DMEventParticipantSongsEditable, DMEventHostSongsEditable, DMEventSongsManagerSeparatable {
     
     private let disposeBag = DisposeBag()
     private var songPersistenceService: DMEventSongPersistenceServiceType
