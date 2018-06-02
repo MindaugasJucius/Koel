@@ -54,8 +54,14 @@ class DMEventSearchViewModel: ViewModelType, MultipeerViewModelType {
                     sceneCoordinator: self.sceneCoordinator
                 )
                 
-                let participationModel = DMEventParticipationViewModel(host: host, songSharingViewModel: songSharingViewModel)
-
+                let participationModel = DMEventParticipationViewModel(
+                    host: host,
+                    multipeerService: self.multipeerService,
+                    sceneCoordinator: self.sceneCoordinator,
+                    songsSectionsRepresenter: songSharingViewModel,
+                    songsEditor: songSharingViewModel
+                )
+                
                 return self.sceneCoordinator.transition(
                     to: Scene.participation(participationModel),
                     type: .rootWithNavigationVC
@@ -72,18 +78,20 @@ class DMEventSearchViewModel: ViewModelType, MultipeerViewModelType {
             
             let multipeerService = DMEventMultipeerService(asEventHost: true)
             
+            
             let songSharingViewModel = DMEventSongSharingViewModel(
                 songPersistenceService: DMEventSongPersistenceService(selfPeer: multipeerService.myEventPeer),
                 songSharingService: DMEntitySharingService(),
                 multipeerService: multipeerService,
                 sceneCoordinator: self.sceneCoordinator
             )
-
-            let manageEventViewModel = DMEventManagementViewModel(
-                sceneCoordinator: this.sceneCoordinator,
-                songSharingViewModel: songSharingViewModel
-            )
             
+            let manageEventViewModel = DMEventManagementViewModel(
+                multipeerService: multipeerService,
+                sceneCoordinator: self.sceneCoordinator,
+                songsRepresenter: songSharingViewModel,
+                songsEditor: songSharingViewModel
+            )
             return self.sceneCoordinator.transition(
                 to: Scene.manage(manageEventViewModel),
                 type: .rootWithNavigationVC

@@ -13,9 +13,9 @@ import RxDataSources
 
 class DMEventParticipationViewController: UIViewController, BindableType {
 
-    typealias ViewModelType = DMEventParticipationViewModel
+    typealias ViewModelType = DMEventParticipationViewModelType
     
-    var viewModel: DMEventParticipationViewModel
+    var viewModel: DMEventParticipationViewModelType
 
     private let disposeBag = DisposeBag()
     
@@ -32,7 +32,7 @@ class DMEventParticipationViewController: UIViewController, BindableType {
     
     private let label = UILabel()
     
-    required init(withViewModel viewModel: DMEventParticipationViewModel) {
+    required init(withViewModel viewModel: DMEventParticipationViewModelType) {
         self.viewModel = viewModel
         self.tableViewDataSource = DMEventParticipationViewController.persistedSongDataSource(withViewModel: viewModel)
         super.init(nibName: nil, bundle: nil)
@@ -76,7 +76,7 @@ class DMEventParticipationViewController: UIViewController, BindableType {
             .bind(to: label.rx.text)
             .disposed(by: disposeBag)
         
-        viewModel.songSharingViewModel.songsSectioned
+        viewModel.songsSectioned
             .bind(to: tableView.rx.items(dataSource: tableViewDataSource))
             .disposed(by: disposeBag)
     }

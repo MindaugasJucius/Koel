@@ -32,28 +32,23 @@ protocol DMEventManagementViewModelType: ViewModelType, DMEventSongsRepresentabl
 
 class DMEventManagementViewModel: DMEventManagementViewModelType, MultipeerViewModelType, BackgroundDisconnectType {
     
-    let updateSongToState: (DMEventSong, DMEventSongState) -> (Observable<Void>)
+    private let disposeBag = DisposeBag()
+    private let sptPlaybackService: DMSpotifyPlaybackServiceType
+
+    private let songsRepresenter: DMEventSongsManagerSeparatable & DMEventSongsRepresentable
+    private let songsEditor: DMEventHostSongsEditable & DMEventParticipantSongsEditable
     
     let songsSectioned: Observable<[SongSection]>
     
     let onSongSearch: CocoaAction
     let onSongsDelete: CocoaAction
+    let onUpvote: (DMEventSong) -> (CocoaAction)
+    let updateSongToState: (DMEventSong, DMEventSongState) -> (Observable<Void>)
     
-    //TODO: make this lazy var action
-    func onUpvote(song: DMEventSong) -> CocoaAction {
-        return self.songsEditor.onUpvote(song: song)
-    }
-    
-    private let disposeBag = DisposeBag()
-    private let sptPlaybackService: DMSpotifyPlaybackServiceType
-
     let sceneCoordinator: SceneCoordinatorType
+    let multipeerService: DMEventMultipeerService
 
-    private let songsRepresenter: DMEventSongsManagerSeparatable & DMEventSongsRepresentable
-    private let songsEditor: DMEventHostSongsEditable & DMEventParticipantSongsEditable
-    
     var backgroundTaskID = UIBackgroundTaskInvalid
-    var multipeerService: DMEventMultipeerService
 
     required init(multipeerService: DMEventMultipeerService,
                   sceneCoordinator: SceneCoordinatorType,
@@ -76,6 +71,7 @@ class DMEventManagementViewModel: DMEventManagementViewModelType, MultipeerViewM
         
         self.onSongsDelete = self.songsEditor.onSongsDelete
         self.onSongSearch = self.songsEditor.onSongSearch
+        self.onUpvote = self.songsEditor.onUpvote
         self.updateSongToState = self.songsEditor.updateSongToState
         
         self.songsSectioned = songsRepresenter.songsSectioned

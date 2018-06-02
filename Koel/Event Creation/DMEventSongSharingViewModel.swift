@@ -19,7 +19,7 @@ protocol DMEventSongsRepresentable {
 
 protocol DMEventParticipantSongsEditable {
     var onSongSearch: CocoaAction { get }
-    func onUpvote(song: DMEventSong) -> CocoaAction
+    var onUpvote: (DMEventSong) -> (CocoaAction) { get }
 }
 
 protocol DMEventHostSongsEditable {
@@ -210,27 +210,30 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType, MultipeerVie
     
     //MARK: - Created song management
     
-    func onUpvote(song: DMEventSong) -> CocoaAction {
-        let canBeUpvotedBySelf = song.rx.observe(Bool.self, "upvotedBySelfPeer")
-            .filterNil() //never nil (default value in DMEventSong = false)
-            .map { !$0 }
+    lazy var onUpvote: (DMEventSong) -> (CocoaAction) = {
+        return { song in
+            let canBeUpvotedBySelf = song.rx.observe(Bool.self, "upvotedBySelfPeer")
+                .filterNil() //never nil (default value in DMEventSong = false)
+                .map { !$0 }
+        
+            let songNotPlayed = song.rx.observe(Date.self, "played")
+                .map { $0 == nil }
+            
+            let canBeUpvoted = Observable
+                .combineLatest(canBeUpvotedBySelf, songNotPlayed)
+                .map { $0 && $1 }
 
-        let songNotPlayed = song.rx.observe(Date.self, "played")
-            .map { $0 == nil }
-        
-        let canBeUpvoted = Observable
-            .combineLatest(canBeUpvotedBySelf, songNotPlayed)
-            .map { $0 && $1 }
-        
-        return CocoaAction(
-            enabledIf: canBeUpvoted,
-            workFactory: { [unowned self] in
-                return self.songPersistenceService
-                    .upvote(song: song, forUser: self.selfPeer.primaryKeyRef)
-                    .share(withMultipeerService: self.multipeerService, sharingService: self.songSharingService)
-            }
-        )
-    }
+            
+            return CocoaAction(
+                enabledIf: canBeUpvoted,
+                workFactory: { [unowned self] in
+                    return self.songPersistenceService
+                        .upvote(song: song, forUser: self.selfPeer.primaryKeyRef)
+                        .share(withMultipeerService: self.multipeerService, sharingService: self.songSharingService)
+                }
+            )
+        }
+    }()
     
     lazy var updateSongToState: (DMEventSong, DMEventSongState) -> (Observable<Void>) = {
         return { song, state in

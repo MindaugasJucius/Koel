@@ -10,20 +10,32 @@ import Foundation
 import RxSwift
 import Action
 
-class DMEventParticipationViewModel: MultipeerViewModelType, BackgroundDisconnectType, SongSharingViewModelType {
+protocol DMEventParticipationViewModelType: ViewModelType, DMEventSongsRepresentable, DMEventParticipantSongsEditable {
+    
+    init(host: DMEventPeer,
+         multipeerService: DMEventMultipeerService,
+         sceneCoordinator: SceneCoordinatorType,
+         songsSectionsRepresenter: DMEventSongsRepresentable,
+         songsEditor: DMEventParticipantSongsEditable)
+    
+    var hostExists: Observable<Bool> { get }
+    
+}
 
+class DMEventParticipationViewModel: DMEventParticipationViewModelType, MultipeerViewModelType, BackgroundDisconnectType {
+    
     private let disposeBag = DisposeBag()
-    
-    let songSharingViewModel: DMEventSongSharingViewModelType
-
-    var backgroundTaskID = UIBackgroundTaskInvalid
-    
     private let host: DMEventPeer
     
-    var multipeerService: DMEventMultipeerService {
-        return songSharingViewModel.multipeerService
-    }
+    let multipeerService: DMEventMultipeerService
+    let sceneCoordinator: SceneCoordinatorType
     
+    let songsSectioned: Observable<[SongSection]>
+    let onSongSearch: CocoaAction
+    let onUpvote: (DMEventSong) -> (CocoaAction)
+    
+    var backgroundTaskID = UIBackgroundTaskInvalid
+
     var hostExists: Observable<Bool> {
         return multipeerService.connectedPeers()
             .map { [unowned self] peers in
@@ -64,10 +76,19 @@ class DMEventParticipationViewModel: MultipeerViewModelType, BackgroundDisconnec
         )
     }(self)
     
-    init(host: DMEventPeer, songSharingViewModel: DMEventSongSharingViewModelType) {
-        self.songSharingViewModel = songSharingViewModel
+    required init(host: DMEventPeer,
+                  multipeerService: DMEventMultipeerService,
+                  sceneCoordinator: SceneCoordinatorType,
+                  songsSectionsRepresenter: DMEventSongsRepresentable,
+                  songsEditor: DMEventParticipantSongsEditable) {
+        
+        self.sceneCoordinator = sceneCoordinator
         self.host = host
-
+        self.songsSectioned = songsSectionsRepresenter.songsSectioned
+        self.onSongSearch = songsEditor.onSongSearch
+        self.onUpvote = songsEditor.onUpvote
+        self.multipeerService = multipeerService
+        
         hostReconnectInvitations
             .subscribe(onNext: { handler in
                     handler(true)
@@ -87,7 +108,7 @@ class DMEventParticipationViewModel: MultipeerViewModelType, BackgroundDisconnec
             .map { _ in host }
             .subscribe(requestReconnect.inputs)
             .disposed(by: disposeBag)
-
+        
         NotificationCenter.default.addObserver(
             forName: Notifications.didEnterBackground,
             object: nil,
@@ -101,6 +122,7 @@ class DMEventParticipationViewModel: MultipeerViewModelType, BackgroundDisconnec
             queue: nil,
             using: willEnterForegroundNotificationHandler
         )
+        
     }
     
 }

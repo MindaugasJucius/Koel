@@ -19,10 +19,10 @@ extension BindableType {
                 guard let songCell = cell as? DMEventSongPersistedTableViewCell else {
                     return cell
                 }
-                
+
                 songCell.configure(
                     withSong: element,
-                    upvoteAction: viewModel.onUpvote(song: element)
+                    upvoteAction: viewModel.onUpvote(element)
                 )
                 
                 return cell
