@@ -149,7 +149,7 @@ class DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
                 observer.onError(error)
             }
             return Disposables.create()
-        }
+        }.subscribeOn(songPersistenceScheduler)
     }
     
     lazy var songs: Observable<Results<DMEventSong>> = {

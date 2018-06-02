@@ -27,7 +27,7 @@ extension Realm {
         action: @escaping (Realm) throws -> T?) -> Observable<T> {
         return Observable<ThreadSafeReference<T>>
             .create { observer -> Disposable in
-                os_log("performing operation: %@", log: OSLog.default, type: OSLogType.info, operation)
+                os_log("performing operation: %@", log: OSLog.default, type: OSLogType.debug, operation)
                 do {
                     let realm = try Realm()
                     if let result = try action(realm) {
@@ -59,7 +59,7 @@ extension Realm {
         action: @escaping (Realm) throws -> [T]?) -> Observable<[T]> {
         return Observable<[ThreadSafeReference<T>]>
             .create { observer -> Disposable in
-                os_log("performing operation: %@", log: OSLog.default, type: OSLogType.info, operation)
+                os_log("performing operation: %@", log: OSLog.default, type: OSLogType.debug, operation)
                 do {
                     let realm = try Realm()
                     if let result = try action(realm) {
