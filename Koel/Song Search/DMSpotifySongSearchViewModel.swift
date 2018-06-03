@@ -9,6 +9,7 @@
 import Foundation
 import Action
 import RxSwift
+import RxCocoa
 
 protocol DMSpotifySongSearchViewModelType: ViewModelType {
     
@@ -21,16 +22,21 @@ protocol DMSpotifySongSearchViewModelType: ViewModelType {
     
     var onClose: Action<[DMEventSong], Void> { get }
     var onDone: CocoaAction { get }
+
+    var loadNextPageOffsetTrigger: Driver<()> { get set }
 }
 
 class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
     
-    var sceneCoordinator: SceneCoordinatorType
-    var spotifySearchService: DMSpotifySearchServiceType
+    private let disposeBag = DisposeBag()
+    
+    var loadNextPageOffsetTrigger: Driver<()>
+    let sceneCoordinator: SceneCoordinatorType
+    let spotifySearchService: DMSpotifySearchServiceType
     
     private var selectedSongs: [DMEventSong] = []
     
-    var onClose: Action<[DMEventSong], Void>
+    let onClose: Action<[DMEventSong], Void>
     
     lazy var onDone: CocoaAction = {
         return CocoaAction(workFactory: { [unowned self] _ -> Observable<Void> in
@@ -39,16 +45,19 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
     }()
     
     lazy var searchResults: Observable<[SongSection]> = {
-        return spotifySearchService.savedTracks().map { songs in
-            [SongSection(model: "Results", items: songs)]
-        }.share()
+        return self.loadNextPageOffsetTrigger.asObservable()
+            .flatMap { [unowned self] _ in self.spotifySearchService.savedTracks() }
+            .debug("searchResults", trimOutput: true)
+            .map { songs in
+                [SongSection(model: "Results", items: songs)]
+        }
     }()
     
     init(sceneCoordinator: SceneCoordinatorType, spotifySearchService: DMSpotifySearchServiceType, onClose: Action<[DMEventSong], Void>) {
         self.sceneCoordinator = sceneCoordinator
         self.spotifySearchService = spotifySearchService
         self.onClose = onClose
-        
+        self.loadNextPageOffsetTrigger = Driver.empty()
     }
     
     lazy var addSelectedSong: Action<DMEventSong, Void> = {
@@ -68,5 +77,5 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
             return Observable.just(())
         })
     }()
-    
+
 }

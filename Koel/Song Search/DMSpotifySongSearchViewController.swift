@@ -11,6 +11,12 @@ import RxSwift
 import RxCocoa
 import RxDataSources
 
+extension UIScrollView {
+    func isNearBottomEdge(edgeOffset: CGFloat = 20.0) -> Bool {
+        return self.contentOffset.y + self.frame.size.height + edgeOffset > self.contentSize.height
+    }
+}
+
 class DMSpotifySongSearchViewController: UIViewController, BindableType {
     
     typealias ViewModelType = DMSpotifySongSearchViewModelType
@@ -83,6 +89,14 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
             .subscribe()
             .disposed(by: disposeBag)
     
+        viewModel.loadNextPageOffsetTrigger = tableView.rx.contentOffset.asDriver()
+            .map { $0.y }
+            .map(tableView.isNearBottomEdge)
+            .distinctUntilChanged()
+            .filter { $0 }
+            .debounce(0.1)
+            .map { _ in }
+        
         tableView.rx
             .modelSelected(DMEventSong.self)
             .subscribe(viewModel.addSelectedSong.inputs)
@@ -100,10 +114,8 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
 
 extension DMSpotifySongSearchViewController {
     
-    static func persistedSongDataSource(withViewModel viewModel: DMSpotifySongSearchViewModelType) -> RxTableViewSectionedAnimatedDataSource<SongSection> {
-        
-        return RxTableViewSectionedAnimatedDataSource<SongSection>(
-            animationConfiguration: AnimationConfiguration(insertAnimation: .top, reloadAnimation: .fade, deleteAnimation: .left),
+    static func persistedSongDataSource(withViewModel viewModel: DMSpotifySongSearchViewModelType) -> RxTableViewSectionedReloadDataSource<SongSection> {
+        return RxTableViewSectionedReloadDataSource<SongSection>(
             configureCell: { (dataSource, tableView, indexPath, element) -> UITableViewCell in
                 let cell = tableView.dequeueReusableCell(withIdentifier: DMSpotifySongTableViewCell.reuseIdentifier, for: indexPath)
                 
@@ -116,11 +128,34 @@ extension DMSpotifySongSearchViewController {
                 )
                 
                 return cell
-            },
+        },
             titleForHeaderInSection: { dataSource, sectionIndex in
                 return dataSource[sectionIndex].model
-            }
+        }
         )
     }
+    
+//    static func persistedSongDataSource(withViewModel viewModel: DMSpotifySongSearchViewModelType) -> RxTableViewSectionedAnimatedDataSource<SongSection> {
+//        
+//        return RxTableViewSectionedAnimatedDataSource<SongSection>(
+//            animationConfiguration: AnimationConfiguration(insertAnimation: .top, reloadAnimation: .fade, deleteAnimation: .left),
+//            configureCell: { (dataSource, tableView, indexPath, element) -> UITableViewCell in
+//                let cell = tableView.dequeueReusableCell(withIdentifier: DMSpotifySongTableViewCell.reuseIdentifier, for: indexPath)
+//                
+//                guard let songCell = cell as? DMSpotifySongTableViewCell else {
+//                    return cell
+//                }
+//                
+//                songCell.configure(
+//                    withSong: element
+//                )
+//                
+//                return cell
+//            },
+//            titleForHeaderInSection: { dataSource, sectionIndex in
+//                return dataSource[sectionIndex].model
+//            }
+//        )
+//    }
     
 }
