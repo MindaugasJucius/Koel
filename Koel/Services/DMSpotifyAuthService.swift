@@ -24,6 +24,8 @@ class DMSpotifyAuthService: NSObject {
     
     let sceneCoordinator: SceneCoordinatorType
     
+    private let maxAttempts = 4
+    
     private let disposeBag = DisposeBag()
     private let auth: SPTAuth = SPTAuth.defaultInstance()
     
@@ -36,9 +38,11 @@ class DMSpotifyAuthService: NSObject {
             .do(onNext: { [unowned self] session in
                 Spartan.authorizationToken = session.accessToken
                 self.auth.session = session
-            }
-        )
+            
+                }
+            )
     }
+    
     
     init(sceneCoordinator: SceneCoordinatorType) {
         self.sceneCoordinator = sceneCoordinator
@@ -56,9 +60,28 @@ class DMSpotifyAuthService: NSObject {
         ]
     }
     
+    private func currentSession() -> Observable<SPTSession> {
+        guard auth.session != nil else {
+            return performAuthenticationFlow()
+        }
+        
+        if auth.session.isValid() {
+            return Observable<SPTSession>.just(auth.session)
+        } else {
+            return Observable<SPTSession>.create { [unowned self] observer -> Disposable in
+                os_log("renewing spt session", log: OSLog.default, type: .info)
+                self.auth.renewSession(self.auth.session, callback: { (error, session) in
+                    self.authCallback(error, session, observer)
+                })
+                return Disposables.create()
+            }
+        }
+    }
+    
     private var authCallback: SPTAuthCallbackObserver {
         return { error, session, observer in
             if let error = error {
+                print((error as NSError).domain)
                 os_log("spotify auth callback error: %@", log: OSLog.default, type: .error, error.localizedDescription)
                 observer.onError(error)
             } else if let session = session {
@@ -84,25 +107,6 @@ class DMSpotifyAuthService: NSObject {
                 return url
             }
             .filterNil()
-    }
-    
-    private func currentSession() -> Observable<SPTSession> {
-        guard auth.session != nil else {
-            return performAuthenticationFlow()
-        }
-        
-        if auth.session.isValid() {
-            return Observable<SPTSession>.just(auth.session)
-        } else {
-            return Observable<SPTSession>.create { [unowned self] observer -> Disposable in
-                os_log("renewing spt session", log: OSLog.default, type: .info)
-                self.auth.renewSession(self.auth.session, callback: { (error, session) in
-                        self.authCallback(error, session, observer)
-                    }
-                )
-                return Disposables.create()
-            }
-        }
     }
     
     private func performAuthenticationFlow() -> Observable<SPTSession> {

@@ -9,8 +9,15 @@
 import Foundation
 import Spartan
 import RxSwift
+import ObjectMapper
 
-typealias SpartanMapped = ([DMEventSong], Bool)
+enum Result<T, E: Error> {
+    case success(T)
+    case failure(E)
+}
+
+typealias PagingObjectSuccess<T: Paginatable & Mappable> = ((PagingObject<T>) -> Void)
+typealias PagingObjectFailure = (SpartanError) -> (Void)
 
 protocol DMSpotifySearchServiceType {
     
@@ -29,53 +36,51 @@ class DMSpotifySearchService: DMSpotifySearchServiceType {
     
     init(authService: DMSpotifyAuthService) {
         self.authService = authService
-        
     }
     
-    private func initialRequest() -> Observable<PagingObject<SavedTrack>> {
-        return Observable<PagingObject<SavedTrack>>.create { observer in
-            _ = Spartan.getSavedTracks(limit: 50,
-                                       offset: 0,
-                                       success: { pagingObject in
-                observer.onNext(pagingObject)
-                observer.onCompleted()
-            }, failure: { error in
-                if let error = error.nsError {
-                    observer.onError(error)
+    private func initial<T: Paginatable & Mappable>(completionBlocks: @escaping ((success: PagingObjectSuccess<T>, failure: PagingObjectFailure)) -> ()) -> Observable<PagingObject<T>> {
+        return Observable<PagingObject<T>>.create { observer in
+            let completion: (success: PagingObjectSuccess<T>, failure: PagingObjectFailure) = (
+                success: { pagingObject in
+                    observer.onNext(pagingObject)
                     observer.onCompleted()
+                },
+                failure: { error in
+                    let nsError = error.nsError ?? NSError(domain: error.errorMessage, code: 0, userInfo: nil)
+                    observer.onError(nsError)
                 }
-            })
+            )
+            completionBlocks(completion)
             return Disposables.create()
         }
     }
     
-    private func followingRequest(pagingObject: PagingObject<SavedTrack>) -> Observable<PagingObject<SavedTrack>> {
-        return Observable<PagingObject<SavedTrack>>.create { observer in
+    private func following<T: Paginatable & Mappable>(pagingObject: PagingObject<T>) -> Observable<PagingObject<T>> {
+        return Observable<PagingObject<T>>.create { observer in
             pagingObject.getNext(
                 success: { pagingObject in
                     observer.onNext(pagingObject)
                     observer.onCompleted()
                 },
                 failure: { error in
-                    if let error = error.nsError {
-                        observer.onError(error)
-                        observer.onCompleted()
-                    }
-            })
+                    let nsError = error.nsError ?? NSError(domain: error.errorMessage, code: 0, userInfo: nil)
+                    observer.onError(nsError)
+                }
+            )
             return Disposables.create()
         }
     }
-  
+    
     func savedTracks() -> Observable<[DMEventSong]> {
         return authService.currentSessionObservable
             .flatMap { [unowned self] _ in Observable.just(self.latestSavedTracksPagingObject) }
             .flatMap { [unowned self] paggingObject -> Observable<PagingObject<SavedTrack>> in
                 guard let paggingObject = paggingObject else {
-                    return self.initialRequest()
+                    return self.initial { Spartan.getSavedTracks(limit: 50, success: $0, failure: $1) }
                 }
                 
                 if paggingObject.canMakeNextRequest {
-                    return self.followingRequest(pagingObject: paggingObject)
+                    return self.following(pagingObject: paggingObject)
                 }
                 
                 return .empty()

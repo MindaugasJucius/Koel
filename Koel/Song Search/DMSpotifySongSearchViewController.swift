@@ -91,10 +91,12 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
     
         viewModel.loadNextPageOffsetTrigger = tableView.rx.contentOffset.asDriver()
             .map { $0.y }
+            .debug("offset", trimOutput: true)
             .map(tableView.isNearBottomEdge)
             .distinctUntilChanged()
             .filter { $0 }
             .debounce(0.1)
+            .debug("triggered", trimOutput: true)
             .map { _ in }
         
         tableView.rx
@@ -123,9 +125,7 @@ extension DMSpotifySongSearchViewController {
                     return cell
                 }
                 
-                songCell.configure(
-                    withSong: element
-                )
+                songCell.configure(withSong: element)
                 
                 return cell
         },
@@ -135,27 +135,5 @@ extension DMSpotifySongSearchViewController {
         )
     }
     
-//    static func persistedSongDataSource(withViewModel viewModel: DMSpotifySongSearchViewModelType) -> RxTableViewSectionedAnimatedDataSource<SongSection> {
-//        
-//        return RxTableViewSectionedAnimatedDataSource<SongSection>(
-//            animationConfiguration: AnimationConfiguration(insertAnimation: .top, reloadAnimation: .fade, deleteAnimation: .left),
-//            configureCell: { (dataSource, tableView, indexPath, element) -> UITableViewCell in
-//                let cell = tableView.dequeueReusableCell(withIdentifier: DMSpotifySongTableViewCell.reuseIdentifier, for: indexPath)
-//                
-//                guard let songCell = cell as? DMSpotifySongTableViewCell else {
-//                    return cell
-//                }
-//                
-//                songCell.configure(
-//                    withSong: element
-//                )
-//                
-//                return cell
-//            },
-//            titleForHeaderInSection: { dataSource, sectionIndex in
-//                return dataSource[sectionIndex].model
-//            }
-//        )
-//    }
     
 }
