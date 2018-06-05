@@ -12,7 +12,7 @@ import RxCocoa
 import RxDataSources
 
 extension UIScrollView {
-    func isNearBottomEdge(edgeOffset: CGFloat = 20.0) -> Bool {
+    func isNearBottomEdge(edgeOffset: CGFloat = 100.0) -> Bool {
         return self.contentOffset.y + self.frame.size.height + edgeOffset > self.contentSize.height
     }
 }
@@ -90,13 +90,12 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
             .disposed(by: disposeBag)
     
         viewModel.loadNextPageOffsetTrigger = tableView.rx.contentOffset.asDriver()
-            .map { $0.y }
-            .debug("offset", trimOutput: true)
-            .map(tableView.isNearBottomEdge)
+            .map { [unowned self] _ in
+                return self.tableView.isNearBottomEdge()
+            }
             .distinctUntilChanged()
             .filter { $0 }
             .debounce(0.1)
-            .debug("triggered", trimOutput: true)
             .map { _ in }
         
         tableView.rx
