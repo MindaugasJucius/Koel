@@ -38,6 +38,8 @@ class DMEventManagementViewModel: DMEventManagementViewModelType, MultipeerViewM
     private let songsRepresenter: DMEventSongsManagerSeparatable & DMEventSongsRepresentable
     private let songsEditor: DMEventHostSongsEditable & DMEventParticipantSongsEditable
     
+    private let errorHandler: DMErrorHandlerServiceType
+    
     let songsSectioned: Observable<[SongSection]>
     
     let onSongSearch: CocoaAction
@@ -67,7 +69,7 @@ class DMEventManagementViewModel: DMEventManagementViewModelType, MultipeerViewM
                                                            addedSongs: songsRepresenter.addedSongs,
                                                            playingSong: songsRepresenter.playingSong,
                                                            upNextSong: songsRepresenter.upNextSong)
-        
+        self.errorHandler = DMErrorHandlerService(sceneCoordinator: sceneCoordinator)
         
         self.onSongsDelete = self.songsEditor.onSongsDelete
         self.onSongSearch = self.songsEditor.onSongSearch
@@ -191,7 +193,11 @@ class DMEventManagementViewModel: DMEventManagementViewModelType, MultipeerViewM
     
     lazy var onPlay: CocoaAction = {
         return CocoaAction { [unowned self] in
-            return self.sptPlaybackService.togglePlayback
+            return self.sptPlaybackService.togglePlayback.catchError { error in
+                return self.sceneCoordinator.promptFor(error.localizedDescription, cancelAction: "cancel", actions: nil)
+                    .map { _ in }
+                    .take(1)
+            }
         }
     }()
     
@@ -204,7 +210,7 @@ class DMEventManagementViewModel: DMEventManagementViewModelType, MultipeerViewM
             .playingSong
             .map { $0 != nil }
         
-        return  Observable.combineLatest(queuedSongsAvailable, playingSongAvailable) { $0 || $1 }
+        return Observable.combineLatest(queuedSongsAvailable, playingSongAvailable) { $0 || $1 }
     }()
     
     lazy var isPlaying: Observable<Bool> = {

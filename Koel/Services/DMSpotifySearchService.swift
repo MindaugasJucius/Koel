@@ -11,11 +11,6 @@ import Spartan
 import RxSwift
 import ObjectMapper
 
-enum Result<T, E: Error> {
-    case success(T)
-    case failure(E)
-}
-
 typealias PagingObjectSuccess<T: Paginatable & Mappable> = ((PagingObject<T>) -> Void)
 typealias PagingObjectFailure = (SpartanError) -> (Void)
 

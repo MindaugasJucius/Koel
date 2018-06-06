@@ -25,6 +25,7 @@ protocol DMSpotifyPlaybackServiceType {
     func nextEnabled() -> Observable<Bool>
 }
 
+
 class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
 
     private let disposeBag = DisposeBag()
@@ -43,6 +44,8 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
     private let isPlayingSubject: BehaviorSubject<Bool> = BehaviorSubject(value: false)
     private let playingURISubject: BehaviorSubject<String?> = BehaviorSubject(value: .none)
     private let metadataCurrentURISubject: BehaviorSubject<String?> = BehaviorSubject(value: .none)
+    
+    private let reachabilityService: DefaultReachabilityService = try! DefaultReachabilityService()
     
     private var playingURI: Observable<String?> {
         return playingURISubject.asObservable()
@@ -127,7 +130,7 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
                     }
                     return self.togglePlaybackState(isPlaying: !isPlaying)
                 }
-                
+
                 return .just(())
             }
     }()
@@ -147,9 +150,16 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
     //MARK: - Private
     
     private func login() -> Observable<Bool> {
-        return authService.currentSessionObservable.map { session -> String in
-                return session.accessToken
+
+        return
+            reachabilityService.reachability.flatMap { [unowned self] status -> Observable<SPTSession>  in
+                if status.reachable {
+                    return self.authService.currentSessionObservable
+                } else {
+                    return .error(ReachabilityStatusError.networkUnavailable)
+                }
             }
+            .map { $0.accessToken }
             .do(onNext: { [unowned self] accessToken in
                 self.player.login(withAccessToken: accessToken)
             })
