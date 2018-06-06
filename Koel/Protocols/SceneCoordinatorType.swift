@@ -28,6 +28,8 @@ protocol SceneCoordinatorType {
     /// pop scene from navigation stack or dismiss current modal
     @discardableResult
     func pop(animated: Bool) -> Observable<Void>
+    
+    func promptFor<Action : CustomStringConvertible>(_ message: String, cancelAction: Action, actions: [Action]?) -> Observable<Action>
 }
 
 extension SceneCoordinatorType {

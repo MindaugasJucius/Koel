@@ -37,6 +37,29 @@ class SceneCoordinator: NSObject, SceneCoordinatorType {
         ).disposed(by: disposeBag)
     }
     
+    func promptFor<Action : CustomStringConvertible>(_ message: String, cancelAction: Action, actions: [Action]?) -> Observable<Action> {
+        return Observable.create { observer in
+            let alertView = UIAlertController(title: "RxExample", message: message, preferredStyle: .alert)
+            alertView.addAction(UIAlertAction(title: cancelAction.description, style: .cancel) { _ in
+                observer.on(.next(cancelAction))
+            })
+            
+            if let actions = actions {
+                for action in actions {
+                    alertView.addAction(UIAlertAction(title: action.description, style: .default) { _ in
+                        observer.on(.next(action))
+                    })
+                }
+            }
+            
+            self.currentViewController.present(alertView, animated: true, completion: nil)
+
+            return Disposables.create {
+                alertView.dismiss(animated:false, completion: nil)
+            }
+        }
+    }
+    
     static func actualViewController(for viewController: UIViewController) -> UIViewController {
         if let navigationController = viewController as? UINavigationController {
             return navigationController.viewControllers.first!
