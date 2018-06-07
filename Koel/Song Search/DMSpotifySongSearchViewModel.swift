@@ -47,7 +47,6 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
     lazy var searchResults: Observable<[SongSection]> = {
         return self.loadNextPageOffsetTrigger.asObservable()
             .flatMap { [unowned self] _ in self.spotifySearchService.savedTracks() }
-            .debug("searchResults", trimOutput: true)
             .map { songs in
                 [SongSection(model: "Results", items: songs)]
         }

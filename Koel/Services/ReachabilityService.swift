@@ -7,6 +7,7 @@
 //
 
 import RxSwift
+import Reachability
 
 #if swift(>=3.2)
     import class Dispatch.DispatchQueue
@@ -62,7 +63,7 @@ class DefaultReachabilityService
 
         reachabilityRef.whenReachable = { reachability in
             backgroundQueue.async {
-                reachabilitySubject.on(.next(.reachable(viaWiFi: reachabilityRef.isReachableViaWiFi)))
+                reachabilitySubject.on(.next(.reachable(viaWiFi: reachability.connection == .wifi)))
             }
         }
 

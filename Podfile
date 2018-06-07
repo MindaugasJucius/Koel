@@ -13,6 +13,7 @@ target 'Koel' do
     pod 'Action'
     pod 'SCSiriWaveformView'
     pod 'Spartan', :git => 'https://github.com/MindaugasJucius/Spartan', :commit => 'f998860fba79e59afe57464b4de4ee57d01e372a'
+    pod 'ReachabilitySwift'
   # Pods for Koel
 
   target 'KoelTests' do
