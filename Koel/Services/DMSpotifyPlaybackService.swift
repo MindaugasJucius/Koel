@@ -162,7 +162,7 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
             }
             .map { $0.accessToken }
             .do(onNext: { [unowned self] accessToken in
-                self.player.login(withAccessToken: accessToken)
+                    self.player.login(withAccessToken: accessToken)
             })
             .flatMap { [unowned self] _ in
                 return self.isLoggedIn.asObservable().filter { $0 }
