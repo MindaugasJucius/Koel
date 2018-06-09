@@ -41,6 +41,8 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
         return tableView
     }()
     
+    private let refreshControl = UIRefreshControl()
+    
     required init(withViewModel viewModel: DMSpotifySongSearchViewModelType) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -72,6 +74,9 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
             doneButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ]
         
+        
+        tableView.addSubview(refreshControl)
+        
         NSLayoutConstraint.activate(buttonConstraints)
     }
     
@@ -81,6 +86,10 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
             .take(1)
             .do { [unowned self] in
                 let dataSource = DMSpotifySongSearchViewController.persistedSongDataSource(withViewModel: self.viewModel)
+
+
+                
+
                 
                 self.viewModel.searchResults
                     .bind(to: self.tableView.rx.items(dataSource: dataSource))
@@ -88,12 +97,15 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
             }
             .subscribe()
             .disposed(by: disposeBag)
-    
+
+        refreshControl.rx.controlEvent(.valueChanged)
+            .map { _ in }
+        
+        
         viewModel.loadNextPageOffsetTrigger = tableView.rx.contentOffset.asDriver()
             .map { [unowned self] _ in
                 return self.tableView.isNearBottomEdge()
             }
-            .distinctUntilChanged()
             .filter { $0 }
             .debounce(0.1)
             .map { _ in }

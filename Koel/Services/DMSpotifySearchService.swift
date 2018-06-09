@@ -27,7 +27,6 @@ class DMSpotifySearchService: DMSpotifySearchServiceType {
     let authService: DMSpotifyAuthService
     
     private var latestSavedTracksPagingObject: PagingObject<SavedTrack>? = nil
-    private var allSavedTracks: [DMEventSong] = []
     
     init(authService: DMSpotifyAuthService) {
         self.authService = authService
@@ -90,15 +89,10 @@ class DMSpotifySearchService: DMSpotifySearchServiceType {
                     eventSong.title = savedTrack.track.name
                     let artistTitle = savedTrack.track.album.artists.reduce("", { currentTitle, artist in
                         return currentTitle.appending("\(artist.name!) ")
-                    }
-                    )
+                    })
                     eventSong.artistTitle = artistTitle
                     return eventSong
                 }
-            }
-            .map { [unowned self] newSavedTracks in
-                self.allSavedTracks.append(contentsOf: newSavedTracks)
-                return self.allSavedTracks
             }
     }
 

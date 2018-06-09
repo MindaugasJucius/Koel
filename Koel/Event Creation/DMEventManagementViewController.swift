@@ -81,7 +81,6 @@ class DMEventManagementViewController: UIViewController, BindableType {
         ]
         
         view.addSubview(invitationsButton)
-
         
         view.addSubview(playbackControlsView)
         let playbackControlsViewConstraints = [
@@ -109,7 +108,6 @@ class DMEventManagementViewController: UIViewController, BindableType {
         NSLayoutConstraint.activate(invitationConstraints)
         NSLayoutConstraint.activate(addButtonConstraints)
         NSLayoutConstraint.activate(tableViewConstraints)
-        
         
         #if DEBUG
             view.addSubview(deleteSongsButton)

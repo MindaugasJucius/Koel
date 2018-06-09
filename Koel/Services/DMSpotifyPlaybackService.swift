@@ -150,9 +150,8 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
     //MARK: - Private
     
     private func login() -> Observable<Bool> {
-
-        return
-            reachabilityService.reachability.flatMap { [unowned self] status -> Observable<SPTSession>  in
+        return reachabilityService.reachability
+            .flatMap { [unowned self] status -> Observable<SPTSession> in
                 if status.reachable {
                     return self.authService.currentSessionObservable
                 } else {
@@ -161,7 +160,7 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
             }
             .map { $0.accessToken }
             .do(onNext: { [unowned self] accessToken in
-                self.player.login(withAccessToken: accessToken)
+                    self.player.login(withAccessToken: accessToken)
             })
             .flatMap { [unowned self] _ in
                 return self.isLoggedIn.asObservable().filter { $0 }

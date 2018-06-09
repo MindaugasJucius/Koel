@@ -9,6 +9,11 @@
 import UIKit
 import RxSwift
 
+enum Result<T, E: Error> {
+    case success(T)
+    case failure(E)
+}
+
 protocol BindableType {
     associatedtype ViewModelType
     
