@@ -16,6 +16,7 @@ class DMEventSearchViewModel: ViewModelType, MultipeerViewModelType {
     private let disposeBag = DisposeBag()
     
     let multipeerService = DMEventMultipeerService(asEventHost: false)
+    private let reachabilityService = try! DefaultReachabilityService()
     
     let sceneCoordinator: SceneCoordinatorType
 
@@ -43,12 +44,13 @@ class DMEventSearchViewModel: ViewModelType, MultipeerViewModelType {
             .filter { $0.isHost }
     }
     
-    lazy var pushParticipation: Action<DMEventPeer, Void> = {
+    private lazy var pushParticipation: Action<DMEventPeer, Void> = {
         return Action (
             workFactory: { [unowned self] host in
-                
+
                 let songSharingViewModel = DMEventSongSharingViewModel(
                     songPersistenceService: DMEventSongPersistenceService(selfPeer: self.multipeerService.myEventPeer),
+                    reachabilityService: self.reachabilityService,
                     songSharingService: DMEntitySharingService(),
                     multipeerService: self.multipeerService,
                     sceneCoordinator: self.sceneCoordinator
@@ -78,9 +80,9 @@ class DMEventSearchViewModel: ViewModelType, MultipeerViewModelType {
             
             let multipeerService = DMEventMultipeerService(asEventHost: true)
             
-            
             let songSharingViewModel = DMEventSongSharingViewModel(
                 songPersistenceService: DMEventSongPersistenceService(selfPeer: multipeerService.myEventPeer),
+                reachabilityService: self.reachabilityService,
                 songSharingService: DMEntitySharingService(),
                 multipeerService: multipeerService,
                 sceneCoordinator: self.sceneCoordinator
@@ -88,10 +90,12 @@ class DMEventSearchViewModel: ViewModelType, MultipeerViewModelType {
             
             let manageEventViewModel = DMEventManagementViewModel(
                 multipeerService: multipeerService,
+                reachabilityService: self.reachabilityService,
                 sceneCoordinator: self.sceneCoordinator,
                 songsRepresenter: songSharingViewModel,
                 songsEditor: songSharingViewModel
             )
+            
             return self.sceneCoordinator.transition(
                 to: Scene.manage(manageEventViewModel),
                 type: .rootWithNavigationVC

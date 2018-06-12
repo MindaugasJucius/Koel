@@ -12,7 +12,7 @@ import RxCocoa
 import RxDataSources
 
 extension UIScrollView {
-    func isNearBottomEdge(edgeOffset: CGFloat = 100.0) -> Bool {
+    func isNearBottomEdge(edgeOffset: CGFloat = 200.0) -> Bool {
         return self.contentOffset.y + self.frame.size.height + edgeOffset > self.contentSize.height
     }
 }
@@ -39,6 +39,12 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
         tableView.allowsMultipleSelection = true
         tableView.register(DMSpotifySongTableViewCell.self, forCellReuseIdentifier: DMSpotifySongTableViewCell.reuseIdentifier)
         return tableView
+    }()
+    
+    private lazy var activityControl: UIActivityIndicatorView = {
+        let activityControl = UIActivityIndicatorView(activityIndicatorStyle: .gray)
+        activityControl.translatesAutoresizingMaskIntoConstraints = false
+        return activityControl
     }()
     
     private let refreshControl = UIRefreshControl()
@@ -74,10 +80,18 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
             doneButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ]
         
-        
         tableView.addSubview(refreshControl)
-        
+
         NSLayoutConstraint.activate(buttonConstraints)
+        
+        view.addSubview(activityControl)
+        
+        let activityControlConstraints = [
+            activityControl.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            activityControl.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        ]
+        
+        NSLayoutConstraint.activate(activityControlConstraints)
     }
     
     func bindViewModel() {
@@ -86,21 +100,17 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
             .take(1)
             .do { [unowned self] in
                 let dataSource = DMSpotifySongSearchViewController.persistedSongDataSource(withViewModel: self.viewModel)
-
-
                 
-
-                
-                self.viewModel.searchResults
-                    .bind(to: self.tableView.rx.items(dataSource: dataSource))
+                self.viewModel.results
+                    .drive(self.tableView.rx.items(dataSource: dataSource))
                     .disposed(by: self.disposeBag)
             }
             .subscribe()
             .disposed(by: disposeBag)
-
-        refreshControl.rx.controlEvent(.valueChanged)
-            .map { _ in }
         
+        viewModel.isLoading
+            .drive(activityControl.rx.isAnimating)
+            .disposed(by: self.disposeBag)
         
         viewModel.loadNextPageOffsetTrigger = tableView.rx.contentOffset.asDriver()
             .map { [unowned self] _ in

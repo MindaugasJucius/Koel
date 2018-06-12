@@ -74,6 +74,8 @@ class DMSpotifySearchService: DMSpotifySearchServiceType {
                 }
                 
                 if paggingObject.canMakeNextRequest {
+                    
+                    //TODO: add caching to pagingObject.getNext
                     return self.following(pagingObject: paggingObject)
                 }
                 

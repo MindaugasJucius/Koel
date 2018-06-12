@@ -16,6 +16,7 @@ import RxDataSources
 protocol DMEventManagementViewModelType: ViewModelType, DMEventSongsRepresentable, DMEventParticipantSongsEditable, DMEventHostSongsEditable {
     
     init(multipeerService: DMEventMultipeerService,
+         reachabilityService: ReachabilityService,
          sceneCoordinator: SceneCoordinatorType,
          songsRepresenter: DMEventSongsRepresentable & DMEventSongsManagerSeparatable,
          songsEditor: DMEventParticipantSongsEditable & DMEventHostSongsEditable)
@@ -53,6 +54,7 @@ class DMEventManagementViewModel: DMEventManagementViewModelType, MultipeerViewM
     var backgroundTaskID = UIBackgroundTaskInvalid
 
     required init(multipeerService: DMEventMultipeerService,
+                  reachabilityService: ReachabilityService,
                   sceneCoordinator: SceneCoordinatorType,
                   songsRepresenter: DMEventSongsManagerSeparatable & DMEventSongsRepresentable,
                   songsEditor: DMEventHostSongsEditable & DMEventParticipantSongsEditable) {
@@ -65,6 +67,7 @@ class DMEventManagementViewModel: DMEventManagementViewModelType, MultipeerViewM
         let sptAuthService = DMSpotifyAuthService(sceneCoordinator: sceneCoordinator)
         
         self.sptPlaybackService = DMSpotifyPlaybackService(authService: sptAuthService,
+                                                           reachabilityService: reachabilityService,
                                                            updateSongToState: songsEditor.updateSongToState,
                                                            addedSongs: songsRepresenter.addedSongs,
                                                            playingSong: songsRepresenter.playingSong,

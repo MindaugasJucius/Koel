@@ -44,9 +44,9 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType, MultipeerVie
     private let disposeBag = DisposeBag()
     private var songPersistenceService: DMEventSongPersistenceServiceType
     
-    var songSharingService: DMEntitySharingService<DMEventSong>
-    var multipeerService: DMEventMultipeerService
-    var sceneCoordinator: SceneCoordinatorType
+    let songSharingService: DMEntitySharingService<DMEventSong>
+    let multipeerService: DMEventMultipeerService
+    let sceneCoordinator: SceneCoordinatorType
     
     private let songSortDescriptors = [
         SortDescriptor(keyPath: "upvoteCount", ascending: false),
@@ -54,8 +54,10 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType, MultipeerVie
     ]
     
     init(songPersistenceService: DMEventSongPersistenceServiceType,
+         reachabilityService: ReachabilityService,
          songSharingService: DMEntitySharingService<DMEventSong>,
          multipeerService: DMEventMultipeerService,
+         
          sceneCoordinator: SceneCoordinatorType) {
         self.songSharingService = songSharingService
         self.songPersistenceService = songPersistenceService
@@ -168,6 +170,25 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType, MultipeerVie
     
     //MARK: - Song search
     
+    lazy var onSongSearch: CocoaAction = {
+        return CocoaAction { [unowned self] in
+            
+            let spotifyAuthService = DMSpotifyAuthService(sceneCoordinator: self.sceneCoordinator)
+            let spotifySearchService = DMSpotifySearchService(authService: spotifyAuthService)
+            
+            let spotifySongSearchViewModel = DMSpotifySongSearchViewModel(
+                sceneCoordinator: self.sceneCoordinator,
+                spotifySearchService: spotifySearchService,
+                onClose: self.onSearchClose()
+            )
+            
+            return self.sceneCoordinator.transition(
+                to: Scene.searchSpotify(spotifySongSearchViewModel),
+                type: .modal
+            )
+        }
+    }()
+    
     private func onSearchClose() -> Action<[DMEventSong], Void> {
         return Action<[DMEventSong], Void>(workFactory: { [unowned self] (songs) -> Observable<Void> in
             
@@ -182,23 +203,6 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType, MultipeerVie
             )
         })
     }
-  
-    lazy var onSongSearch: CocoaAction = {
-        return CocoaAction { [unowned self] in
-            let spotifyAuthService = DMSpotifyAuthService(sceneCoordinator: self.sceneCoordinator)
-            let spotifySearchService = DMSpotifySearchService(authService: spotifyAuthService)
-            let spotifySongSearchViewModel = DMSpotifySongSearchViewModel(
-                sceneCoordinator: self.sceneCoordinator,
-                spotifySearchService: spotifySearchService,
-                onClose: self.onSearchClose()
-            )
-            
-            return self.sceneCoordinator.transition(
-                to: Scene.searchSpotify(spotifySongSearchViewModel),
-                type: .modal
-            )
-        }
-    }()
     
     //MARK: - Song creation
   

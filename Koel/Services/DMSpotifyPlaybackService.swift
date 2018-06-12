@@ -45,7 +45,7 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
     private let playingURISubject: BehaviorSubject<String?> = BehaviorSubject(value: .none)
     private let metadataCurrentURISubject: BehaviorSubject<String?> = BehaviorSubject(value: .none)
     
-    private let reachabilityService: DefaultReachabilityService = try! DefaultReachabilityService()
+    private let reachabilityService: ReachabilityService
     
     private var playingURI: Observable<String?> {
         return playingURISubject.asObservable()
@@ -67,12 +67,14 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
     }
     
     init(authService: DMSpotifyAuthService,
+         reachabilityService: ReachabilityService,
          updateSongToState: @escaping (DMEventSong, DMEventSongState) -> (Observable<Void>),
          addedSongs: Observable<[DMEventSong]>,
          playingSong: Observable<DMEventSong?>,
          upNextSong: Observable<DMEventSong?>) {
         
         self.authService = authService
+        self.reachabilityService = reachabilityService
         self.updateSongToState = updateSongToState
         self.addedSongs = addedSongs
         self.playingSong = playingSong
@@ -160,7 +162,7 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
             }
             .map { $0.accessToken }
             .do(onNext: { [unowned self] accessToken in
-                    self.player.login(withAccessToken: accessToken)
+                self.player.login(withAccessToken: accessToken)
             })
             .flatMap { [unowned self] _ in
                 return self.isLoggedIn.asObservable().filter { $0 }

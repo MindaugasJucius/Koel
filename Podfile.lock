@@ -45,24 +45,6 @@ DEPENDENCIES:
   - SCSiriWaveformView
   - Spartan (from `https://github.com/MindaugasJucius/Spartan`, commit `f998860fba79e59afe57464b4de4ee57d01e372a`)
 
-SPEC REPOS:
-  https://github.com/cocoapods/specs.git:
-    - Action
-    - Alamofire
-    - AlamofireObjectMapper
-    - AlamoRecord
-    - Differentiator
-    - ObjectMapper
-    - ReachabilitySwift
-    - Realm
-    - RealmSwift
-    - RxCocoa
-    - RxDataSources
-    - RxOptional
-    - RxRealm
-    - RxSwift
-    - SCSiriWaveformView
-
 EXTERNAL SOURCES:
   Spartan:
     :commit: f998860fba79e59afe57464b4de4ee57d01e372a
@@ -93,4 +75,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 33f9b5875b41a67d4e53185e7918c6a287243a4a
 
-COCOAPODS: 1.5.3
+COCOAPODS: 1.4.0
