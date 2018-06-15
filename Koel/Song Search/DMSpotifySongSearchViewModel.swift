@@ -19,13 +19,9 @@ enum DMSpotifySongSearchState<T, E: Error> {
 protocol DMSpotifySongSearchViewModelType: ViewModelType {
     
     var spotifySearchService: DMSpotifySearchServiceType { get }
-    
-    var searchResults: Observable<[SongSection]> { get }
-    
-    var results: Signal<[SongSection]> { get }
-    var error: Signal<NSError> { get }
-    var isLoading: Signal<Bool> { get }
-    var isRefreshing: Signal<Bool> { get }
+
+    var results: Driver<[SongSection]> { get }
+    var isLoading: Driver<Bool> { get }
     
     var removeSelectedSong: Action<DMEventSong, Void> { get }
     var addSelectedSong: Action<DMEventSong, Void> { get }
@@ -38,35 +34,41 @@ protocol DMSpotifySongSearchViewModelType: ViewModelType {
 }
 
 class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
+
+//    var isLoading: Signal<Bool>
+//    var isRefreshing: Signal<Bool>
+//    var error: Signal<NSError>
     
-    var isLoading: Signal<Bool>
-    var isRefreshing: Signal<Bool>
-    var error: Signal<NSError>
+    private let isLoadingRelay = BehaviorRelay(value: false)
     
+    var isLoading: Driver<Bool> {
+        return self.isLoadingRelay.asDriver()
+    }
     
     private var allSavedTracks: [DMEventSong] = []
     
-    
-//        .map { [unowned self] newSavedTracks in
-//            self.allSavedTracks.append(contentsOf: newSavedTracks)
-//            return self.allSavedTracks
-//    }
-    
-    lazy var results: Signal<[SongSection]> = {
+    lazy var results: Driver<[SongSection]> = {
         return self.loadNextPageOffsetTrigger
+            .withLatestFrom(self.isLoading)
+            .filter { !$0 }
+            .do(onNext: { _ in self.isLoadingRelay.accept(true) })
             .flatMap { [unowned self] _ in
-                self.spotifySearchService.savedTracks().asSignal(onErrorJustReturn: [])
+                self.spotifySearchService.savedTracks()
+                    .asDriver(onErrorJustReturn: [])
+                    .do(onNext: { _ in self.isLoadingRelay.accept(false) })
+                    .filter { !$0.isEmpty }
             }
-            .map { songs in
-                [SongSection(model: "Results", items: songs)]
+            .map { [unowned self] newSavedTracks in
+                self.allSavedTracks.append(contentsOf: newSavedTracks)
+                return self.allSavedTracks
             }
+            .map { [SongSection(model: "Results", items: $0)] }
     }()
     
     
     private let disposeBag = DisposeBag()
     
     var loadNextPageOffsetTrigger: Driver<()>
-
     let sceneCoordinator: SceneCoordinatorType
     let spotifySearchService: DMSpotifySearchServiceType
     
@@ -80,22 +82,19 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
         })
     }()
     
-    lazy var searchResults: Observable<[SongSection]> = {
-        return self.loadNextPageOffsetTrigger.asObservable()
-            .flatMap { [unowned self] _ in self.spotifySearchService.savedTracks() }
-            .map { songs in
-                [SongSection(model: "Results", items: songs)]
-            }
-    }()
-    
-
     init(sceneCoordinator: SceneCoordinatorType, spotifySearchService: DMSpotifySearchServiceType, onClose: Action<[DMEventSong], Void>) {
         self.sceneCoordinator = sceneCoordinator
         self.spotifySearchService = spotifySearchService
         self.onClose = onClose
         self.loadNextPageOffsetTrigger = Driver.empty()
-        //self.results = Driver.empty()
         
+        spotifySearchService.resultError
+            .asObservable()
+            .flatMap { error in
+                sceneCoordinator.promptFor(error.localizedDescription, cancelAction: "ok", actions: nil)
+            }
+            .subscribe()
+            .disposed(by: disposeBag)
     }
     
     lazy var addSelectedSong: Action<DMEventSong, Void> = {

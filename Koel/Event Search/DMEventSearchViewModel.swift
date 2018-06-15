@@ -19,8 +19,6 @@ class DMEventSearchViewModel: ViewModelType, MultipeerViewModelType {
     private let reachabilityService = try! DefaultReachabilityService()
     
     let sceneCoordinator: SceneCoordinatorType
-
-    private let spotifySearchService: DMSpotifySearchServiceType
     
     var incommingInvitations: Observable<(DMEventPeer, (Bool) -> ())> {
         return multipeerService
@@ -113,9 +111,6 @@ class DMEventSearchViewModel: ViewModelType, MultipeerViewModelType {
     
     required init(withSceneCoordinator sceneCoordinator: SceneCoordinatorType) {
         self.sceneCoordinator = sceneCoordinator
-        
-        let spotifyAuthService = DMSpotifyAuthService(sceneCoordinator: sceneCoordinator)
-        self.spotifySearchService = DMSpotifySearchService(authService: spotifyAuthService)
         
         multipeerService.startAdvertising()
         multipeerService.startBrowsing()

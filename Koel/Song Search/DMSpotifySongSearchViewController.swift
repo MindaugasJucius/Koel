@@ -12,9 +12,14 @@ import RxCocoa
 import RxDataSources
 
 extension UIScrollView {
-    func isNearBottomEdge(edgeOffset: CGFloat = 200.0) -> Bool {
-        return self.contentOffset.y + self.frame.size.height + edgeOffset > self.contentSize.height
+    func isNearBottomEdge(edgeOffset: CGFloat = 200) -> Bool {
+        return contentOffset.y + frame.size.height + edgeOffset > contentSize.height
     }
+
+    func isNearBottomEdge(contentOffset: CGPoint, edgeOffset: CGFloat = 200) -> Bool {
+        return contentOffset.y + frame.size.height + edgeOffset > contentSize.height
+    }
+
 }
 
 class DMSpotifySongSearchViewController: UIViewController, BindableType {
@@ -112,13 +117,25 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
             .drive(activityControl.rx.isAnimating)
             .disposed(by: self.disposeBag)
         
-        viewModel.loadNextPageOffsetTrigger = tableView.rx.contentOffset.asDriver()
-            .map { [unowned self] _ in
-                return self.tableView.isNearBottomEdge()
+        let didScrollDownwards = tableView.rx.didEndDragging
+            .map { [unowned self] _ -> Bool in
+                let translation = self.tableView.panGestureRecognizer.velocity(in: nil)
+                return translation.y < 0
             }
+        
+        let offsetTrigger = tableView.rx.willEndDragging
+            .map { (velocity, targetOffsetPointer) -> Bool in
+                let targetOffset = targetOffsetPointer.pointee
+                return self.tableView.isNearBottomEdge(contentOffset: targetOffset)
+            }
+
+        viewModel.loadNextPageOffsetTrigger = Observable.combineLatest(didScrollDownwards, offsetTrigger)
+            .map { $0 && $1 }
+            .startWith(true)
             .filter { $0 }
-            .debounce(0.1)
             .map { _ in }
+            .asDriver(onErrorJustReturn: ())
+            .debounce(0.1)
         
         tableView.rx
             .modelSelected(DMEventSong.self)

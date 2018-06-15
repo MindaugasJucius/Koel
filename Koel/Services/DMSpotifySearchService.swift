@@ -8,6 +8,7 @@
 
 import Foundation
 import Spartan
+import RxCocoa
 import RxSwift
 import ObjectMapper
 
@@ -16,7 +17,7 @@ typealias PagingObjectFailure = (SpartanError) -> (Void)
 
 protocol DMSpotifySearchServiceType {
     
-    var authService: DMSpotifyAuthService { get }
+    var resultError: Driver<Error> { get }
     
     func savedTracks() -> Observable<[DMEventSong]>
     
@@ -24,12 +25,20 @@ protocol DMSpotifySearchServiceType {
 
 class DMSpotifySearchService: DMSpotifySearchServiceType {
     
-    let authService: DMSpotifyAuthService
+    private let authService: DMSpotifyAuthService
+    private let reachabilityService: ReachabilityService
     
     private var latestSavedTracksPagingObject: PagingObject<SavedTrack>? = nil
     
-    init(authService: DMSpotifyAuthService) {
+    private let resultErrorRelay: BehaviorRelay<Error?> = BehaviorRelay(value: nil)
+
+    var resultError: Driver<Error> {
+        return resultErrorRelay.asDriver().filterNil()
+    }
+    
+    init(authService: DMSpotifyAuthService, reachabilityService: ReachabilityService) {
         self.authService = authService
+        self.reachabilityService = reachabilityService
     }
     
     private func initial<T: Paginatable & Mappable>(completionBlocks: @escaping ((success: PagingObjectSuccess<T>, failure: PagingObjectFailure)) -> ()) -> Observable<PagingObject<T>> {
@@ -65,8 +74,22 @@ class DMSpotifySearchService: DMSpotifySearchServiceType {
         }
     }
     
+    lazy var retryHandler: (Observable<Error>) -> Observable<Int> = { e in
+        return e.enumerated().flatMap { (attempt, error) -> Observable<Int> in
+            let nsError = error as NSError
+            
+            if nsError.code == -1009 {
+                return self.reachabilityService.reachability
+                    .filter { $0.reachable }
+                    .map { _ in 1 }
+            }
+            print("network error")
+            return Observable.error(error)
+        }
+    }
+    
     func savedTracks() -> Observable<[DMEventSong]> {
-        return authService.currentSessionObservable
+        return self.authService.currentSessionObservable
             .flatMap { [unowned self] _ in Observable.just(self.latestSavedTracksPagingObject) }
             .flatMap { [unowned self] paggingObject -> Observable<PagingObject<SavedTrack>> in
                 guard let paggingObject = paggingObject else {
@@ -74,7 +97,6 @@ class DMSpotifySearchService: DMSpotifySearchServiceType {
                 }
                 
                 if paggingObject.canMakeNextRequest {
-                    
                     //TODO: add caching to pagingObject.getNext
                     return self.following(pagingObject: paggingObject)
                 }
@@ -96,6 +118,9 @@ class DMSpotifySearchService: DMSpotifySearchServiceType {
                     return eventSong
                 }
             }
+            .timeout(5, scheduler: MainScheduler.instance)
+            .do(onError: { error in self.resultErrorRelay.accept(error) })
+            .retryWhen(retryHandler)
     }
 
 }

@@ -42,7 +42,8 @@ protocol DMEventSongSharingViewModelType {
 class DMEventSongSharingViewModel: DMEventSongSharingViewModelType, MultipeerViewModelType, DMEventSongsRepresentable, DMEventParticipantSongsEditable, DMEventHostSongsEditable, DMEventSongsManagerSeparatable {
     
     private let disposeBag = DisposeBag()
-    private var songPersistenceService: DMEventSongPersistenceServiceType
+    private let songPersistenceService: DMEventSongPersistenceServiceType
+    private let reachabilityService: ReachabilityService
     
     let songSharingService: DMEntitySharingService<DMEventSong>
     let multipeerService: DMEventMultipeerService
@@ -57,12 +58,13 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType, MultipeerVie
          reachabilityService: ReachabilityService,
          songSharingService: DMEntitySharingService<DMEventSong>,
          multipeerService: DMEventMultipeerService,
-         
          sceneCoordinator: SceneCoordinatorType) {
+        
         self.songSharingService = songSharingService
         self.songPersistenceService = songPersistenceService
         self.multipeerService = multipeerService
         self.sceneCoordinator = sceneCoordinator
+        self.reachabilityService = reachabilityService
         
         multipeerService
             .receive()
@@ -174,7 +176,8 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType, MultipeerVie
         return CocoaAction { [unowned self] in
             
             let spotifyAuthService = DMSpotifyAuthService(sceneCoordinator: self.sceneCoordinator)
-            let spotifySearchService = DMSpotifySearchService(authService: spotifyAuthService)
+            let spotifySearchService = DMSpotifySearchService(authService: spotifyAuthService,
+                                                              reachabilityService: self.reachabilityService)
             
             let spotifySongSearchViewModel = DMSpotifySongSearchViewModel(
                 sceneCoordinator: self.sceneCoordinator,
