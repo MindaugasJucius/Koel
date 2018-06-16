@@ -12,12 +12,13 @@ import RxCocoa
 import RxDataSources
 
 extension UIScrollView {
-    func isNearBottomEdge(edgeOffset: CGFloat = 200) -> Bool {
-        return contentOffset.y + frame.size.height + edgeOffset > contentSize.height
-    }
 
+    func isNearBottomEdge() -> Bool {
+        return contentOffset.y + frame.size.height > contentSize.height
+    }
+    
     func isNearBottomEdge(contentOffset: CGPoint, edgeOffset: CGFloat = 200) -> Bool {
-        return contentOffset.y + frame.size.height + edgeOffset > contentSize.height
+        return contentOffset.y + frame.size.height + edgeOffset >= contentSize.height
     }
 
 }
@@ -46,11 +47,7 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
         return tableView
     }()
     
-    private lazy var activityControl: UIActivityIndicatorView = {
-        let activityControl = UIActivityIndicatorView(activityIndicatorStyle: .gray)
-        activityControl.translatesAutoresizingMaskIntoConstraints = false
-        return activityControl
-    }()
+    private let tableViewLoadingFooter = DMKoelLoadingView()
     
     private let refreshControl = UIRefreshControl()
     
@@ -68,39 +65,28 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
         view.backgroundColor = .green
         
         view.addSubview(tableView)
+        tableView.addSubview(refreshControl)
         
         let tableViewConstraints = [
-            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            tableView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
-            tableView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+            tableView.topAnchor.constraint(equalTo: view.readableContentGuide.topAnchor),
+            tableView.leftAnchor.constraint(equalTo: view.readableContentGuide.leftAnchor),
+            tableView.rightAnchor.constraint(equalTo: view.readableContentGuide.rightAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.readableContentGuide.bottomAnchor)
         ]
-        
         NSLayoutConstraint.activate(tableViewConstraints)
         
-        self.view.addSubview(doneButton)
-        
+        view.addSubview(doneButton)
         let buttonConstraints = [
             doneButton.leftAnchor.constraintEqualToSystemSpacingAfter(view.safeAreaLayoutGuide.leftAnchor, multiplier: 2),
             doneButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ]
-        
-        tableView.addSubview(refreshControl)
-
         NSLayoutConstraint.activate(buttonConstraints)
         
-        view.addSubview(activityControl)
-        
-        let activityControlConstraints = [
-            activityControl.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            activityControl.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
-        ]
-        
-        NSLayoutConstraint.activate(activityControlConstraints)
+        self.tableView.tableFooterView = tableViewLoadingFooter
+    
     }
     
     func bindViewModel() {
-
         rx.methodInvoked(#selector(UIViewController.viewDidAppear(_:)))
             .take(1)
             .do { [unowned self] in
@@ -113,30 +99,6 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
             .subscribe()
             .disposed(by: disposeBag)
         
-        viewModel.isLoading
-            .drive(activityControl.rx.isAnimating)
-            .disposed(by: self.disposeBag)
-        
-        let didScrollDownwards = tableView.rx.didEndDragging
-            .map { [unowned self] _ -> Bool in
-                let translation = self.tableView.panGestureRecognizer.velocity(in: nil)
-                return translation.y < 0
-            }
-        
-        let offsetTrigger = tableView.rx.willEndDragging
-            .map { (velocity, targetOffsetPointer) -> Bool in
-                let targetOffset = targetOffsetPointer.pointee
-                return self.tableView.isNearBottomEdge(contentOffset: targetOffset)
-            }
-
-        viewModel.loadNextPageOffsetTrigger = Observable.combineLatest(didScrollDownwards, offsetTrigger)
-            .map { $0 && $1 }
-            .startWith(true)
-            .filter { $0 }
-            .map { _ in }
-            .asDriver(onErrorJustReturn: ())
-            .debounce(0.1)
-        
         tableView.rx
             .modelSelected(DMEventSong.self)
             .subscribe(viewModel.addSelectedSong.inputs)
@@ -148,14 +110,73 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
             .disposed(by: disposeBag)
         
         doneButton.rx.action = viewModel.onDone
+        
+        bindLoadingTrigger()
+        bindLoadingView()
+    }
+    
+    func bindLoadingTrigger() {
+        let willEndTraggingTargetOffset = tableView.rx.willEndDragging.map { $0.1 }
+        
+        willEndTraggingTargetOffset.withLatestFrom(viewModel.isLoading) { (mutableOffset, loading) -> () in
+                guard !loading else {
+                    return
+                }
+                var currentTargetOffset = mutableOffset.pointee
+                if self.tableView.isNearBottomEdge(contentOffset: currentTargetOffset) {
+                    self.tableView.tableFooterView?.frame = CGRect(x: 0, y: 0, width: self.tableView.frame.width, height: 50)
+                    self.tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 50, right: 0)
+                    //self.tableView.setContentOffset(CGPoint(x: 0, y: self.tableView.contentSize.height - self.tableView.frame.height + 50), animated: false)
+                    currentTargetOffset = CGPoint(x: 0, y: currentTargetOffset.y + 50)
+                }
+            }
+            .subscribe()
+            .disposed(by: disposeBag)
+        
+        let prefetchTrigger = willEndTraggingTargetOffset.map { mutableOffset -> Bool in
+                let targetOffset = mutableOffset.pointee
+                let translation = self.tableView.panGestureRecognizer.velocity(in: nil)
+                let downwards = translation.y < 0
+                if downwards {
+                    return self.tableView.isNearBottomEdge(contentOffset: targetOffset)
+                } else {
+                    return self.tableView.isNearBottomEdge(contentOffset: targetOffset, edgeOffset: 0)
+                }
+            }
+            .filter { $0 }
+            .startWith(true)
+        
+        viewModel.loadNextPageOffsetTrigger = prefetchTrigger
+            .map { _ in }
+            .asDriver(onErrorJustReturn: ())
+            .debounce(0.1)
+    }
+    
+    func bindLoadingView() {
+        viewModel.isLoading
+            .drive(tableViewLoadingFooter.isAnimating)
+            .disposed(by: self.disposeBag)
+        
+        viewModel.isLoading.filter { !$0 }
+            .do(
+                onNext: { [unowned self] _ in
+                    UIView.animate(withDuration: 0.3, animations: {
+                        self.tableView.tableFooterView?.frame = .zero
+                        self.tableView.contentInset = .zero
+                    })
+                    return
+                }
+            )
+            .drive()
+            .disposed(by: self.disposeBag)
     }
     
 }
 
 extension DMSpotifySongSearchViewController {
     
-    static func persistedSongDataSource(withViewModel viewModel: DMSpotifySongSearchViewModelType) -> RxTableViewSectionedReloadDataSource<SongSection> {
-        return RxTableViewSectionedReloadDataSource<SongSection>(
+    static func persistedSongDataSource(withViewModel viewModel: DMSpotifySongSearchViewModelType) -> RxTableViewSectionedReloadDataSource<SongSectionModel> {
+        return RxTableViewSectionedReloadDataSource<SongSectionModel>(
             configureCell: { (dataSource, tableView, indexPath, element) -> UITableViewCell in
                 let cell = tableView.dequeueReusableCell(withIdentifier: DMSpotifySongTableViewCell.reuseIdentifier, for: indexPath)
                 

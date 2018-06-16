@@ -36,9 +36,8 @@ class DMSpotifyAuthService: NSObject {
     var currentSessionObservable: Observable<SPTSession> {
         return currentSession()
             .do(onNext: { [unowned self] session in
-                Spartan.authorizationToken = session.accessToken
-                self.auth.session = session
-            
+                    Spartan.authorizationToken = session.accessToken
+                    self.auth.session = session
                 }
             )
     }
