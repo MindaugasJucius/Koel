@@ -59,6 +59,7 @@
 		5F84FFAE1FDC2F3F003332B4 /* DMEventPeerPersistenceServiceType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F84FFAD1FDC2F3F003332B4 /* DMEventPeerPersistenceServiceType.swift */; };
 		5F84FFB01FDC3AB0003332B4 /* DMEventPeerPersistenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F84FFAF1FDC3AB0003332B4 /* DMEventPeerPersistenceService.swift */; };
 		5F93078820D5214B00DE9FD1 /* DMKoelLoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F93078720D5214B00DE9FD1 /* DMKoelLoadingView.swift */; };
+		5F93078A20D67E4600DE9FD1 /* DMKoelEmptyPlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F93078920D67E4600DE9FD1 /* DMKoelEmptyPlaceholderView.swift */; };
 		5F9C2D231FDED1970067BDC4 /* DMKoelButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F9C2D221FDED1970067BDC4 /* DMKoelButton.swift */; };
 		5FA42B5C1FD6E6F600578EF5 /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FA42B5B1FD6E6F600578EF5 /* Notifications.swift */; };
 		5FAFD146206FF5BE00077E39 /* DMSpotifySongTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FAFD145206FF5BE00077E39 /* DMSpotifySongTableViewCell.swift */; };
@@ -144,6 +145,7 @@
 		5F84FFAD1FDC2F3F003332B4 /* DMEventPeerPersistenceServiceType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventPeerPersistenceServiceType.swift; sourceTree = "<group>"; };
 		5F84FFAF1FDC3AB0003332B4 /* DMEventPeerPersistenceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventPeerPersistenceService.swift; sourceTree = "<group>"; };
 		5F93078720D5214B00DE9FD1 /* DMKoelLoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMKoelLoadingView.swift; sourceTree = "<group>"; };
+		5F93078920D67E4600DE9FD1 /* DMKoelEmptyPlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMKoelEmptyPlaceholderView.swift; sourceTree = "<group>"; };
 		5F9C2D221FDED1970067BDC4 /* DMKoelButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMKoelButton.swift; sourceTree = "<group>"; };
 		5FA42B5B1FD6E6F600578EF5 /* Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
 		5FAFD145206FF5BE00077E39 /* DMSpotifySongTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMSpotifySongTableViewCell.swift; sourceTree = "<group>"; };
@@ -374,6 +376,7 @@
 				5F014BD31FB9E20000079009 /* WaveView.swift */,
 				5F9C2D221FDED1970067BDC4 /* DMKoelButton.swift */,
 				5F93078720D5214B00DE9FD1 /* DMKoelLoadingView.swift */,
+				5F93078920D67E4600DE9FD1 /* DMKoelEmptyPlaceholderView.swift */,
 			);
 			path = "UI Elements";
 			sourceTree = "<group>";
@@ -672,6 +675,7 @@
 				5F84FFA31FDAEC82003332B4 /* DMEventSong.swift in Sources */,
 				5F8186121FBB6EDB00477C71 /* DMKoelLogoView.swift in Sources */,
 				5F81861E1FD3FADB00477C71 /* UINavigationController+Rx.swift in Sources */,
+				5F93078A20D67E4600DE9FD1 /* DMKoelEmptyPlaceholderView.swift in Sources */,
 				5F5445951FD594460059A975 /* DMEventParticipationViewModel.swift in Sources */,
 				039A2C6C2078AAE100C58BE5 /* DMEntity.swift in Sources */,
 				5FB2C93A1FE7F534001D532F /* CAGradientLayer+Extensions.swift in Sources */,

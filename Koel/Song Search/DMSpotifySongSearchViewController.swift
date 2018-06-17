@@ -43,7 +43,10 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
         let tableView = UITableView()
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.allowsMultipleSelection = true
-        tableView.register(DMSpotifySongTableViewCell.self, forCellReuseIdentifier: DMSpotifySongTableViewCell.reuseIdentifier)
+        tableView.register(DMSpotifySongTableViewCell.self,
+                           forCellReuseIdentifier: DMSpotifySongTableViewCell.reuseIdentifier)
+        tableView.register(DMKoelEmptyPlaceholderTableViewCell.self,
+                           forCellReuseIdentifier: DMKoelEmptyPlaceholderTableViewCell.reuseIdentifier)
         return tableView
     }()
     
@@ -88,7 +91,7 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
     }
     
     func bindViewModel() {
-        rx.methodInvoked(#selector(UIViewController.viewDidAppear(_:)))
+        rx.methodInvoked(#selector(UIViewController.viewWillAppear(_:)))
             .take(1)
             .do { [unowned self] in
                 let dataSource = DMSpotifySongSearchViewController.persistedSongDataSource(withViewModel: self.viewModel)
@@ -180,25 +183,18 @@ extension DMSpotifySongSearchViewController {
     static func persistedSongDataSource(withViewModel viewModel: DMSpotifySongSearchViewModelType) -> RxTableViewSectionedReloadDataSource<SongSectionModel> {
         return RxTableViewSectionedReloadDataSource<SongSectionModel>(
             configureCell: { (dataSource, tableView, indexPath, element) -> UITableViewCell in
-                let cell = tableView.dequeueReusableCell(withIdentifier: DMSpotifySongTableViewCell.reuseIdentifier, for: indexPath)
-                
-                guard let songCell = cell as? DMSpotifySongTableViewCell else {
-                    return cell
-                }
-                
+                let cell = tableView.dequeueReusableCell(withIdentifier: DMSpotifySongTableViewCell.reuseIdentifier,
+                                                         for: indexPath)
                 switch dataSource[indexPath] {
                 case let .songSectionItem(song: item):
-                    songCell.configure(withSong: item)
+                    (cell as? DMSpotifySongTableViewCell)?.configure(withSong: item)
+                    return cell
+                case .emptySectionItem:
+                    let cell = tableView.dequeueReusableCell(withIdentifier: DMKoelEmptyPlaceholderTableViewCell.reuseIdentifier,
+                                                             for: indexPath)
                     return cell
                 default:
                     return cell
-                }
-            },
-            titleForHeaderInSection: { dataSource, sectionIndex in
-                let model: SongSectionModel = dataSource[sectionIndex]
-                switch model {
-                default:
-                    return nil
                 }
             }
         )
