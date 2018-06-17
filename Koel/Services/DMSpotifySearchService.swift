@@ -12,6 +12,8 @@ import RxCocoa
 import RxSwift
 import ObjectMapper
 
+private let concurrentScheduler = ConcurrentDispatchQueueScheduler(qos: DispatchQoS.userInitiated)
+
 typealias PagingObjectSuccess<T: Paginatable & Mappable> = ((PagingObject<T>) -> Void)
 typealias PagingObjectFailure = (SpartanError) -> (Void)
 
@@ -122,6 +124,7 @@ class DMSpotifySearchService: DMSpotifySearchServiceType {
             }
             .retryWhen(retryHandler)
             .do(onError: { error in self.resultErrorRelay.accept(error) })
+            .subscribeOn(concurrentScheduler)
     }
 
 }
