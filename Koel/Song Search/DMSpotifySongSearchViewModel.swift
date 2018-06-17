@@ -53,7 +53,7 @@ protocol DMSpotifySongSearchViewModelType: ViewModelType {
     
     var spotifySearchService: DMSpotifySearchServiceType { get }
 
-    var results: Driver<[SongSectionModel]> { get }
+    var songResults: Driver<[SongSectionModel]> { get }
     var isLoading: Driver<Bool> { get }
     
     var removeSelectedSong: Action<DMEventSong, Void> { get }
@@ -62,15 +62,13 @@ protocol DMSpotifySongSearchViewModelType: ViewModelType {
     var onClose: Action<[DMEventSong], Void> { get }
     var onDone: CocoaAction { get }
 
-    var loadNextPageOffsetTrigger: Driver<()> { get set }
-    
+    var offsetTriggerRelay: BehaviorRelay<()> { get }
+    var refreshTriggerRelay: PublishRelay<()> { get }
 }
 
 class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
 
-//    var isLoading: Signal<Bool>
-//    var isRefreshing: Signal<Bool>
-//    var error: Signal<NSError>
+    private let disposeBag = DisposeBag()
     
     private let isLoadingRelay = BehaviorRelay(value: true)
     
@@ -78,46 +76,31 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
         return self.isLoadingRelay.asDriver()
     }
     
-    private var allSavedTracks: [DMEventSong] = []
+    private let songResultRelay: BehaviorRelay<[SongSectionModel]>
     
-    lazy var results: Driver<[SongSectionModel]> = {
-        return self.loadNextPageOffsetTrigger
-            .do(onNext: { _ in self.isLoadingRelay.accept(true) })
-            .flatMap { [unowned self] _ in
-                self.spotifySearchService.savedTracks()
-                    .asDriver(onErrorJustReturn: [])
-            }
-            .map { [unowned self] newSavedTracks in
-                self.allSavedTracks.append(contentsOf: newSavedTracks)
-                return self.allSavedTracks.map { SectionItem.songSectionItem(song: $0) }
-            }
-            .map { [SongSectionModel.songSection(title: "Results", items: $0)] }
-            .do(onNext: { _ in self.isLoadingRelay.accept(false) })
-            .startWith([SongSectionModel.emptySection(item: SectionItem.emptySectionItem)])
-    }()
+    var songResults: Driver<[SongSectionModel]> {
+        return songResultRelay.asDriver()
+    }
     
+    let offsetTriggerRelay: BehaviorRelay<()>
+    let refreshTriggerRelay: PublishRelay<()>
     
-    private let disposeBag = DisposeBag()
-    
-    var loadNextPageOffsetTrigger: Driver<()>
     let sceneCoordinator: SceneCoordinatorType
     let spotifySearchService: DMSpotifySearchServiceType
     
     private var selectedSongs: [DMEventSong] = []
+    private var allSavedTracks: [DMEventSong] = []
     
     let onClose: Action<[DMEventSong], Void>
-    
-    lazy var onDone: CocoaAction = {
-        return CocoaAction(workFactory: { [unowned self] _ -> Observable<Void> in
-            return self.onClose.execute(self.selectedSongs)
-        })
-    }()
     
     init(sceneCoordinator: SceneCoordinatorType, spotifySearchService: DMSpotifySearchServiceType, onClose: Action<[DMEventSong], Void>) {
         self.sceneCoordinator = sceneCoordinator
         self.spotifySearchService = spotifySearchService
         self.onClose = onClose
-        self.loadNextPageOffsetTrigger = Driver.empty()
+        
+        self.refreshTriggerRelay = PublishRelay()
+        self.songResultRelay = BehaviorRelay(value: [SongSectionModel.emptySection(item: SectionItem.emptySectionItem)])
+        self.offsetTriggerRelay = BehaviorRelay(value: ())
         
         spotifySearchService.resultError
             .flatMap { error in
@@ -126,7 +109,31 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
             .do(onNext: { _ in self.isLoadingRelay.accept(false) }) // let user perform requests after errors
             .subscribe()
             .disposed(by: disposeBag)
+        
+        refreshTriggerRelay.asObservable()
+            .bind(to: offsetTriggerRelay)
+            .disposed(by: disposeBag)
+        
+        offsetTriggerRelay.asObservable()
+            .do(onNext: { _ in self.isLoadingRelay.accept(true) })
+            .flatMap { [unowned self] _ in
+                self.spotifySearchService.savedTracks()
+            }
+            .map { [unowned self] newSavedTracks in
+                self.allSavedTracks.append(contentsOf: newSavedTracks)
+                return self.allSavedTracks.map { SectionItem.songSectionItem(song: $0) }
+            }
+            .map { [SongSectionModel.songSection(title: "Results", items: $0)] }
+            .do(onNext: { _ in self.isLoadingRelay.accept(false) })
+            .bind(to: songResultRelay)
+            .disposed(by: disposeBag)
     }
+    
+    lazy var onDone: CocoaAction = {
+        return CocoaAction(workFactory: { [unowned self] _ -> Observable<Void> in
+            return self.onClose.execute(self.selectedSongs)
+        })
+    }()
     
     lazy var addSelectedSong: Action<DMEventSong, Void> = {
         return Action(workFactory: { [unowned self] (song: DMEventSong) -> Observable<Void> in

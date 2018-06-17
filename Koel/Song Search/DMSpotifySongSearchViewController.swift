@@ -96,7 +96,7 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
             .do { [unowned self] in
                 let dataSource = DMSpotifySongSearchViewController.persistedSongDataSource(withViewModel: self.viewModel)
                 
-                self.viewModel.results
+                self.viewModel.songResults
                     .drive(self.tableView.rx.items(dataSource: dataSource))
                     .disposed(by: self.disposeBag)
             }
@@ -134,12 +134,13 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
                 }
             }
             .filter { $0 }
-            .startWith(true)
         
-        viewModel.loadNextPageOffsetTrigger = prefetchTrigger
+        prefetchTrigger
             .map { _ in }
             .asDriver(onErrorJustReturn: ())
             .debounce(0.1)
+            .drive(viewModel.offsetTriggerRelay)
+            .disposed(by: disposeBag)
     }
     
     func bindLoadingView() {
@@ -173,6 +174,11 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
                 }
             )
             .drive()
+            .disposed(by: self.disposeBag)
+
+        refreshControl.rx.controlEvent(.valueChanged).asObservable()
+            .debug("refresh", trimOutput: false)
+            .bind(to: viewModel.refreshTriggerRelay)
             .disposed(by: self.disposeBag)
     }
     
