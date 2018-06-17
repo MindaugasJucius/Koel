@@ -17,7 +17,7 @@ typealias PagingObjectFailure = (SpartanError) -> (Void)
 
 protocol DMSpotifySearchServiceType {
     
-    var resultError: Driver<Error> { get }
+    var resultError: Observable<Error> { get }
     
     func savedTracks() -> Observable<[DMEventSong]>
     
@@ -30,10 +30,10 @@ class DMSpotifySearchService: DMSpotifySearchServiceType {
     
     private var latestSavedTracksPagingObject: PagingObject<SavedTrack>? = nil
     
-    private let resultErrorRelay: BehaviorRelay<Error?> = BehaviorRelay(value: nil)
+    private let resultErrorRelay: PublishRelay<Error> = PublishRelay()
 
-    var resultError: Driver<Error> {
-        return resultErrorRelay.asDriver().filterNil()
+    var resultError: Observable<Error> {
+        return resultErrorRelay.asObservable()
     }
     
     init(authService: DMSpotifyAuthService, reachabilityService: ReachabilityService) {
@@ -94,11 +94,13 @@ class DMSpotifySearchService: DMSpotifySearchServiceType {
             .flatMap { [unowned self] paggingObject -> Observable<PagingObject<SavedTrack>> in
                 guard let paggingObject = paggingObject else {
                     return self.initial { Spartan.getSavedTracks(limit: 50, success: $0, failure: $1) }
+                        .timeout(5, scheduler: MainScheduler.instance)
                 }
                 
                 if paggingObject.canMakeNextRequest {
                     //TODO: add caching to pagingObject.getNext
                     return self.following(pagingObject: paggingObject)
+                        .timeout(5, scheduler: MainScheduler.instance)
                 }
                 
                 return .empty()
@@ -118,9 +120,8 @@ class DMSpotifySearchService: DMSpotifySearchServiceType {
                     return eventSong
                 }
             }
-            .timeout(5, scheduler: MainScheduler.instance)
-            .do(onError: { error in self.resultErrorRelay.accept(error) })
             .retryWhen(retryHandler)
+            .do(onError: { error in self.resultErrorRelay.accept(error) })
     }
 
 }

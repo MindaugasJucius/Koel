@@ -10,17 +10,50 @@ import Foundation
 import Action
 import RxSwift
 import RxCocoa
+import RxDataSources
 
-enum DMSpotifySongSearchState<T, E: Error> {
-    case success(T)
-    case failure(E)
+enum SectionItem {
+    case songSectionItem(song: DMEventSong)
+    case loadingSectionItem
+    case emptySectionItem
+}
+
+enum SongSectionModel: SectionModelType {
+    
+    typealias Item = SectionItem
+    
+    var items: [SectionItem] {
+        switch self {
+        case .songSection(title: _, items: let songItems):
+            return songItems
+        case .loadingSection(item: let loadingItem):
+            return [loadingItem]
+        case .emptySection(item: let emptyItem):
+            return [emptyItem]
+        }
+    }
+
+    init(original: SongSectionModel, items: [SectionItem]) {
+        switch original {
+        case let .songSection(title: title, items: _):
+            self = .songSection(title: title, items: items)
+        case .loadingSection(item: _):
+            self = .loadingSection(item: items.first!)
+        case .emptySection(item: _):
+            self = .emptySection(item: items.first!)
+        }
+    }
+
+    case songSection(title: String, items: [SectionItem])
+    case loadingSection(item: SectionItem)
+    case emptySection(item: SectionItem)
 }
 
 protocol DMSpotifySongSearchViewModelType: ViewModelType {
     
     var spotifySearchService: DMSpotifySearchServiceType { get }
 
-    var results: Driver<[SongSection]> { get }
+    var results: Driver<[SongSectionModel]> { get }
     var isLoading: Driver<Bool> { get }
     
     var removeSelectedSong: Action<DMEventSong, Void> { get }
@@ -39,7 +72,7 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
 //    var isRefreshing: Signal<Bool>
 //    var error: Signal<NSError>
     
-    private let isLoadingRelay = BehaviorRelay(value: false)
+    private let isLoadingRelay = BehaviorRelay(value: true)
     
     var isLoading: Driver<Bool> {
         return self.isLoadingRelay.asDriver()
@@ -47,22 +80,20 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
     
     private var allSavedTracks: [DMEventSong] = []
     
-    lazy var results: Driver<[SongSection]> = {
+    lazy var results: Driver<[SongSectionModel]> = {
         return self.loadNextPageOffsetTrigger
-            .withLatestFrom(self.isLoading)
-            .filter { !$0 }
             .do(onNext: { _ in self.isLoadingRelay.accept(true) })
             .flatMap { [unowned self] _ in
                 self.spotifySearchService.savedTracks()
                     .asDriver(onErrorJustReturn: [])
-                    .do(onNext: { _ in self.isLoadingRelay.accept(false) })
-                    .filter { !$0.isEmpty }
             }
             .map { [unowned self] newSavedTracks in
                 self.allSavedTracks.append(contentsOf: newSavedTracks)
-                return self.allSavedTracks
+                return self.allSavedTracks.map { SectionItem.songSectionItem(song: $0) }
             }
-            .map { [SongSection(model: "Results", items: $0)] }
+            .map { [SongSectionModel.songSection(title: "Results", items: $0)] }
+            .do(onNext: { _ in self.isLoadingRelay.accept(false) })
+            .startWith([SongSectionModel.emptySection(item: SectionItem.emptySectionItem)])
     }()
     
     
@@ -89,10 +120,10 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
         self.loadNextPageOffsetTrigger = Driver.empty()
         
         spotifySearchService.resultError
-            .asObservable()
             .flatMap { error in
                 sceneCoordinator.promptFor(error.localizedDescription, cancelAction: "ok", actions: nil)
             }
+            .do(onNext: { _ in self.isLoadingRelay.accept(false) }) // let user perform requests after errors
             .subscribe()
             .disposed(by: disposeBag)
     }

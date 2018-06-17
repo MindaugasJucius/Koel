@@ -47,6 +47,8 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
         return tableView
     }()
     
+    private lazy var willEndDraggingTargetOffset = tableView.rx.willEndDragging.map { $0.1 }
+    
     private let tableViewLoadingFooter = DMKoelLoadingView()
     
     private let refreshControl = UIRefreshControl()
@@ -83,7 +85,6 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
         NSLayoutConstraint.activate(buttonConstraints)
         
         self.tableView.tableFooterView = tableViewLoadingFooter
-    
     }
     
     func bindViewModel() {
@@ -116,24 +117,10 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
     }
     
     func bindLoadingTrigger() {
-        let willEndTraggingTargetOffset = tableView.rx.willEndDragging.map { $0.1 }
-        
-        willEndTraggingTargetOffset.withLatestFrom(viewModel.isLoading) { (mutableOffset, loading) -> () in
+        let prefetchTrigger = willEndDraggingTargetOffset.withLatestFrom(viewModel.isLoading) { (mutableOffset, loading) -> Bool in
                 guard !loading else {
-                    return
+                    return false
                 }
-                var currentTargetOffset = mutableOffset.pointee
-                if self.tableView.isNearBottomEdge(contentOffset: currentTargetOffset) {
-                    self.tableView.tableFooterView?.frame = CGRect(x: 0, y: 0, width: self.tableView.frame.width, height: 50)
-                    self.tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 50, right: 0)
-                    //self.tableView.setContentOffset(CGPoint(x: 0, y: self.tableView.contentSize.height - self.tableView.frame.height + 50), animated: false)
-                    currentTargetOffset = CGPoint(x: 0, y: currentTargetOffset.y + 50)
-                }
-            }
-            .subscribe()
-            .disposed(by: disposeBag)
-        
-        let prefetchTrigger = willEndTraggingTargetOffset.map { mutableOffset -> Bool in
                 let targetOffset = mutableOffset.pointee
                 let translation = self.tableView.panGestureRecognizer.velocity(in: nil)
                 let downwards = translation.y < 0
@@ -153,7 +140,22 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
     }
     
     func bindLoadingView() {
+        willEndDraggingTargetOffset.withLatestFrom(viewModel.isLoading) { (mutableOffset, loading) -> () in
+                guard !loading else {
+                    return
+                }
+                var currentTargetOffset = mutableOffset.pointee
+                if self.tableView.isNearBottomEdge(contentOffset: currentTargetOffset) {
+                    self.tableView.tableFooterView?.frame = CGRect(x: 0, y: 0, width: self.tableView.frame.width, height: 50)
+                    self.tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 50, right: 0)
+                    currentTargetOffset = CGPoint(x: 0, y: currentTargetOffset.y + 50)
+                }
+            }
+            .subscribe()
+            .disposed(by: disposeBag)
+
         viewModel.isLoading
+            .debug("loading", trimOutput: false)
             .drive(tableViewLoadingFooter.isAnimating)
             .disposed(by: self.disposeBag)
         
@@ -184,13 +186,21 @@ extension DMSpotifySongSearchViewController {
                     return cell
                 }
                 
-                songCell.configure(withSong: element)
-                
-                return cell
-        },
+                switch dataSource[indexPath] {
+                case let .songSectionItem(song: item):
+                    songCell.configure(withSong: item)
+                    return cell
+                default:
+                    return cell
+                }
+            },
             titleForHeaderInSection: { dataSource, sectionIndex in
-                return dataSource[sectionIndex].model
-        }
+                let model: SongSectionModel = dataSource[sectionIndex]
+                switch model {
+                default:
+                    return nil
+                }
+            }
         )
     }
     
