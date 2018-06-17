@@ -11,6 +11,9 @@ import RxCocoa
 
 class DMKoelLoadingView: UIView {
 
+    static let height: CGFloat = 50
+    static let frame: CGRect = CGRect(x: 0, y: 0, width: 0, height: 50)
+    
     private lazy var activityControl: UIActivityIndicatorView = {
         let activityControl = UIActivityIndicatorView(activityIndicatorStyle: .gray)
         activityControl.translatesAutoresizingMaskIntoConstraints = false
@@ -24,7 +27,7 @@ class DMKoelLoadingView: UIView {
     }
     
     init() {
-        super.init(frame: CGRect(x: 0, y: 0, width: CGFloat.leastNormalMagnitude, height: 50))
+        super.init(frame: DMKoelLoadingView.frame)
         backgroundColor = .lightGray
         
         addSubview(activityControl)

@@ -149,9 +149,9 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
                 }
                 var currentTargetOffset = mutableOffset.pointee
                 if self.tableView.isNearBottomEdge(contentOffset: currentTargetOffset) {
-                    self.tableView.tableFooterView?.frame = CGRect(x: 0, y: 0, width: self.tableView.frame.width, height: 50)
-                    self.tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 50, right: 0)
-                    currentTargetOffset = CGPoint(x: 0, y: currentTargetOffset.y + 50)
+                    self.tableView.tableFooterView?.frame = DMKoelLoadingView.frame
+                    self.tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: DMKoelLoadingView.height, right: 0)
+                    currentTargetOffset = CGPoint(x: 0, y: currentTargetOffset.y + DMKoelLoadingView.height)
                 }
             }
             .subscribe()
