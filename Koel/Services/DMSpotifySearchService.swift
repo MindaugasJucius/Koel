@@ -21,7 +21,7 @@ protocol DMSpotifySearchServiceType {
     
     var resultError: Observable<Error> { get }
     
-    func savedTracks() -> Observable<[DMEventSong]>
+    func savedTracks() -> Driver<[DMEventSong]>
     
 }
 
@@ -77,32 +77,39 @@ class DMSpotifySearchService: DMSpotifySearchServiceType {
     }
     
     lazy var retryHandler: (Observable<Error>) -> Observable<Int> = { e in
-        return e.enumerated().flatMap { (attempt, error) -> Observable<Int> in
-            let nsError = error as NSError
-            
-            if nsError.code == -1009 {
-                return self.reachabilityService.reachability
-                    .filter { $0.reachable }
-                    .map { _ in 1 }
+        
+        
+        let waitForReachability = self.reachabilityService.reachability
+            .filter { $0.reachable }
+            .map { _ in 1 }
+        
+        return e.enumerated()
+            .withLatestFrom(self.reachabilityService.reachability) { (errorTuple, reachabilityStatus) -> Observable<Int> in
+                let error = errorTuple.element as NSError
+
+                //Error codes: http://nshipster.com/nserror/
+                let isConnectivityError = -1011...(-998) ~= error.code
+                if isConnectivityError, case ReachabilityStatus.unreachable = reachabilityStatus {
+                    return waitForReachability
+                }
+
+                print("received error in \(#file). Code: \(error.code)")
+                return .error(error)
             }
-            print("network error")
-            return Observable.error(error)
-        }
+            .flatMap { $0 }
     }
     
-    func savedTracks() -> Observable<[DMEventSong]> {
+    func savedTracks() -> Driver<[DMEventSong]> {
         return self.authService.currentSessionObservable
             .flatMap { [unowned self] _ in Observable.just(self.latestSavedTracksPagingObject) }
             .flatMap { [unowned self] paggingObject -> Observable<PagingObject<SavedTrack>> in
                 guard let paggingObject = paggingObject else {
                     return self.initial { Spartan.getSavedTracks(limit: 50, success: $0, failure: $1) }
-                        .timeout(5, scheduler: MainScheduler.instance)
                 }
                 
                 if paggingObject.canMakeNextRequest {
                     //TODO: add caching to pagingObject.getNext
                     return self.following(pagingObject: paggingObject)
-                        .timeout(5, scheduler: MainScheduler.instance)
                 }
                 
                 return .empty()
@@ -125,6 +132,7 @@ class DMSpotifySearchService: DMSpotifySearchServiceType {
             .retryWhen(retryHandler)
             .do(onError: { error in self.resultErrorRelay.accept(error) })
             .subscribeOn(concurrentScheduler)
+            .asDriver(onErrorJustReturn: [])
     }
 
 }

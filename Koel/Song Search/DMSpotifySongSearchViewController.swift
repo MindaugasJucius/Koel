@@ -91,7 +91,7 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
     }
     
     func bindViewModel() {
-        rx.methodInvoked(#selector(UIViewController.viewWillAppear(_:)))
+        rx.methodInvoked(#selector(UIViewController.viewDidAppear(_:)))
             .take(1)
             .do { [unowned self] in
                 let dataSource = DMSpotifySongSearchViewController.persistedSongDataSource(withViewModel: self.viewModel)
@@ -116,7 +116,8 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
         doneButton.rx.action = viewModel.onDone
         
         bindLoadingTrigger()
-        bindLoadingView()
+        bindLoadingFooterView()
+        bindRefreshView()
     }
     
     func bindLoadingTrigger() {
@@ -133,17 +134,17 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
                     return self.tableView.isNearBottomEdge(contentOffset: targetOffset, edgeOffset: 0)
                 }
             }
+            .startWith(true)
             .filter { $0 }
         
         prefetchTrigger
             .map { _ in }
-            .asDriver(onErrorJustReturn: ())
-            .debounce(0.1)
-            .drive(viewModel.offsetTriggerRelay)
+            .debounce(0.1, scheduler: MainScheduler.instance)
+            .bind(to: viewModel.offsetTriggerRelay)
             .disposed(by: disposeBag)
     }
     
-    func bindLoadingView() {
+    private func bindLoadingFooterView() {
         willEndDraggingTargetOffset.withLatestFrom(viewModel.isLoading) { (mutableOffset, loading) -> () in
                 guard !loading else {
                     return
@@ -175,7 +176,9 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
             )
             .drive()
             .disposed(by: self.disposeBag)
-
+    }
+    
+    private func bindRefreshView() {
         refreshControl.rx.controlEvent(.valueChanged).asObservable()
             .debug("refresh", trimOutput: false)
             .bind(to: viewModel.refreshTriggerRelay)

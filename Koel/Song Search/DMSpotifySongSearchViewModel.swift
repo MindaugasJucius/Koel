@@ -62,7 +62,7 @@ protocol DMSpotifySongSearchViewModelType: ViewModelType {
     var onClose: Action<[DMEventSong], Void> { get }
     var onDone: CocoaAction { get }
 
-    var offsetTriggerRelay: BehaviorRelay<()> { get }
+    var offsetTriggerRelay: PublishRelay<()> { get }
     var refreshTriggerRelay: PublishRelay<()> { get }
 }
 
@@ -82,7 +82,7 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
         return songResultRelay.asDriver()
     }
     
-    let offsetTriggerRelay: BehaviorRelay<()>
+    let offsetTriggerRelay: PublishRelay<()>
     let refreshTriggerRelay: PublishRelay<()>
     
     let sceneCoordinator: SceneCoordinatorType
@@ -100,7 +100,7 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
         
         self.refreshTriggerRelay = PublishRelay()
         self.songResultRelay = BehaviorRelay(value: [SongSectionModel.emptySection(item: SectionItem.emptySectionItem)])
-        self.offsetTriggerRelay = BehaviorRelay(value: ())
+        self.offsetTriggerRelay = PublishRelay()
         
         spotifySearchService.resultError
             .flatMap { error in
@@ -109,8 +109,9 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
             .do(onNext: { _ in self.isLoadingRelay.accept(false) }) // let user perform requests after errors
             .subscribe()
             .disposed(by: disposeBag)
-        
+
         refreshTriggerRelay.asObservable()
+            .map { _ in self.songResultRelay.accept([SongSectionModel.emptySection(item: SectionItem.emptySectionItem)]) }
             .bind(to: offsetTriggerRelay)
             .disposed(by: disposeBag)
         
