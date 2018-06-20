@@ -21,7 +21,7 @@ protocol DMSpotifySearchServiceType {
     
     var resultError: Observable<Error> { get }
     
-    func savedTracks() -> Driver<[SongSectionModel]>
+    func savedTracks(resetResults reset: Bool) -> Driver<[SongSectionModel]>
     
 }
 
@@ -99,7 +99,12 @@ class DMSpotifySearchService: DMSpotifySearchServiceType {
             .flatMap { $0 }
     }
     
-    func savedTracks() -> Driver<[SongSectionModel]> {
+    func savedTracks(resetResults reset: Bool) -> Driver<[SongSectionModel]> {
+        if reset {
+            self.latestSavedTracksPagingObject = nil
+            self.allSavedTracks = []
+        }
+        
         return self.authService.currentSessionObservable
             .flatMap { [unowned self] _ in Observable.just(self.latestSavedTracksPagingObject) }
             .flatMap { [unowned self] paggingObject -> Observable<PagingObject<SavedTrack>> in

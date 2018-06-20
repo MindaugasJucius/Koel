@@ -109,15 +109,11 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
             .subscribe()
             .disposed(by: disposeBag)
 
-        refreshTriggerRelay.asObservable()
-            .map { _ in self.songResultRelay.accept([SongSectionModel.emptySection(item: SectionItem.emptySectionItem)]) }
-            .bind(to: offsetTriggerRelay)
-            .disposed(by: disposeBag)
-        
-        offsetTriggerRelay.asObservable()
+        Observable.merge(refreshTriggerRelay.asObservable().map { _ in true },
+                         offsetTriggerRelay.asObservable().map { _ in false })
             .do(onNext: { _ in self.isLoadingRelay.accept(true) })
-            .flatMap { [unowned self] _ in
-                self.spotifySearchService.savedTracks()
+            .flatMap { [unowned self] reset in
+                self.spotifySearchService.savedTracks(resetResults: reset)
             }
             .do(onNext: { _ in self.isLoadingRelay.accept(false) })
             .bind(to: songResultRelay)

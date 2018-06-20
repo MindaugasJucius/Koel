@@ -50,8 +50,6 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
         return tableView
     }()
     
-    private lazy var willEndDraggingTargetOffset = tableView.rx.willEndDragging.map { $0.1 }
-    
     private let tableViewLoadingFooter = DMKoelLoadingView()
     
     private let refreshControl = UIRefreshControl()
@@ -121,21 +119,38 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
     }
     
     func bindLoadingTrigger() {
+        let willEndDraggingTargetOffset = tableView.rx.willEndDragging.map { $0.1 }
+        
         let prefetchTrigger = willEndDraggingTargetOffset.withLatestFrom(viewModel.isLoading) { (mutableOffset, loading) -> Bool in
                 guard !loading else {
                     return false
                 }
-                let targetOffset = mutableOffset.pointee
+            
                 let translation = self.tableView.panGestureRecognizer.velocity(in: nil)
-                let downwards = translation.y < 0
-                if downwards {
-                    return self.tableView.isNearBottomEdge(contentOffset: targetOffset)
+                let draggingDownwards = translation.y < 0
+                var targetOffset = mutableOffset.pointee
+            
+                let shouldTrigger: Bool
+            
+                if draggingDownwards {
+                    shouldTrigger = self.tableView.isNearBottomEdge(contentOffset: targetOffset)
                 } else {
-                    return self.tableView.isNearBottomEdge(contentOffset: targetOffset, edgeOffset: 0)
+                    shouldTrigger = self.tableView.isNearBottomEdge(contentOffset: targetOffset, edgeOffset: 0)
                 }
+            
+                if shouldTrigger {
+                    self.adjustFooter(toVisible: true)
+                    targetOffset = CGPoint(x: 0, y: targetOffset.y + DMKoelLoadingView.height)
+                }
+            
+                return shouldTrigger
             }
             .startWith(true)
             .filter { $0 }
+        
+        prefetchTrigger
+            .bind(to: tableViewLoadingFooter.isAnimating)
+            .disposed(by: disposeBag)
         
         prefetchTrigger
             .map { _ in }
@@ -145,44 +160,34 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
     }
     
     private func bindLoadingFooterView() {
-        willEndDraggingTargetOffset.withLatestFrom(viewModel.isLoading) { (mutableOffset, loading) -> () in
-                guard !loading else {
-                    return
-                }
-                var currentTargetOffset = mutableOffset.pointee
-                if self.tableView.isNearBottomEdge(contentOffset: currentTargetOffset) {
-                    self.tableView.tableFooterView?.frame = DMKoelLoadingView.frame
-                    self.tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: DMKoelLoadingView.height, right: 0)
-                    currentTargetOffset = CGPoint(x: 0, y: currentTargetOffset.y + DMKoelLoadingView.height)
-                }
-            }
-            .subscribe()
-            .disposed(by: disposeBag)
-
-        viewModel.isLoading
-            .debug("loading", trimOutput: false)
-            .drive(tableViewLoadingFooter.isAnimating)
-            .disposed(by: self.disposeBag)
-        
         viewModel.isLoading.filter { !$0 }
-            .do(
-                onNext: { [unowned self] _ in
-                    UIView.animate(withDuration: 0.3, animations: {
-                        self.tableView.tableFooterView?.frame = .zero
-                        self.tableView.contentInset = .zero
-                    })
-                    return
-                }
-            )
-            .drive()
+            .do(onNext: { _ in self.adjustFooter(toVisible: false) })
+            .drive(tableViewLoadingFooter.isAnimating)
             .disposed(by: self.disposeBag)
     }
     
     private func bindRefreshView() {
+        viewModel.songResults
+            .map { _ in false }
+            .drive(refreshControl.rx.isRefreshing)
+            .disposed(by: disposeBag)
+        
         refreshControl.rx.controlEvent(.valueChanged).asObservable()
             .debug("refresh", trimOutput: false)
             .bind(to: viewModel.refreshTriggerRelay)
-            .disposed(by: self.disposeBag)
+            .disposed(by: disposeBag)
+    }
+    
+    private func adjustFooter(toVisible visible: Bool) {
+        if visible {
+            tableView.tableFooterView?.frame = DMKoelLoadingView.frame
+            tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: DMKoelLoadingView.height, right: 0)
+        } else {
+            UIView.animate(withDuration: 0.3, animations: {
+                self.tableView.tableFooterView?.frame = .zero
+                self.tableView.contentInset = .zero
+            })
+        }
     }
     
 }
