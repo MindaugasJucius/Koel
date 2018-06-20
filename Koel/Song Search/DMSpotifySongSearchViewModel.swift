@@ -51,7 +51,7 @@ enum SongSectionModel: SectionModelType {
 
 protocol DMSpotifySongSearchViewModelType: ViewModelType {
     
-    var spotifySearchService: DMSpotifySearchServiceType { get }
+   // var spotifySearchService: DMSpotifySearchServiceType { get }
 
     var songResults: Driver<[SongSectionModel]> { get }
     var isLoading: Driver<Bool> { get }
@@ -89,7 +89,6 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
     let spotifySearchService: DMSpotifySearchServiceType
     
     private var selectedSongs: [DMEventSong] = []
-    private var allSavedTracks: [DMEventSong] = []
     
     let onClose: Action<[DMEventSong], Void>
     
@@ -120,11 +119,6 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
             .flatMap { [unowned self] _ in
                 self.spotifySearchService.savedTracks()
             }
-            .map { [unowned self] newSavedTracks in
-                self.allSavedTracks.append(contentsOf: newSavedTracks)
-                return self.allSavedTracks.map { SectionItem.songSectionItem(song: $0) }
-            }
-            .map { [SongSectionModel.songSection(title: "Results", items: $0)] }
             .do(onNext: { _ in self.isLoadingRelay.accept(false) })
             .bind(to: songResultRelay)
             .disposed(by: disposeBag)

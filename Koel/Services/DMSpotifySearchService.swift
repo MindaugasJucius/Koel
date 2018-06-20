@@ -21,7 +21,7 @@ protocol DMSpotifySearchServiceType {
     
     var resultError: Observable<Error> { get }
     
-    func savedTracks() -> Driver<[DMEventSong]>
+    func savedTracks() -> Driver<[SongSectionModel]>
     
 }
 
@@ -31,6 +31,7 @@ class DMSpotifySearchService: DMSpotifySearchServiceType {
     private let reachabilityService: ReachabilityService
     
     private var latestSavedTracksPagingObject: PagingObject<SavedTrack>? = nil
+    private var allSavedTracks: [DMEventSong] = []
     
     private let resultErrorRelay: PublishRelay<Error> = PublishRelay()
 
@@ -78,7 +79,6 @@ class DMSpotifySearchService: DMSpotifySearchServiceType {
     
     lazy var retryHandler: (Observable<Error>) -> Observable<Int> = { e in
         
-        
         let waitForReachability = self.reachabilityService.reachability
             .filter { $0.reachable }
             .map { _ in 1 }
@@ -99,7 +99,7 @@ class DMSpotifySearchService: DMSpotifySearchServiceType {
             .flatMap { $0 }
     }
     
-    func savedTracks() -> Driver<[DMEventSong]> {
+    func savedTracks() -> Driver<[SongSectionModel]> {
         return self.authService.currentSessionObservable
             .flatMap { [unowned self] _ in Observable.just(self.latestSavedTracksPagingObject) }
             .flatMap { [unowned self] paggingObject -> Observable<PagingObject<SavedTrack>> in
@@ -129,6 +129,11 @@ class DMSpotifySearchService: DMSpotifySearchServiceType {
                     return eventSong
                 }
             }
+            .map { [unowned self] newSavedTracks in
+                self.allSavedTracks.append(contentsOf: newSavedTracks)
+                return self.allSavedTracks.map { SectionItem.songSectionItem(song: $0) }
+            }
+            .map { [SongSectionModel.songSection(title: "Results", items: $0)] }
             .retryWhen(retryHandler)
             .do(onError: { error in self.resultErrorRelay.accept(error) })
             .subscribeOn(concurrentScheduler)
