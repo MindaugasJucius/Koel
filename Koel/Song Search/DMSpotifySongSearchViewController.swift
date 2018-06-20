@@ -31,6 +31,8 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
 
     private let disposeBag = DisposeBag()
     
+    //MARK: UI Elements
+    
     private lazy var doneButton: UIButton = {
         let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -51,8 +53,31 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
     }()
     
     private let tableViewLoadingFooter = DMKoelLoadingView()
-    
     private let refreshControl = UIRefreshControl()
+    
+    //MARK: Common observables
+    
+    private lazy var prefetchTrigger: Observable<Bool> = {
+        let willEndDraggingTargetOffset = tableView.rx.willEndDragging.map { $0.1 }
+        let prefetchTrigger = willEndDraggingTargetOffset.withLatestFrom(viewModel.isLoading) { (mutableOffset, loading) -> Bool in
+            guard !loading else {
+                return false
+            }
+            
+            var targetOffset = mutableOffset.pointee
+            let shouldTrigger = self.shouldPrefetchTrigger(withTargetOffset: targetOffset)
+            
+            if shouldTrigger {
+                self.adjustFooter(toVisible: true)
+                targetOffset = CGPoint(x: 0, y: targetOffset.y + DMKoelLoadingView.height)
+            }
+            
+            return shouldTrigger
+            }
+            .startWith(true)
+            .filter { $0 }
+        return prefetchTrigger
+    }()
     
     required init(withViewModel viewModel: DMSpotifySongSearchViewModelType) {
         self.viewModel = viewModel
@@ -118,40 +143,7 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
         bindRefreshView()
     }
     
-    func bindLoadingTrigger() {
-        let willEndDraggingTargetOffset = tableView.rx.willEndDragging.map { $0.1 }
-        
-        let prefetchTrigger = willEndDraggingTargetOffset.withLatestFrom(viewModel.isLoading) { (mutableOffset, loading) -> Bool in
-                guard !loading else {
-                    return false
-                }
-            
-                let translation = self.tableView.panGestureRecognizer.velocity(in: nil)
-                let draggingDownwards = translation.y < 0
-                var targetOffset = mutableOffset.pointee
-            
-                let shouldTrigger: Bool
-            
-                if draggingDownwards {
-                    shouldTrigger = self.tableView.isNearBottomEdge(contentOffset: targetOffset)
-                } else {
-                    shouldTrigger = self.tableView.isNearBottomEdge(contentOffset: targetOffset, edgeOffset: 0)
-                }
-            
-                if shouldTrigger {
-                    self.adjustFooter(toVisible: true)
-                    targetOffset = CGPoint(x: 0, y: targetOffset.y + DMKoelLoadingView.height)
-                }
-            
-                return shouldTrigger
-            }
-            .startWith(true)
-            .filter { $0 }
-        
-        prefetchTrigger
-            .bind(to: tableViewLoadingFooter.isAnimating)
-            .disposed(by: disposeBag)
-        
+    private func bindLoadingTrigger() {
         prefetchTrigger
             .map { _ in }
             .debounce(0.1, scheduler: MainScheduler.instance)
@@ -160,6 +152,10 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
     }
     
     private func bindLoadingFooterView() {
+        prefetchTrigger
+            .bind(to: tableViewLoadingFooter.isAnimating)
+            .disposed(by: disposeBag)
+        
         viewModel.isLoading.filter { !$0 }
             .do(onNext: { _ in self.adjustFooter(toVisible: false) })
             .drive(tableViewLoadingFooter.isAnimating)
@@ -171,11 +167,28 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
             .map { _ in false }
             .drive(refreshControl.rx.isRefreshing)
             .disposed(by: disposeBag)
-        
+                
         refreshControl.rx.controlEvent(.valueChanged).asObservable()
             .debug("refresh", trimOutput: false)
             .bind(to: viewModel.refreshTriggerRelay)
             .disposed(by: disposeBag)
+    }
+    
+}
+
+extension DMSpotifySongSearchViewController {
+    
+    //MARK: - Helpers
+    
+    private func shouldPrefetchTrigger(withTargetOffset targetOffset: CGPoint) -> Bool {
+        let translation = self.tableView.panGestureRecognizer.velocity(in: nil)
+        let draggingDownwards = translation.y < 0
+        
+        if draggingDownwards {
+            return self.tableView.isNearBottomEdge(contentOffset: targetOffset)
+        } else {
+            return self.tableView.isNearBottomEdge(contentOffset: targetOffset, edgeOffset: 0)
+        }
     }
     
     private func adjustFooter(toVisible visible: Bool) {

@@ -50,9 +50,6 @@ enum SongSectionModel: SectionModelType {
 }
 
 protocol DMSpotifySongSearchViewModelType: ViewModelType {
-    
-   // var spotifySearchService: DMSpotifySearchServiceType { get }
-
     var songResults: Driver<[SongSectionModel]> { get }
     var isLoading: Driver<Bool> { get }
     
