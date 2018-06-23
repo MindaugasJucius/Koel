@@ -76,7 +76,7 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
             }
             .startWith(true)
             .filter { $0 }
-        return prefetchTrigger
+        return prefetchTrigger.share()
     }()
     
     required init(withViewModel viewModel: DMSpotifySongSearchViewModelType) {

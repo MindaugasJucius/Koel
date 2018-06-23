@@ -52,6 +52,7 @@ enum SongSectionModel: SectionModelType {
 protocol DMSpotifySongSearchViewModelType: ViewModelType {
     var songResults: Driver<[SongSectionModel]> { get }
     var isLoading: Driver<Bool> { get }
+    var isRefreshing: Driver<Bool> { get }
     
     var removeSelectedSong: Action<DMEventSong, Void> { get }
     var addSelectedSong: Action<DMEventSong, Void> { get }
@@ -66,6 +67,12 @@ protocol DMSpotifySongSearchViewModelType: ViewModelType {
 class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
 
     private let disposeBag = DisposeBag()
+    
+    private let isRefreshingRelay = BehaviorRelay(value: false)
+    
+    var isRefreshing: Driver<Bool> {
+        return self.isRefreshingRelay.asDriver()
+    }
     
     private let isLoadingRelay = BehaviorRelay(value: true)
     
@@ -106,8 +113,16 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
             .subscribe()
             .disposed(by: disposeBag)
 
-        Observable.merge(refreshTriggerRelay.asObservable().map { _ in true },
-                         offsetTriggerRelay.asObservable().map { _ in false })
+        refreshTriggerRelay.asObservable().map { _ in true }
+            .do(onNext: { _ in self.isRefreshingRelay.accept(true) })
+            .flatMap { [unowned self] reset in
+                self.spotifySearchService.savedTracks(resetResults: reset)
+            }
+            .do(onNext: { _ in self.isRefreshingRelay.accept(false) })
+            .bind(to: songResultRelay)
+            .disposed(by: disposeBag)
+
+        offsetTriggerRelay.asObservable().map { _ in false }
             .do(onNext: { _ in self.isLoadingRelay.accept(true) })
             .flatMap { [unowned self] reset in
                 self.spotifySearchService.savedTracks(resetResults: reset)
