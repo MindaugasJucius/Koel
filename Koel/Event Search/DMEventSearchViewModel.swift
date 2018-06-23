@@ -74,24 +74,6 @@ class DMEventSearchViewModel: MultipeerViewModelType {
             self.multipeerService.stopAdvertising()
             self.multipeerService.stopBrowsing()
             self.multipeerService.disconnect()
-            
-//            let multipeerService = DMEventMultipeerService(asEventHost: true)
-//
-//            let songSharingViewModel = DMEventSongSharingViewModel(
-//                songPersistenceService: DMEventSongPersistenceService(selfPeer: multipeerService.myEventPeer),
-//                reachabilityService: self.reachabilityService,
-//                songSharingService: DMEntitySharingService(),
-//                multipeerService: multipeerService,
-//                sceneCoordinator: self.sceneCoordinator
-//            )
-//
-//            let manageEventViewModel = DMEventManagementViewModel(
-//                multipeerService: multipeerService,
-//                reachabilityService: self.reachabilityService,
-//                promptCoordinator: self.sceneCoordinator,
-//                songsRepresenter: songSharingViewModel,
-//                songsEditor: songSharingViewModel
-//            )
             return self.sceneCoordinator.transition(to: .management)
         }
     }()

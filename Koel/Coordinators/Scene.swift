@@ -14,10 +14,6 @@ enum Scene {
     //MARK: Shared
     case search(DMEventSearchViewModel)
 
-    //MARK: Host
-    case invite(DMEventInvitationsViewModel)
-    case manage(DMEventManagementViewModel)
-
     //MARK: Participant
     case participation(DMEventParticipationViewModel)
     
@@ -39,17 +35,6 @@ extension Scene {
             let eventParticipationVC = DMEventParticipationViewController(withViewModel: viewModel)
             eventParticipationVC.setupForViewModel()
             return eventParticipationVC
-            
-        //MARK: Host
-        case .invite(let viewModel):
-            let eventCreationVC = DMEventInvitationsViewController(withViewModel: viewModel)
-            eventCreationVC.setupForViewModel()
-            return eventCreationVC
-        case .manage(let viewModel):
-            let managementVC = DMEventManagementViewController(withViewModel: viewModel)
-            managementVC.setupForViewModel()
-            return managementVC
-            
         //MARK: Spotify
         case .authenticateSpotify(let authenticationURL):
             let authenticationController = SFSafariViewController(url: authenticationURL)

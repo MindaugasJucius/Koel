@@ -13,50 +13,139 @@ protocol RootTransitioning {
     func beginCoordinating(withWindow window: UIWindow)
 }
 
-class DMEventManagementSceneCoordinator: RootTransitioning {
+private enum ManagementScene {
+    case invites
+    case songs
+    case search
+}
+
+class DMEventManagementSceneCoordinator: NSObject, RootTransitioning {
 
     private var currentViewController: UIViewController?
     private let reachabilityService = try! DefaultReachabilityService()
+    private let multipeerService = DMEventMultipeerService(asEventHost: true)
     
-    init() {
-        
-    }
+    private let pageViewController = UIPageViewController(transitionStyle: .scroll,
+                                                          navigationOrientation: .horizontal,
+                                                          options: nil)
     
-    func transitionToEventManagement() -> Observable<Void> {
-        
-        return .just(())
-    }
+    private let scenes: [ManagementScene] = [.invites, .songs, .search]
     
-    func beginCoordinating(withWindow window: UIWindow) {
-        let multipeerService = DMEventMultipeerService(asEventHost: true)
+    private lazy var songsViewController: UINavigationController = {
+        let songPersistenceService = DMEventSongPersistenceService(selfPeer: multipeerService.myEventPeer)
+        let songSharingViewModel = DMEventSongSharingViewModel(songPersistenceService: songPersistenceService,
+                                                               reachabilityService: self.reachabilityService,
+                                                               songSharingService: DMEntitySharingService(),
+                                                               multipeerService: multipeerService)
         
-        let songSharingViewModel = DMEventSongSharingViewModel(
-            songPersistenceService: DMEventSongPersistenceService(selfPeer: multipeerService.myEventPeer),
-            reachabilityService: self.reachabilityService,
-            songSharingService: DMEntitySharingService(),
-            multipeerService: multipeerService
-        )
+        let manageEventViewModel = DMEventManagementViewModel(multipeerService: multipeerService,
+                                                              reachabilityService: self.reachabilityService,
+                                                              promptCoordinator: self,
+                                                              songsRepresenter: songSharingViewModel,
+                                                              songsEditor: songSharingViewModel)
+        let managementVC = DMEventManagementViewController(withViewModel: manageEventViewModel)
+        managementVC.setupForViewModel()
+        return UINavigationController(rootViewController: managementVC)
+    }()
+    
+    private lazy var invitesViewController: UINavigationController = {
+        let invitationsViewModel = DMEventInvitationsViewModel(multipeerService: multipeerService)
         
-        let manageEventViewModel = DMEventManagementViewModel(
-            multipeerService: multipeerService,
-            reachabilityService: self.reachabilityService,
-            promptCoordinator: self,
-            songsRepresenter: songSharingViewModel,
-            songsEditor: songSharingViewModel
-        )
-        
+        let invitationsVC = DMEventInvitationsViewController(withViewModel: invitationsViewModel)
+        invitationsVC.setupForViewModel()
+        return UINavigationController(rootViewController: invitationsVC)
+    }()
+    
+    private lazy var searchViewController: UINavigationController = {
         let spotifyAuthService = DMSpotifyAuthService()
         let spotifySearchService = DMSpotifySearchService(authService: spotifyAuthService,
                                                           reachabilityService: self.reachabilityService)
         
-        let spotifySongSearchViewModel = DMSpotifySongSearchViewModel(
-            promptCoordinator: self,
-            spotifySearchService: spotifySearchService
-        )
+        let spotifySongSearchViewModel = DMSpotifySongSearchViewModel(promptCoordinator: self,
+                                                                      spotifySearchService: spotifySearchService)
         
-        let invitationsViewModel = DMEventInvitationsViewModel(
-            multipeerService: multipeerService
-        )
+        let spotifySearchVC = DMSpotifySongSearchViewController(withViewModel: spotifySongSearchViewModel)
+        spotifySearchVC.setupForViewModel()
+        return UINavigationController(rootViewController: spotifySearchVC)
+    }()
+    
+    func beginCoordinating(withWindow window: UIWindow) {
+        
+        pageViewController.setViewControllers([managementViewController(forScene: .songs)],
+                                              direction: .forward,
+                                              animated: false,
+                                              completion: nil)
+        pageViewController.dataSource = self
+        window.rootViewController = pageViewController
+    }
+    
+    private func managementViewController(forScene scene: ManagementScene) -> UIViewController {
+        switch scene {
+        case .songs:
+            return songsViewController
+        case .invites:
+            return invitesViewController
+        case .search:
+            return searchViewController
+        }
+    }
+    
+    private func scene(ofViewController viewController: UIViewController) -> ManagementScene? {
+        if viewController is DMEventManagementViewController {
+            return .songs
+        }
+        
+        if viewController is DMEventInvitationsViewController {
+            return .invites
+        }
+        
+        if viewController is DMSpotifySongSearchViewController {
+            return .search
+        }
+        
+        return nil
+    }
+    
+}
+
+extension DMEventManagementSceneCoordinator: UIPageViewControllerDataSource {
+    
+    func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
+        guard let contentController = (viewController as? UINavigationController)?.viewControllers.first else {
+            return nil
+        }
+        
+        guard let scene = scene(ofViewController: contentController) else {
+            return nil
+        }
+    
+        guard let sceneIndex = scenes.index(of: scene) else {
+            return nil
+        }
+        
+        let newIndex = sceneIndex + 1
+        
+        guard newIndex != scenes.count else {
+            return nil
+        }
+        
+        return managementViewController(forScene: scenes[newIndex])
+    }
+    
+    func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
+        guard let contentController = (viewController as? UINavigationController)?.viewControllers.first else {
+            return nil
+        }
+        
+        guard let scene = scene(ofViewController: contentController) else {
+            return nil
+        }
+        
+        guard let sceneIndex = scenes.index(of: scene), sceneIndex != 0 else {
+            return nil
+        }
+        
+        return managementViewController(forScene: scenes[sceneIndex - 1])
     }
     
 }
