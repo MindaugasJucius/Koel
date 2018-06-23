@@ -65,18 +65,18 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
     private lazy var prefetchTrigger: Observable<Bool> = {
         let willEndDraggingTargetOffset = tableView.rx.willEndDragging.map { $0.1 }
         let prefetchTrigger = willEndDraggingTargetOffset.withLatestFrom(viewModel.isLoading) { (mutableOffset, loading) -> Bool in
-            guard !loading else {
-                return false
-            }
-            
-            var targetOffset = mutableOffset.pointee
-            let shouldTrigger = self.shouldPrefetchTrigger(withTargetOffset: targetOffset)
-            
-            if shouldTrigger {
-                targetOffset = CGPoint(x: 0, y: targetOffset.y + DMKoelLoadingView.height)
-            }
-            
-            return shouldTrigger
+                guard !loading else {
+                    return false
+                }
+                
+                var targetOffset = mutableOffset.pointee
+                let shouldTrigger = self.shouldPrefetchTrigger(withTargetOffset: targetOffset)
+                
+                if shouldTrigger {
+                    targetOffset = CGPoint(x: 0, y: targetOffset.y + DMKoelLoadingView.height)
+                }
+                
+                return shouldTrigger
             }
             .startWith(true)
             .filter { $0 }

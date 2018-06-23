@@ -42,7 +42,7 @@ class DMEventSearchViewModel: ViewModelType, MultipeerViewModelType {
             .filter { $0.isHost }
     }
     
-    private lazy var pushParticipation: Action<DMEventPeer, Void> = {
+    private lazy var pushEventParticipation: Action<DMEventPeer, Void> = {
         return Action (
             workFactory: { [unowned self] host in
 
@@ -70,11 +70,11 @@ class DMEventSearchViewModel: ViewModelType, MultipeerViewModelType {
         )
     }()
     
-    lazy var pushCreateEvent: CocoaAction = { this in
+    lazy var pushEventManagement: CocoaAction = {
         return CocoaAction { _ in
-            this.multipeerService.stopAdvertising()
-            this.multipeerService.stopBrowsing()
-            this.multipeerService.disconnect()
+            self.multipeerService.stopAdvertising()
+            self.multipeerService.stopBrowsing()
+            self.multipeerService.disconnect()
             
             let multipeerService = DMEventMultipeerService(asEventHost: true)
             
@@ -99,15 +99,15 @@ class DMEventSearchViewModel: ViewModelType, MultipeerViewModelType {
                 type: .rootWithNavigationVC
             )
         }
-    }(self)
+    }()
 
-    lazy var requestAccess: Action<(DMEventPeer), Void> = { this in
+    lazy var requestAccess: Action<(DMEventPeer), Void> = {
         return Action (
             workFactory: { (eventPeer: DMEventPeer) in
-                return this.multipeerService.connect(eventPeer.peerID, context: nil)
+                return self.multipeerService.connect(eventPeer.peerID, context: nil)
             }
         )
-    }(self)
+    }()
     
     required init(withSceneCoordinator sceneCoordinator: SceneCoordinatorType) {
         self.sceneCoordinator = sceneCoordinator
@@ -117,7 +117,7 @@ class DMEventSearchViewModel: ViewModelType, MultipeerViewModelType {
         
         host
             .observeOn(MainScheduler.instance)
-            .subscribe(pushParticipation.inputs)
+            .subscribe(pushEventParticipation.inputs)
             .disposed(by: disposeBag)
 
     }

@@ -82,7 +82,7 @@ class DMEventSearchViewController: UIViewController, BindableType {
             }
             .disposed(by: bag)
         
-        startEventButton.rx.action = viewModel.pushCreateEvent
+        startEventButton.rx.action = viewModel.pushEventManagement
         
         tableView.rx
             .modelSelected(DMEventPeer.self)
