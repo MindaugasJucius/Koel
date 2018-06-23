@@ -74,7 +74,7 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
         return self.isRefreshingRelay.asDriver()
     }
     
-    private let isLoadingRelay = BehaviorRelay(value: true)
+    private let isLoadingRelay = BehaviorRelay(value: false)
     
     var isLoading: Driver<Bool> {
         return self.isLoadingRelay.asDriver()
@@ -113,19 +113,23 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
             .subscribe()
             .disposed(by: disposeBag)
 
-        refreshTriggerRelay.asObservable().map { _ in true }
+        refreshTriggerRelay.asObservable()
+            .withLatestFrom(isLoading.asObservable())
+            .filter { !$0 }
             .do(onNext: { _ in self.isRefreshingRelay.accept(true) })
-            .flatMap { [unowned self] reset in
-                self.spotifySearchService.savedTracks(resetResults: reset)
+            .flatMap { [unowned self] _ in
+                self.spotifySearchService.savedTracks(resetResults: true)
             }
             .do(onNext: { _ in self.isRefreshingRelay.accept(false) })
             .bind(to: songResultRelay)
             .disposed(by: disposeBag)
 
-        offsetTriggerRelay.asObservable().map { _ in false }
+        offsetTriggerRelay.asObservable()
+            .withLatestFrom(isRefreshing.asObservable())
+            .filter { !$0 }
             .do(onNext: { _ in self.isLoadingRelay.accept(true) })
-            .flatMap { [unowned self] reset in
-                self.spotifySearchService.savedTracks(resetResults: reset)
+            .flatMap { [unowned self] _ in
+                self.spotifySearchService.savedTracks(resetResults: false)
             }
             .do(onNext: { _ in self.isLoadingRelay.accept(false) })
             .bind(to: songResultRelay)

@@ -40,6 +40,7 @@ struct UIConstants {
         static let managementTitle = NSLocalizedString("MANAGEMENT_TITLE", comment: "")
         static let nearbyPeers = NSLocalizedString("NEARBY_PEERS_SECTION_TITLE", comment: "")
         static let joinedPeers = NSLocalizedString("JOINED_PEERS_SECTION_TITLE", comment: "")
+        static let refreshCache = NSLocalizedString("REFRESH_SONG_CACHE", comment: "")
         
         // Participate
         static let participateTitle = NSLocalizedString("PARTICIPATE_TITLE", comment: "")

@@ -53,7 +53,12 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
     }()
     
     private let tableViewLoadingFooter = DMKoelLoadingView()
-    private let refreshControl = UIRefreshControl()
+    private let refreshControl: UIRefreshControl = {
+        let refreshControl = UIRefreshControl()
+        let title = UIConstants.strings.refreshCache
+        refreshControl.attributedTitle = NSAttributedString(string: title)
+        return refreshControl
+    }()
     
     //MARK: Common observables
     
@@ -68,7 +73,6 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
             let shouldTrigger = self.shouldPrefetchTrigger(withTargetOffset: targetOffset)
             
             if shouldTrigger {
-                self.adjustFooter(toVisible: true)
                 targetOffset = CGPoint(x: 0, y: targetOffset.y + DMKoelLoadingView.height)
             }
             
@@ -93,7 +97,7 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
         view.backgroundColor = .green
         
         view.addSubview(tableView)
-        tableView.addSubview(refreshControl)
+        tableView.refreshControl = refreshControl
         
         let tableViewConstraints = [
             tableView.topAnchor.constraint(equalTo: view.readableContentGuide.topAnchor),
@@ -152,24 +156,32 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
     }
     
     private func bindLoadingFooterView() {
-        prefetchTrigger
-            .bind(to: tableViewLoadingFooter.isAnimating)
-            .disposed(by: disposeBag)
-        
-        viewModel.isLoading.filter { !$0 }
-            .do(onNext: { _ in self.adjustFooter(toVisible: false) })
+        viewModel.isLoading
+            .do(onNext: { loading in self.adjustFooter(toVisible: loading) })
             .drive(tableViewLoadingFooter.isAnimating)
             .disposed(by: self.disposeBag)
     }
     
     private func bindRefreshView() {
-        viewModel.songResults
-            .map { _ in false }
+        viewModel.isLoading
+            .do(onNext: { isLoading in
+                // Disable UIRefreshControl if loading
+                if isLoading {
+                    self.tableView.refreshControl = nil
+                } else {
+                    self.tableView.refreshControl = self.refreshControl
+                }
+            })
+            .drive()
+            .disposed(by: disposeBag)
+        
+        viewModel.isRefreshing
+            .filter { !$0 }
             .drive(refreshControl.rx.isRefreshing)
             .disposed(by: disposeBag)
-                
+
         refreshControl.rx.controlEvent(.valueChanged).asObservable()
-            .debug("refresh", trimOutput: false)
+            .debug("what", trimOutput: true)
             .bind(to: viewModel.refreshTriggerRelay)
             .disposed(by: disposeBag)
     }
