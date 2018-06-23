@@ -18,6 +18,8 @@
 		039A2C6C2078AAE100C58BE5 /* DMEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 039A2C6B2078AAE100C58BE5 /* DMEntity.swift */; };
 		039A2C6E207A438A00C58BE5 /* Array+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 039A2C6D207A438A00C58BE5 /* Array+Extensions.swift */; };
 		039A726D20C866AB0078D0CD /* ReachabilityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 039A726B20C866AB0078D0CD /* ReachabilityService.swift */; };
+		03A2F73F20DE8CA10045B2E7 /* DMEventManagementSceneCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03A2F73E20DE8CA10045B2E7 /* DMEventManagementSceneCoordinator.swift */; };
+		03A2F74120DE98260045B2E7 /* CoordinatorScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03A2F74020DE98260045B2E7 /* CoordinatorScene.swift */; };
 		33CD43033F2349BABFA21363 /* Pods_Koel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 859C054680781DDB43D6FFC3 /* Pods_Koel.framework */; };
 		47ADB8775C90C90A34CB0B4E /* Pods_KoelTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C68936EB8AF29A19F4BC4C74 /* Pods_KoelTests.framework */; };
 		5F014BD41FB9E20000079009 /* WaveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F014BD31FB9E20000079009 /* WaveView.swift */; };
@@ -97,6 +99,8 @@
 		039A2C6B2078AAE100C58BE5 /* DMEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEntity.swift; sourceTree = "<group>"; };
 		039A2C6D207A438A00C58BE5 /* Array+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Extensions.swift"; sourceTree = "<group>"; };
 		039A726B20C866AB0078D0CD /* ReachabilityService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReachabilityService.swift; sourceTree = "<group>"; };
+		03A2F73E20DE8CA10045B2E7 /* DMEventManagementSceneCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventManagementSceneCoordinator.swift; sourceTree = "<group>"; };
+		03A2F74020DE98260045B2E7 /* CoordinatorScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoordinatorScene.swift; sourceTree = "<group>"; };
 		1EEEA22101255BEC78867464 /* Pods-Koel.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Koel.release.xcconfig"; path = "Pods/Target Support Files/Pods-Koel/Pods-Koel.release.xcconfig"; sourceTree = "<group>"; };
 		2F9833A4A17A19528964480E /* Pods-Koel.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Koel.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Koel/Pods-Koel.debug.xcconfig"; sourceTree = "<group>"; };
 		4BFB7D7E45702A7F3768CF64 /* Pods-KoelTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KoelTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-KoelTests/Pods-KoelTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -235,7 +239,7 @@
 				5F9C2D241FDFE59F0067BDC4 /* UI Elements */,
 				5FB665DD1FA34B32005C5165 /* Initial Loading */,
 				5F84FF9D1FD98429003332B4 /* Protocols */,
-				5FB665DA1FA346C5005C5165 /* Coordinator */,
+				5FB665DA1FA346C5005C5165 /* Coordinators */,
 				5F58F0321F9CB7AE006B9B47 /* Extensions */,
 				035596DD206802BA0067A737 /* Song Search */,
 				5F47B8321FD4034B0053A0A5 /* Event Search */,
@@ -381,13 +385,15 @@
 			path = "UI Elements";
 			sourceTree = "<group>";
 		};
-		5FB665DA1FA346C5005C5165 /* Coordinator */ = {
+		5FB665DA1FA346C5005C5165 /* Coordinators */ = {
 			isa = PBXGroup;
 			children = (
 				5F8186151FD3F62000477C71 /* Scene.swift */,
+				03A2F74020DE98260045B2E7 /* CoordinatorScene.swift */,
 				5F81861B1FD3FAB000477C71 /* SceneCoordinator.swift */,
+				03A2F73E20DE8CA10045B2E7 /* DMEventManagementSceneCoordinator.swift */,
 			);
-			path = Coordinator;
+			path = Coordinators;
 			sourceTree = "<group>";
 		};
 		5FB665DD1FA34B32005C5165 /* Initial Loading */ = {
@@ -623,12 +629,14 @@
 				5F84FF9A1FD86350003332B4 /* DMEventManagementViewModel.swift in Sources */,
 				5F9C2D231FDED1970067BDC4 /* DMKoelButton.swift in Sources */,
 				5FB2C9421FE92D26001D532F /* Realm+Extensions.swift in Sources */,
+				03A2F73F20DE8CA10045B2E7 /* DMEventManagementSceneCoordinator.swift in Sources */,
 				5FA42B5C1FD6E6F600578EF5 /* Notifications.swift in Sources */,
 				5F84FFA31FDAEC82003332B4 /* DMEventSong.swift in Sources */,
 				5F8186121FBB6EDB00477C71 /* DMKoelLogoView.swift in Sources */,
 				5F81861E1FD3FADB00477C71 /* UINavigationController+Rx.swift in Sources */,
 				5F93078A20D67E4600DE9FD1 /* DMKoelEmptyPlaceholderView.swift in Sources */,
 				5F5445951FD594460059A975 /* DMEventParticipationViewModel.swift in Sources */,
+				03A2F74120DE98260045B2E7 /* CoordinatorScene.swift in Sources */,
 				039A2C6C2078AAE100C58BE5 /* DMEntity.swift in Sources */,
 				5FB2C93A1FE7F534001D532F /* CAGradientLayer+Extensions.swift in Sources */,
 				5FD9306C2073DCEA00943D5C /* DMSpotifyPlaybackService.swift in Sources */,

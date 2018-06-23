@@ -35,7 +35,6 @@ protocol DMEventSongsManagerSeparatable {
 }
 
 protocol DMEventSongSharingViewModelType {
-    var sceneCoordinator: SceneCoordinatorType { get }
     var songSharingService: DMEntitySharingService<DMEventSong> { get }
 }
 
@@ -47,7 +46,6 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType, MultipeerVie
     
     let songSharingService: DMEntitySharingService<DMEventSong>
     let multipeerService: DMEventMultipeerService
-    let sceneCoordinator: SceneCoordinatorType
     
     private let songSortDescriptors = [
         SortDescriptor(keyPath: "upvoteCount", ascending: false),
@@ -57,13 +55,11 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType, MultipeerVie
     init(songPersistenceService: DMEventSongPersistenceServiceType,
          reachabilityService: ReachabilityService,
          songSharingService: DMEntitySharingService<DMEventSong>,
-         multipeerService: DMEventMultipeerService,
-         sceneCoordinator: SceneCoordinatorType) {
+         multipeerService: DMEventMultipeerService) {
         
         self.songSharingService = songSharingService
         self.songPersistenceService = songPersistenceService
         self.multipeerService = multipeerService
-        self.sceneCoordinator = sceneCoordinator
         self.reachabilityService = reachabilityService
         
         multipeerService
@@ -174,36 +170,37 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType, MultipeerVie
     
     lazy var onSongSearch: CocoaAction = {
         return CocoaAction { [unowned self] in
-            
-            let spotifyAuthService = DMSpotifyAuthService(sceneCoordinator: self.sceneCoordinator)
-            let spotifySearchService = DMSpotifySearchService(authService: spotifyAuthService,
-                                                              reachabilityService: self.reachabilityService)
-            
-            let spotifySongSearchViewModel = DMSpotifySongSearchViewModel(
-                sceneCoordinator: self.sceneCoordinator,
-                spotifySearchService: spotifySearchService,
-                onClose: self.onSearchClose()
-            )
-            
-            return self.sceneCoordinator.transition(
-                to: Scene.searchSpotify(spotifySongSearchViewModel),
-                type: .modal
-            )
+
+            return .just(())
+//            let spotifyAuthService = DMSpotifyAuthService()
+//            let spotifySearchService = DMSpotifySearchService(authService: spotifyAuthService,
+//                                                              reachabilityService: self.reachabilityService)
+//
+//            let spotifySongSearchViewModel = DMSpotifySongSearchViewModel(
+//                sceneCoordinator: self.sceneCoordinator,
+//                spotifySearchService: spotifySearchService,
+//                onClose: self.onSearchClose()
+//            )
+//
+//            return self.sceneCoordinator.transition(
+//                to: Scene.searchSpotify(spotifySongSearchViewModel),
+//                type: .modal
+//            )
         }
     }()
     
     private func onSearchClose() -> Action<[DMEventSong], Void> {
         return Action<[DMEventSong], Void>(workFactory: { [unowned self] (songs) -> Observable<Void> in
-            
-            return self.songPersistenceService
-                .store(songs: songs)
-                .filter { !$0.isEmpty }
-                .share(withMultipeerService: self.multipeerService, sharingService: DMEntitySharingService<[DMEventSong]>())
-                .map { _ in }
-                .do(onCompleted: { [unowned self] in
-                    self.sceneCoordinator.pop(animated: true)
-                }
-            )
+            return .just(())
+//            return self.songPersistenceService
+//                .store(songs: songs)
+//                .filter { !$0.isEmpty }
+//                .share(withMultipeerService: self.multipeerService, sharingService: DMEntitySharingService<[DMEventSong]>())
+//                .map { _ in }
+//                .do(onCompleted: { [unowned self] in
+//                    self.sceneCoordinator.pop(animated: true)
+//                }
+//            )
         })
     }
     

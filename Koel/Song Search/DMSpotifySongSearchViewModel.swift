@@ -49,7 +49,7 @@ enum SongSectionModel: SectionModelType {
     case emptySection(item: SectionItem)
 }
 
-protocol DMSpotifySongSearchViewModelType: ViewModelType {
+protocol DMSpotifySongSearchViewModelType {
     var songResults: Driver<[SongSectionModel]> { get }
     var isLoading: Driver<Bool> { get }
     var isRefreshing: Driver<Bool> { get }
@@ -57,9 +57,6 @@ protocol DMSpotifySongSearchViewModelType: ViewModelType {
     var removeSelectedSong: Action<DMEventSong, Void> { get }
     var addSelectedSong: Action<DMEventSong, Void> { get }
     
-    var onClose: Action<[DMEventSong], Void> { get }
-    var onDone: CocoaAction { get }
-
     var offsetTriggerRelay: PublishRelay<()> { get }
     var refreshTriggerRelay: PublishRelay<()> { get }
 }
@@ -89,17 +86,14 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
     let offsetTriggerRelay: PublishRelay<()>
     let refreshTriggerRelay: PublishRelay<()>
     
-    let sceneCoordinator: SceneCoordinatorType
+    let promptCoordinator: PromptCoordinating
     let spotifySearchService: DMSpotifySearchServiceType
     
     private var selectedSongs: [DMEventSong] = []
     
-    let onClose: Action<[DMEventSong], Void>
-    
-    init(sceneCoordinator: SceneCoordinatorType, spotifySearchService: DMSpotifySearchServiceType, onClose: Action<[DMEventSong], Void>) {
-        self.sceneCoordinator = sceneCoordinator
+    init(promptCoordinator: PromptCoordinating, spotifySearchService: DMSpotifySearchServiceType) {
+        self.promptCoordinator = promptCoordinator
         self.spotifySearchService = spotifySearchService
-        self.onClose = onClose
         
         self.refreshTriggerRelay = PublishRelay()
         self.songResultRelay = BehaviorRelay(value: [SongSectionModel.emptySection(item: SectionItem.emptySectionItem)])
@@ -107,7 +101,7 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
         
         spotifySearchService.resultError
             .flatMap { error in
-                sceneCoordinator.promptFor(error.localizedDescription, cancelAction: "ok", actions: nil)
+                promptCoordinator.promptFor(error.localizedDescription, cancelAction: "ok", actions: nil)
             }
             .do(onNext: { _ in self.isLoadingRelay.accept(false) }) // let user perform requests after errors
             .subscribe()
@@ -135,12 +129,6 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
             .bind(to: songResultRelay)
             .disposed(by: disposeBag)
     }
-    
-    lazy var onDone: CocoaAction = {
-        return CocoaAction(workFactory: { [unowned self] _ -> Observable<Void> in
-            return self.onClose.execute(self.selectedSongs)
-        })
-    }()
     
     lazy var addSelectedSong: Action<DMEventSong, Void> = {
         return Action(workFactory: { [unowned self] (song: DMEventSong) -> Observable<Void> in

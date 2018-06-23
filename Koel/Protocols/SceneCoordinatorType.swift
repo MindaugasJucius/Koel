@@ -16,6 +16,19 @@ enum SceneTransitionType {
     case modal      // present view controller modally
 }
 
+protocol CoordinatorTransitioning {
+
+    /// transition to another coordinator
+    @discardableResult
+    func transition(to coordinatorScene: CoordinatorScene) -> Observable<Void>
+    
+}
+
+protocol PromptCoordinating {
+
+    func promptFor<Action : CustomStringConvertible>(_ message: String, cancelAction: Action, actions: [Action]?) -> Observable<Action>
+}
+
 protocol SceneCoordinatorType {
     init(window: UIWindow)
     

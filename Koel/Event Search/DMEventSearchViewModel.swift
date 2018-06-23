@@ -11,14 +11,14 @@ import Action
 import RxSwift
 import MultipeerConnectivity
 
-class DMEventSearchViewModel: ViewModelType, MultipeerViewModelType {
+class DMEventSearchViewModel: MultipeerViewModelType {
     
     private let disposeBag = DisposeBag()
     
     let multipeerService = DMEventMultipeerService(asEventHost: false)
     private let reachabilityService = try! DefaultReachabilityService()
     
-    let sceneCoordinator: SceneCoordinatorType
+    let sceneCoordinator: SceneCoordinatorType & CoordinatorTransitioning
     
     var incommingInvitations: Observable<(DMEventPeer, (Bool) -> ())> {
         return multipeerService
@@ -50,8 +50,7 @@ class DMEventSearchViewModel: ViewModelType, MultipeerViewModelType {
                     songPersistenceService: DMEventSongPersistenceService(selfPeer: self.multipeerService.myEventPeer),
                     reachabilityService: self.reachabilityService,
                     songSharingService: DMEntitySharingService(),
-                    multipeerService: self.multipeerService,
-                    sceneCoordinator: self.sceneCoordinator
+                    multipeerService: self.multipeerService
                 )
                 
                 let participationModel = DMEventParticipationViewModel(
@@ -76,28 +75,24 @@ class DMEventSearchViewModel: ViewModelType, MultipeerViewModelType {
             self.multipeerService.stopBrowsing()
             self.multipeerService.disconnect()
             
-            let multipeerService = DMEventMultipeerService(asEventHost: true)
-            
-            let songSharingViewModel = DMEventSongSharingViewModel(
-                songPersistenceService: DMEventSongPersistenceService(selfPeer: multipeerService.myEventPeer),
-                reachabilityService: self.reachabilityService,
-                songSharingService: DMEntitySharingService(),
-                multipeerService: multipeerService,
-                sceneCoordinator: self.sceneCoordinator
-            )
-            
-            let manageEventViewModel = DMEventManagementViewModel(
-                multipeerService: multipeerService,
-                reachabilityService: self.reachabilityService,
-                sceneCoordinator: self.sceneCoordinator,
-                songsRepresenter: songSharingViewModel,
-                songsEditor: songSharingViewModel
-            )
-            
-            return self.sceneCoordinator.transition(
-                to: Scene.manage(manageEventViewModel),
-                type: .rootWithNavigationVC
-            )
+//            let multipeerService = DMEventMultipeerService(asEventHost: true)
+//
+//            let songSharingViewModel = DMEventSongSharingViewModel(
+//                songPersistenceService: DMEventSongPersistenceService(selfPeer: multipeerService.myEventPeer),
+//                reachabilityService: self.reachabilityService,
+//                songSharingService: DMEntitySharingService(),
+//                multipeerService: multipeerService,
+//                sceneCoordinator: self.sceneCoordinator
+//            )
+//
+//            let manageEventViewModel = DMEventManagementViewModel(
+//                multipeerService: multipeerService,
+//                reachabilityService: self.reachabilityService,
+//                promptCoordinator: self.sceneCoordinator,
+//                songsRepresenter: songSharingViewModel,
+//                songsEditor: songSharingViewModel
+//            )
+            return self.sceneCoordinator.transition(to: .management)
         }
     }()
 
@@ -109,7 +104,7 @@ class DMEventSearchViewModel: ViewModelType, MultipeerViewModelType {
         )
     }()
     
-    required init(withSceneCoordinator sceneCoordinator: SceneCoordinatorType) {
+    required init(withSceneCoordinator sceneCoordinator: SceneCoordinatorType & CoordinatorTransitioning) {
         self.sceneCoordinator = sceneCoordinator
         
         multipeerService.startAdvertising()

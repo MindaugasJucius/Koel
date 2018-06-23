@@ -21,14 +21,6 @@ class DMEventInvitationsViewController: UIViewController, BindableType {
     
     private var bag = DisposeBag()
     
-    private lazy var doneButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle(UIConstants.strings.done, for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 25)
-        return button
-    }()
-    
     required init(withViewModel viewModel: DMEventInvitationsViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -57,20 +49,9 @@ class DMEventInvitationsViewController: UIViewController, BindableType {
         ]
         
         NSLayoutConstraint.activate(tableViewConstraints)
-    
-        view.addSubview(doneButton)
-        
-        let buttonConstraints = [
-            doneButton.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 20),
-            doneButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
-        ]
-        
-        NSLayoutConstraint.activate(buttonConstraints)
     }
     
     func bindViewModel() {
-        doneButton.rx.action = viewModel.onClose
-        
         viewModel.allPeersSectioned
             .bind(to: tableView.rx.items(dataSource: tableViewDataSource))
             .disposed(by: bag)

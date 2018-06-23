@@ -21,9 +21,7 @@ let SpotifyURLCallbackNotificationUserInfoURLKey = "SpotifyURLCallbackNotificati
 class DMSpotifyAuthService: NSObject {
 
     typealias SPTAuthCallbackObserver = (Error?, SPTSession?, AnyObserver<SPTSession>) -> ()
-    
-    let sceneCoordinator: SceneCoordinatorType
-    
+        
     private let maxAttempts = 4
     
     private let disposeBag = DisposeBag()
@@ -43,8 +41,7 @@ class DMSpotifyAuthService: NSObject {
     }
     
     
-    init(sceneCoordinator: SceneCoordinatorType) {
-        self.sceneCoordinator = sceneCoordinator
+    override init() {
         super.init()
         auth.clientID = "e693a6d7103f4d46ac64eebc6906f8f4"
         auth.sessionUserDefaultsKey = KoelSpotifySessionUserDefaultsKey
@@ -112,16 +109,15 @@ class DMSpotifyAuthService: NSObject {
         if SPTAuth.supportsApplicationAuthentication() {
             UIApplication.shared.open(self.auth.spotifyAppAuthenticationURL(), options: [:])
         } else {
-            let authenticationScene = Scene.authenticateSpotify(auth.spotifyWebAuthenticationURL())
-            sceneCoordinator.transition(to: authenticationScene, type: .modal)
+            UIApplication.shared.open(auth.spotifyWebAuthenticationURL(), options: [:])
         }
         
         return authURLNotificationObservable
             .take(1)
             .do(onNext: { [unowned self] _ in
-                if self.sceneCoordinator.currentViewController is SFSafariViewController {
-                    self.sceneCoordinator.pop()
-                }
+//                if self.sceneCoordinator.currentViewController is SFSafariViewController {
+//                    self.sceneCoordinator.pop()
+//                }
             })
             .flatMap { [unowned self] callbackURL -> Observable<SPTSession> in
                 Observable<SPTSession>.create { observer -> Disposable in

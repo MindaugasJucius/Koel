@@ -68,14 +68,14 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
                 guard !loading else {
                     return false
                 }
-                
+            
                 var targetOffset = mutableOffset.pointee
                 let shouldTrigger = self.shouldPrefetchTrigger(withTargetOffset: targetOffset)
-                
+            
                 if shouldTrigger {
                     targetOffset = CGPoint(x: 0, y: targetOffset.y + DMKoelLoadingView.height)
                 }
-                
+            
                 return shouldTrigger
             }
             .startWith(true)
@@ -140,7 +140,7 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
             .subscribe(viewModel.removeSelectedSong.inputs)
             .disposed(by: disposeBag)
         
-        doneButton.rx.action = viewModel.onDone
+        //doneButton.rx.action = viewModel.onDone
         
         bindLoadingTrigger()
         bindLoadingFooterView()

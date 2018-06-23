@@ -155,3 +155,18 @@ class SceneCoordinator: NSObject, SceneCoordinatorType {
         return subject.asObservable()
     }
 }
+
+extension SceneCoordinator: CoordinatorTransitioning {
+    func transition(to coordinatorScene: CoordinatorScene) -> Observable<Void> {
+        switch coordinatorScene {
+        case .management:
+            let managementCoordinator = DMEventManagementSceneCoordinator()
+            managementCoordinator.beginCoordinating(withWindow: window)
+        default:
+            print("lul")
+        }
+        return .just(())
+    }
+    
+    
+}

@@ -13,11 +13,11 @@ import RealmSwift
 import MultipeerConnectivity
 import RxDataSources
 
-protocol DMEventManagementViewModelType: ViewModelType, DMEventSongsRepresentable, DMEventParticipantSongsEditable, DMEventHostSongsEditable {
+protocol DMEventManagementViewModelType: DMEventSongsRepresentable, DMEventParticipantSongsEditable, DMEventHostSongsEditable {
     
     init(multipeerService: DMEventMultipeerService,
          reachabilityService: ReachabilityService,
-         sceneCoordinator: SceneCoordinatorType,
+         promptCoordinator: PromptCoordinating,
          songsRepresenter: DMEventSongsRepresentable & DMEventSongsManagerSeparatable,
          songsEditor: DMEventParticipantSongsEditable & DMEventHostSongsEditable)
     
@@ -39,8 +39,6 @@ class DMEventManagementViewModel: DMEventManagementViewModelType, MultipeerViewM
     private let songsRepresenter: DMEventSongsManagerSeparatable & DMEventSongsRepresentable
     private let songsEditor: DMEventHostSongsEditable & DMEventParticipantSongsEditable
     
-    private let errorHandler: DMErrorHandlerServiceType
-    
     let songsSectioned: Observable<[SongSection]>
     
     let onSongSearch: CocoaAction
@@ -48,23 +46,23 @@ class DMEventManagementViewModel: DMEventManagementViewModelType, MultipeerViewM
     let onUpvote: (DMEventSong) -> (CocoaAction)
     let updateSongToState: (DMEventSong, DMEventSongState) -> (Observable<Void>)
     
-    let sceneCoordinator: SceneCoordinatorType
+    let promptCoordinator: PromptCoordinating
     let multipeerService: DMEventMultipeerService
 
     var backgroundTaskID = UIBackgroundTaskInvalid
 
     required init(multipeerService: DMEventMultipeerService,
                   reachabilityService: ReachabilityService,
-                  sceneCoordinator: SceneCoordinatorType,
+                  promptCoordinator: PromptCoordinating,
                   songsRepresenter: DMEventSongsManagerSeparatable & DMEventSongsRepresentable,
                   songsEditor: DMEventHostSongsEditable & DMEventParticipantSongsEditable) {
         
         self.multipeerService = multipeerService
         self.songsRepresenter = songsRepresenter
         self.songsEditor = songsEditor
-        self.sceneCoordinator = sceneCoordinator
+        self.promptCoordinator = promptCoordinator
         
-        let sptAuthService = DMSpotifyAuthService(sceneCoordinator: sceneCoordinator)
+        let sptAuthService = DMSpotifyAuthService()
         
         self.sptPlaybackService = DMSpotifyPlaybackService(authService: sptAuthService,
                                                            reachabilityService: reachabilityService,
@@ -72,7 +70,6 @@ class DMEventManagementViewModel: DMEventManagementViewModelType, MultipeerViewM
                                                            addedSongs: songsRepresenter.addedSongs,
                                                            playingSong: songsRepresenter.playingSong,
                                                            upNextSong: songsRepresenter.upNextSong)
-        self.errorHandler = DMErrorHandlerService(sceneCoordinator: sceneCoordinator)
         
         self.onSongsDelete = self.songsEditor.onSongsDelete
         self.onSongSearch = self.songsEditor.onSongSearch
@@ -148,17 +145,17 @@ class DMEventManagementViewModel: DMEventManagementViewModelType, MultipeerViewM
     private func setupConnectionObservables() {
         participantWantsJoinRequests
             .subscribe(onNext: { [unowned self] invitation in
-                let alert = UIAlertController(title: "Connection request", message: "\(invitation.0.peerID?.displayName) wants to join your party", preferredStyle: .alert)
-                let connectAction = UIAlertAction(title: "Yes", style: UIAlertActionStyle.default, handler: { action in
-                    let invitationHandler = invitation.1
-                    invitationHandler(true)
-                })
-                alert.addAction(connectAction)
-                self.sceneCoordinator.currentViewController.present(
-                    alert,
-                    animated: true,
-                    completion: nil
-                )
+//                let alert = UIAlertController(title: "Connection request", message: "\(invitation.0.peerID?.displayName) wants to join your party", preferredStyle: .alert)
+//                let connectAction = UIAlertAction(title: "Yes", style: UIAlertActionStyle.default, handler: { action in
+//                    let invitationHandler = invitation.1
+//                    invitationHandler(true)
+//                })
+//                alert.addAction(connectAction)
+//                self.sceneCoordinator.currentViewController.present(
+//                    alert,
+//                    animated: true,
+//                    completion: nil
+//                )
             })
             .disposed(by: disposeBag)
         
@@ -197,7 +194,7 @@ class DMEventManagementViewModel: DMEventManagementViewModelType, MultipeerViewM
     lazy var onPlay: CocoaAction = {
         return CocoaAction { [unowned self] in
             return self.sptPlaybackService.togglePlayback.catchError { error in
-                return self.sceneCoordinator.promptFor(error.localizedDescription, cancelAction: "cancel", actions: nil)
+                return self.promptCoordinator.promptFor(error.localizedDescription, cancelAction: "cancel", actions: nil)
                     .map { _ in }
                     .take(1)
             }
@@ -224,23 +221,24 @@ class DMEventManagementViewModel: DMEventManagementViewModelType, MultipeerViewM
     
     private func onInvitesClose() -> CocoaAction {
         return CocoaAction {
-            return self.sceneCoordinator.pop(animated: true)
+            return .just(())//self.sceneCoordinator.pop(animated: true)
         }
     }
     
     lazy var onInvite: CocoaAction = {
         return CocoaAction { [unowned self] _ in
             
-            let invitationsViewModel = DMEventInvitationsViewModel(
-                withSceneCoordinator: self.sceneCoordinator,
-                multipeerService: self.multipeerService,
-                onClose: self.onInvitesClose()
-            )
+//            let invitationsViewModel = DMEventInvitationsViewModel(
+//                withSceneCoordinator: self.sceneCoordinator,
+//                multipeerService: self.multipeerService,
+//                onClose: self.onInvitesClose()
+//            )
             
-            return self.sceneCoordinator.transition(
-                to: Scene.invite(invitationsViewModel),
-                type: .modal
-            )
+            return .just(())
+//            self.sceneCoordinator.transition(
+//                to: Scene.invite(invitationsViewModel),
+//                type: .modal
+//            )
         }
     }()
     

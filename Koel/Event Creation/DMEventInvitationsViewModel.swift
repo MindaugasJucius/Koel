@@ -10,14 +10,11 @@ import MultipeerConnectivity
 import RxSwift
 import Action
 
-struct DMEventInvitationsViewModel: ViewModelType, MultipeerViewModelType {
+struct DMEventInvitationsViewModel: MultipeerViewModelType {
     
     private let disposeBag = DisposeBag()
     
     let multipeerService: DMEventMultipeerService
-    let sceneCoordinator: SceneCoordinatorType
-    
-    let onClose: CocoaAction
     
     var allPeersSectioned: Observable<[EventPeerSection]> {
         return multipeerService.allPeers()
@@ -48,12 +45,8 @@ struct DMEventInvitationsViewModel: ViewModelType, MultipeerViewModelType {
         )
     }(self)
     
-    init(withSceneCoordinator sceneCoordinator: SceneCoordinatorType,
-         multipeerService: DMEventMultipeerService,
-         onClose: CocoaAction) {
-        self.sceneCoordinator = sceneCoordinator
+    init(multipeerService: DMEventMultipeerService) {
         self.multipeerService = multipeerService
-        self.onClose = onClose
     }
     
 }
