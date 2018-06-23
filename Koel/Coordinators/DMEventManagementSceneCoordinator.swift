@@ -19,7 +19,7 @@ private enum ManagementScene {
     case search
 }
 
-class DMEventManagementSceneCoordinator: NSObject, RootTransitioning {
+class DMEventManagementSceneCoordinator: NSObject {
 
     private var currentViewController: UIViewController?
     private let reachabilityService = try! DefaultReachabilityService()
@@ -30,6 +30,10 @@ class DMEventManagementSceneCoordinator: NSObject, RootTransitioning {
                                                           options: nil)
     
     private let scenes: [ManagementScene] = [.invites, .songs, .search]
+
+    private lazy var scenesDict: [ManagementScene: UIViewController] = [.invites: invitesViewController,
+                                                                        .songs: songsViewController,
+                                                                        .search: searchViewController]
     
     private lazy var songsViewController: UINavigationController = {
         let songPersistenceService = DMEventSongPersistenceService(selfPeer: multipeerService.myEventPeer)
@@ -69,9 +73,16 @@ class DMEventManagementSceneCoordinator: NSObject, RootTransitioning {
         return UINavigationController(rootViewController: spotifySearchVC)
     }()
     
+}
+
+extension DMEventManagementSceneCoordinator: RootTransitioning {
+    
     func beginCoordinating(withWindow window: UIWindow) {
+        guard let songsVC = scenesDict[.songs] else {
+            return
+        }
         
-        pageViewController.setViewControllers([managementViewController(forScene: .songs)],
+        pageViewController.setViewControllers([songsVC],
                                               direction: .forward,
                                               animated: false,
                                               completion: nil)
@@ -79,47 +90,13 @@ class DMEventManagementSceneCoordinator: NSObject, RootTransitioning {
         window.rootViewController = pageViewController
     }
     
-    private func managementViewController(forScene scene: ManagementScene) -> UIViewController {
-        switch scene {
-        case .songs:
-            return songsViewController
-        case .invites:
-            return invitesViewController
-        case .search:
-            return searchViewController
-        }
-    }
-    
-    private func scene(ofViewController viewController: UIViewController) -> ManagementScene? {
-        if viewController is DMEventManagementViewController {
-            return .songs
-        }
-        
-        if viewController is DMEventInvitationsViewController {
-            return .invites
-        }
-        
-        if viewController is DMSpotifySongSearchViewController {
-            return .search
-        }
-        
-        return nil
-    }
-    
 }
 
 extension DMEventManagementSceneCoordinator: UIPageViewControllerDataSource {
     
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
-        guard let contentController = (viewController as? UINavigationController)?.viewControllers.first else {
-            return nil
-        }
         
-        guard let scene = scene(ofViewController: contentController) else {
-            return nil
-        }
-    
-        guard let sceneIndex = scenes.index(of: scene) else {
+        guard let sceneIndex = currentSceneIndex(ofViewController: viewController) else {
             return nil
         }
         
@@ -128,24 +105,32 @@ extension DMEventManagementSceneCoordinator: UIPageViewControllerDataSource {
         guard newIndex != scenes.count else {
             return nil
         }
-        
-        return managementViewController(forScene: scenes[newIndex])
+
+        let newScene = scenes[newIndex]
+        return scenesDict[newScene]
     }
     
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
-        guard let contentController = (viewController as? UINavigationController)?.viewControllers.first else {
+
+        guard let sceneIndex = currentSceneIndex(ofViewController: viewController) else {
             return nil
         }
         
-        guard let scene = scene(ofViewController: contentController) else {
+        guard sceneIndex != 0 else {
             return nil
         }
         
-        guard let sceneIndex = scenes.index(of: scene), sceneIndex != 0 else {
+        let newScene = scenes[sceneIndex - 1]
+        return scenesDict[newScene]
+    }
+    
+    private func currentSceneIndex(ofViewController viewController: UIViewController) -> Int? {
+        let sceneForCurrentVC = scenesDict.first { $0.value.isEqual(viewController) }?.key
+        guard let scene = sceneForCurrentVC else {
             return nil
         }
         
-        return managementViewController(forScene: scenes[sceneIndex - 1])
+        return scenes.index(of: scene)
     }
     
 }
