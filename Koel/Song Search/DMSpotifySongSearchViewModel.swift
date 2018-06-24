@@ -88,7 +88,7 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
     
     let promptCoordinator: PromptCoordinating
     let spotifySearchService: DMSpotifySearchServiceType
-    
+   
     private var selectedSongs: [DMEventSong] = []
     
     init(promptCoordinator: PromptCoordinating, spotifySearchService: DMSpotifySearchServiceType) {

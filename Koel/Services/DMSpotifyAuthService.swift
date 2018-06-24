@@ -7,11 +7,23 @@
 //
 
 import UIKit
-import SafariServices
 import os.log
 import RxSwift
 import RxOptional
 import Spartan
+
+enum SpotifyAuthError: Error {
+    case needToLoginToPerform(String)
+}
+
+extension SpotifyAuthError: LocalizedError {
+    var errorDescription: String? {
+        switch self {
+        case .needToLoginToPerform(let action):
+            return String.init(format: UIConstants.strings.loginToPerformActionError, action)
+        }
+    }
+}
 
 private let KoelSpotifySessionUserDefaultsKey = "koel_spotify_session"
 
@@ -21,27 +33,18 @@ let SpotifyURLCallbackNotificationUserInfoURLKey = "SpotifyURLCallbackNotificati
 class DMSpotifyAuthService: NSObject {
 
     typealias SPTAuthCallbackObserver = (Error?, SPTSession?, AnyObserver<SPTSession>) -> ()
-        
-    private let maxAttempts = 4
     
     private let disposeBag = DisposeBag()
+    
+    private let promptCoordinator: PromptCoordinating
     private let auth: SPTAuth = SPTAuth.defaultInstance()
     
     var authenticationIsNeeded: Bool {
         return auth.session == nil || !auth.session.isValid()
     }
     
-    var currentSessionObservable: Observable<SPTSession> {
-        return currentSession()
-            .do(onNext: { [unowned self] session in
-                    Spartan.authorizationToken = session.accessToken
-                    self.auth.session = session
-                }
-            )
-    }
-    
-    
-    override init() {
+    init(promptCoordinator: PromptCoordinating) {
+        self.promptCoordinator = promptCoordinator
         super.init()
         auth.clientID = "e693a6d7103f4d46ac64eebc6906f8f4"
         auth.sessionUserDefaultsKey = KoelSpotifySessionUserDefaultsKey
@@ -56,9 +59,26 @@ class DMSpotifyAuthService: NSObject {
         ]
     }
     
-    private func currentSession() -> Observable<SPTSession> {
+    func spotifySession(forAction action: String) -> Observable<SPTSession> {
+        return session(forAction: action)
+            .do(onNext: {
+                Spartan.authorizationToken = $0.accessToken
+                self.auth.session = $0
+            })
+    }
+    
+    private func session(forAction action: String) -> Observable<SPTSession> {
         guard auth.session != nil else {
-            return performAuthenticationFlow()
+            let promptText = String.init(format: UIConstants.strings.pleaseLoginToPerformAction, action)
+            return promptCoordinator.promptFor(promptText,
+                                               cancelAction: UIConstants.strings.later,
+                                               actions: [UIConstants.strings.authenticate])
+                .flatMap { promptAction -> Observable<SPTSession> in
+                    if promptAction == UIConstants.strings.later {
+                        return .error(SpotifyAuthError.needToLoginToPerform(action))
+                    }
+                    return self.performAuthenticationFlow()
+                }
         }
         
         if auth.session.isValid() {
@@ -114,11 +134,6 @@ class DMSpotifyAuthService: NSObject {
         
         return authURLNotificationObservable
             .take(1)
-            .do(onNext: { [unowned self] _ in
-//                if self.sceneCoordinator.currentViewController is SFSafariViewController {
-//                    self.sceneCoordinator.pop()
-//                }
-            })
             .flatMap { [unowned self] callbackURL -> Observable<SPTSession> in
                 Observable<SPTSession>.create { observer -> Disposable in
                     self.auth.handleAuthCallback(

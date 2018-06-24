@@ -30,10 +30,9 @@ class DMEventManagementSceneCoordinator: NSObject {
                                                           options: nil)
     
     private let scenes: [ManagementScene] = [.invites, .songs, .search]
-
-    private lazy var scenesDict: [ManagementScene: UIViewController] = [.invites: invitesViewController,
-                                                                        .songs: songsViewController,
-                                                                        .search: searchViewController]
+    private lazy var scenesViewControllerDict: [ManagementScene: UIViewController] = [.invites: invitesViewController,
+                                                                                      .songs: songsViewController,
+                                                                                      .search: searchViewController]
     
     private lazy var songsViewController: UINavigationController = {
         let songPersistenceService = DMEventSongPersistenceService(selfPeer: multipeerService.myEventPeer)
@@ -61,7 +60,7 @@ class DMEventManagementSceneCoordinator: NSObject {
     }()
     
     private lazy var searchViewController: UINavigationController = {
-        let spotifyAuthService = DMSpotifyAuthService()
+        let spotifyAuthService = DMSpotifyAuthService(promptCoordinator: self)
         let spotifySearchService = DMSpotifySearchService(authService: spotifyAuthService,
                                                           reachabilityService: self.reachabilityService)
         
@@ -78,7 +77,7 @@ class DMEventManagementSceneCoordinator: NSObject {
 extension DMEventManagementSceneCoordinator: RootTransitioning {
     
     func beginCoordinating(withWindow window: UIWindow) {
-        guard let songsVC = scenesDict[.songs] else {
+        guard let songsVC = scenesViewControllerDict[.songs] else {
             return
         }
         
@@ -107,7 +106,7 @@ extension DMEventManagementSceneCoordinator: UIPageViewControllerDataSource {
         }
 
         let newScene = scenes[newIndex]
-        return scenesDict[newScene]
+        return scenesViewControllerDict[newScene]
     }
     
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
@@ -121,11 +120,11 @@ extension DMEventManagementSceneCoordinator: UIPageViewControllerDataSource {
         }
         
         let newScene = scenes[sceneIndex - 1]
-        return scenesDict[newScene]
+        return scenesViewControllerDict[newScene]
     }
     
     private func currentSceneIndex(ofViewController viewController: UIViewController) -> Int? {
-        let sceneForCurrentVC = scenesDict.first { $0.value.isEqual(viewController) }?.key
+        let sceneForCurrentVC = scenesViewControllerDict.first { $0.value.isEqual(viewController) }?.key
         guard let scene = sceneForCurrentVC else {
             return nil
         }
@@ -152,7 +151,7 @@ extension DMEventManagementSceneCoordinator: PromptCoordinating {
                 }
             }
             
-            self.currentViewController?.present(alertView, animated: true, completion: nil)
+            self.pageViewController.present(alertView, animated: true, completion: nil)
             
             return Disposables.create {
                 alertView.dismiss(animated:false, completion: nil)

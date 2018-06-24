@@ -21,8 +21,6 @@ protocol DMEventManagementViewModelType: DMEventSongsRepresentable, DMEventParti
          songsRepresenter: DMEventSongsRepresentable & DMEventSongsManagerSeparatable,
          songsEditor: DMEventParticipantSongsEditable & DMEventHostSongsEditable)
     
-    var onInvite: CocoaAction { get }
-    
     var playbackEnabled: Observable<Bool> { get }
     var isPlaying: Observable<Bool> { get }
     
@@ -62,7 +60,7 @@ class DMEventManagementViewModel: DMEventManagementViewModelType, MultipeerViewM
         self.songsEditor = songsEditor
         self.promptCoordinator = promptCoordinator
         
-        let sptAuthService = DMSpotifyAuthService()
+        let sptAuthService = DMSpotifyAuthService(promptCoordinator: promptCoordinator)
         
         self.sptPlaybackService = DMSpotifyPlaybackService(authService: sptAuthService,
                                                            reachabilityService: reachabilityService,
@@ -215,31 +213,6 @@ class DMEventManagementViewModel: DMEventManagementViewModelType, MultipeerViewM
     
     lazy var isPlaying: Observable<Bool> = {
         return sptPlaybackService.isPlaying
-    }()
-    
-    // MARK: - Connection bindables
-    
-    private func onInvitesClose() -> CocoaAction {
-        return CocoaAction {
-            return .just(())//self.sceneCoordinator.pop(animated: true)
-        }
-    }
-    
-    lazy var onInvite: CocoaAction = {
-        return CocoaAction { [unowned self] _ in
-            
-//            let invitationsViewModel = DMEventInvitationsViewModel(
-//                withSceneCoordinator: self.sceneCoordinator,
-//                multipeerService: self.multipeerService,
-//                onClose: self.onInvitesClose()
-//            )
-            
-            return .just(())
-//            self.sceneCoordinator.transition(
-//                to: Scene.invite(invitationsViewModel),
-//                type: .modal
-//            )
-        }
     }()
     
 }

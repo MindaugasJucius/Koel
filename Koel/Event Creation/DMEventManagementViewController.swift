@@ -27,22 +27,6 @@ class DMEventManagementViewController: UIViewController, BindableType {
         return tableView
     }()
     
-    private lazy var invitationsButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle(UIConstants.strings.invite, for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 25)
-        return button
-    }()
-
-    private lazy var addButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle(UIConstants.strings.addSong, for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 25)
-        return button
-    }()
-    
     private lazy var deleteSongsButton: UIButton = {
         let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -80,7 +64,6 @@ class DMEventManagementViewController: UIViewController, BindableType {
             tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ]
         
-        view.addSubview(invitationsButton)
         
         view.addSubview(playbackControlsView)
         let playbackControlsViewConstraints = [
@@ -89,24 +72,9 @@ class DMEventManagementViewController: UIViewController, BindableType {
             playbackControlsView.rightAnchor.constraint(equalTo: view.rightAnchor),
             playbackControlsView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ]
-        
-        let invitationConstraints = [
-            invitationsButton.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor,
-                                                    constant: 20),
-            invitationsButton.bottomAnchor.constraint(equalTo: playbackControlsView.topAnchor)
-        ]
-        
-        view.addSubview(addButton)
-        
-        let addButtonConstraints = [
-            addButton.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor,
-                                             constant: -20),
-            addButton.bottomAnchor.constraint(equalTo: playbackControlsView.topAnchor)
-        ]
+
 
         NSLayoutConstraint.activate(playbackControlsViewConstraints)
-        NSLayoutConstraint.activate(invitationConstraints)
-        NSLayoutConstraint.activate(addButtonConstraints)
         NSLayoutConstraint.activate(tableViewConstraints)
         
         #if DEBUG
@@ -114,7 +82,7 @@ class DMEventManagementViewController: UIViewController, BindableType {
             let deleteSongsButtonConstraints = [
                 deleteSongsButton.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor,
                                                          constant: -20),
-                deleteSongsButton.bottomAnchor.constraint(equalTo: addButton.topAnchor)
+                deleteSongsButton.bottomAnchor.constraint(equalTo: playbackControlsView.topAnchor)
             ]
         
             NSLayoutConstraint.activate(deleteSongsButtonConstraints)
@@ -129,9 +97,7 @@ class DMEventManagementViewController: UIViewController, BindableType {
             .bind(to: tableView.rx.items(dataSource: songsDataSource))
             .disposed(by: disposeBag)
         
-        addButton.rx.action = viewModel.onSongSearch
         deleteSongsButton.rx.action = viewModel.onSongsDelete
-        invitationsButton.rx.action = viewModel.onInvite
         
         //DMPlaybackControlsView bindings
         self.viewModel.playbackEnabled

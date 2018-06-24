@@ -78,7 +78,6 @@ class DMSpotifySearchService: DMSpotifySearchServiceType {
     }
     
     lazy var retryHandler: (Observable<Error>) -> Observable<Int> = { e in
-        
         let waitForReachability = self.reachabilityService.reachability
             .filter { $0.reachable }
             .map { _ in 1 }
@@ -105,8 +104,12 @@ class DMSpotifySearchService: DMSpotifySearchServiceType {
             self.allSavedTracks = []
         }
         
-        return self.authService.currentSessionObservable
-            .flatMap { [unowned self] _ in Observable.just(self.latestSavedTracksPagingObject) }
+        let valueOnError = allSavedTracks.isEmpty ? [SongSectionModel.emptySection(item: SectionItem.emptySectionItem)] : []
+        
+        return self.authService.spotifySession(forAction: UIConstants.strings.SPTSearchTracks)
+            .flatMap { [unowned self] _ in
+                return Observable.just(self.latestSavedTracksPagingObject)
+            }
             .flatMap { [unowned self] paggingObject -> Observable<PagingObject<SavedTrack>> in
                 guard let paggingObject = paggingObject else {
                     return self.initial { Spartan.getSavedTracks(limit: 50, success: $0, failure: $1) }
@@ -141,7 +144,7 @@ class DMSpotifySearchService: DMSpotifySearchServiceType {
             .retryWhen(retryHandler)
             .do(onError: { error in self.resultErrorRelay.accept(error) })
             .subscribeOn(concurrentScheduler)
-            .asDriver(onErrorJustReturn: [])
+            .asDriver(onErrorJustReturn: valueOnError)
     }
 
 }

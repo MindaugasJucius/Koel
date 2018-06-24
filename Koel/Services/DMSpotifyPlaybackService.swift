@@ -13,6 +13,10 @@ import Action
 import AVKit
 import MediaPlayer
 
+enum PlaybackError: Error {
+    case needToLoginToPlaySongs
+}
+
 protocol DMSpotifyPlaybackServiceType {
     
     var authService: DMSpotifyAuthService { get }
@@ -155,7 +159,8 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
         return reachabilityService.reachability
             .flatMap { [unowned self] status -> Observable<SPTSession> in
                 if status.reachable {
-                    return self.authService.currentSessionObservable
+                    let sptAction = UIConstants.strings.SPTActionPlayback
+                    return self.authService.spotifySession(forAction: sptAction)
                 } else {
                     return .error(ReachabilityStatusError.networkUnavailable)
                 }

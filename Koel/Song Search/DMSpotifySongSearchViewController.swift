@@ -118,16 +118,10 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
     }
     
     func bindViewModel() {
-        rx.methodInvoked(#selector(UIViewController.viewDidAppear(_:)))
-            .take(1)
-            .do { [unowned self] in
-                let dataSource = DMSpotifySongSearchViewController.persistedSongDataSource(withViewModel: self.viewModel)
-                
-                self.viewModel.songResults
-                    .drive(self.tableView.rx.items(dataSource: dataSource))
-                    .disposed(by: self.disposeBag)
-            }
-            .subscribe()
+        let dataSource = DMSpotifySongSearchViewController.persistedSongDataSource(withViewModel: self.viewModel)
+        
+        self.viewModel.songResults
+            .drive(tableView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
         
         tableView.rx
@@ -140,18 +134,22 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
             .subscribe(viewModel.removeSelectedSong.inputs)
             .disposed(by: disposeBag)
         
-        //doneButton.rx.action = viewModel.onDone
-        
         bindLoadingTrigger()
         bindLoadingFooterView()
         bindRefreshView()
     }
     
     private func bindLoadingTrigger() {
-        prefetchTrigger
-            .map { _ in }
-            .debounce(0.1, scheduler: MainScheduler.instance)
-            .bind(to: viewModel.offsetTriggerRelay)
+        rx.methodInvoked(#selector(UIViewController.viewDidAppear(_:)))
+            .take(1)
+            .do { [unowned self] in
+                self.prefetchTrigger
+                    .map { _ in }
+                    .debounce(0.1, scheduler: MainScheduler.instance)
+                    .bind(to: self.viewModel.offsetTriggerRelay)
+                    .disposed(by: self.disposeBag)
+            }
+            .subscribe()
             .disposed(by: disposeBag)
     }
     

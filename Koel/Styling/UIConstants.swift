@@ -32,7 +32,19 @@ struct UIConstants {
         static let done = NSLocalizedString("DONE", comment: "")
         static let queuedSongs = NSLocalizedString("QUEUED_SONGS_SECTION_TITLE", comment: "")
         static let playedSongs = NSLocalizedString("PLAYED_SONGS_SECTION_TITLE", comment: "")
+        static let later = NSLocalizedString("LATER", comment: "")
+        static let authenticate = NSLocalizedString("AUTHENTICATE", comment: "")
         
+        //SPT Actions
+        static let SPTActionPlayback = NSLocalizedString("SPT_ACTION_PLAYBACK", comment: "")
+        static let SPTSearchTracks = NSLocalizedString("SPT_ACTION_SEARCH_TRACKS", comment: "")
+        
+        //SPT General
+        static let pleaseLoginToPerformAction = NSLocalizedString("PLEASE_LOGIN_TO_PERFORM_ACTION", comment: "")
+        
+        //SPT Errors
+        static let loginToPerformActionError = NSLocalizedString("NEED_TO_LOGIN_TO_PERFORM_ACTION_ERROR", comment: "")
+
         // Management
         static let addSong = NSLocalizedString("ADD_SONG", comment: "")
         static let deleteSongs = NSLocalizedString("DELETE_SONGS", comment: "")

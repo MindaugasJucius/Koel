@@ -11,6 +11,18 @@
 "QUEUED_SONGS_SECTION_TITLE" = "Queued";
 "PLAYED_SONGS_SECTION_TITLE" = "Played";
 "REFRESH_SONG_CACHE" = "Pull to refresh";
+"LATER" = "Later";
+"AUTHENTICATE" = "Login";
+
+//SPT Errors
+"NEED_TO_LOGIN_TO_PERFORM_ACTION_ERROR" = "You need to login with Spotify to %@.";
+
+//SPT Actions
+"SPT_ACTION_PLAYBACK" = "play music";
+"SPT_ACTION_SEARCH_TRACKS" = "search for tracks";
+
+//SPT General
+"PLEASE_LOGIN_TO_PERFORM_ACTION" = "Please login with Spotify to %@.";
 
 // Management
 "NEARBY_PEERS_SECTION_TITLE" = "Nearby";
