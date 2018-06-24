@@ -122,24 +122,6 @@ class DMEventSceneCoordinator: NSObject {
     
 }
 
-extension DMEventSceneCoordinator {
-    
-    private func transition(toManagementScene scene: ManagementScene, animated: Bool) -> Observable<Void> {
-        let subject = PublishSubject<Void>()
-
-        guard let viewController = scenesViewControllerDict[scene] else {
-            return .empty()
-        }
-        
-        pageViewController.setViewControllers([viewController], direction: .reverse, animated: animated) { _ in
-            subject.onCompleted()
-        }
-
-        return subject
-    }
-    
-}
-
 extension DMEventSceneCoordinator: RootTransitioning {
     
     func beginCoordinating(withWindow window: UIWindow) -> Observable<Void> {
@@ -147,6 +129,24 @@ extension DMEventSceneCoordinator: RootTransitioning {
         pageViewController.dataSource = self
         
         return transition(toManagementScene: .songs, animated: false)
+    }
+    
+}
+
+extension DMEventSceneCoordinator {
+    
+    private func transition(toManagementScene scene: ManagementScene, animated: Bool) -> Observable<Void> {
+        let subject = PublishSubject<Void>()
+        
+        guard let viewController = scenesViewControllerDict[scene] else {
+            return .empty()
+        }
+        
+        pageViewController.setViewControllers([viewController], direction: .reverse, animated: animated) { _ in
+            subject.onCompleted()
+        }
+        
+        return subject
     }
     
 }

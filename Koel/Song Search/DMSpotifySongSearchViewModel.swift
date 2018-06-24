@@ -93,15 +93,14 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
     let spotifySearchService: DMSpotifySearchServiceType
    
     private var selectedSongsRelay = BehaviorRelay<[DMEventSong]>(value: [])
-    private var selectedSongs: [DMEventSong] = []
     var onQueueSelectedSongs: Action<[DMEventSong], Void>
     
-    var queueSelectedSongs: CocoaAction {
+    lazy var queueSelectedSongs: CocoaAction = {
         let enabledIf = selectedSongsRelay.map { $0.count > 0 }.distinctUntilChanged()
         return CocoaAction(enabledIf: enabledIf, workFactory: { _ -> Observable<Void> in
-            return self.onQueueSelectedSongs.execute(self.selectedSongs)
+            return self.onQueueSelectedSongs.execute(self.selectedSongsRelay.value)
         })
-    }
+    }()
     
     init(promptCoordinator: PromptCoordinating,
          spotifySearchService: DMSpotifySearchServiceType,
@@ -122,6 +121,11 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
             .subscribe()
             .disposed(by: disposeBag)
 
+        // remove selected songs on queueing
+        queueSelectedSongs.executionObservables.map { _ in [] }
+            .bind(to: selectedSongsRelay)
+            .disposed(by: disposeBag)
+        
         refreshTriggerRelay.asObservable()
             .withLatestFrom(isLoading.asObservable())
             .filter { !$0 }
@@ -148,8 +152,9 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
     lazy var sectionItemSelected: Action<SectionItem, Void> = {
         return Action(workFactory: { [unowned self] (sectionItem: SectionItem) -> Observable<Void> in
             if case SectionItem.songSectionItem(song: let selectedSong) = sectionItem {
-                self.selectedSongs.append(selectedSong)
-                self.selectedSongsRelay.accept(self.selectedSongs)
+                var selectedSongs = self.selectedSongsRelay.value
+                selectedSongs.append(selectedSong)
+                self.selectedSongsRelay.accept(selectedSongs)
             }
             return Observable.just(())
         })
@@ -158,9 +163,10 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
     lazy var sectionItemDeselected: Action<SectionItem, Void> = {
         return Action(workFactory: { [unowned self] (sectionItem: SectionItem) -> Observable<Void> in
             if case SectionItem.songSectionItem(song: let selectedSong) = sectionItem,
-                let songIndex = self.selectedSongs.index(of: selectedSong) {
-                self.selectedSongs.remove(at: songIndex)
-                self.selectedSongsRelay.accept(self.selectedSongs)
+                let songIndex = self.selectedSongsRelay.value.index(of: selectedSong) {
+                var selectedSongs = self.selectedSongsRelay.value
+                selectedSongs.remove(at: songIndex)
+                self.selectedSongsRelay.accept(selectedSongs)
             }
             return Observable.just(())
         })

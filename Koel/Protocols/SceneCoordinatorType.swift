@@ -21,13 +21,12 @@ protocol CoordinatorTransitioning {
 }
 
 protocol PromptCoordinating {
-
     func promptFor<Action : CustomStringConvertible>(_ message: String, cancelAction: Action, actions: [Action]?) -> Observable<Action>
 }
 
 protocol SceneCoordinatorType {
     init(window: UIWindow)
-        
+    
     /// transition to another scene
     @discardableResult
     func transition(to scene: Scene, type: SceneTransitionType) -> Observable<Void>
