@@ -60,11 +60,12 @@ protocol DMSpotifySongSearchViewModelType {
     var offsetTriggerRelay: PublishRelay<()> { get }
     var refreshTriggerRelay: PublishRelay<()> { get }
     
-    var hasSelectedSongs: Observable<Bool> { get }
+
+    var queueSelectedSongs: CocoaAction { get }
 }
 
 class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
-
+    
     private let disposeBag = DisposeBag()
     
     private let isRefreshingRelay = BehaviorRelay(value: false)
@@ -93,14 +94,21 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
    
     private var selectedSongsRelay = BehaviorRelay<[DMEventSong]>(value: [])
     private var selectedSongs: [DMEventSong] = []
+    var onQueueSelectedSongs: Action<[DMEventSong], Void>
     
-    var hasSelectedSongs: Observable<Bool> {
-        return selectedSongsRelay.map { $0.count > 0 }.distinctUntilChanged()
+    var queueSelectedSongs: CocoaAction {
+        let enabledIf = selectedSongsRelay.map { $0.count > 0 }.distinctUntilChanged()
+        return CocoaAction(enabledIf: enabledIf, workFactory: { _ -> Observable<Void> in
+            return self.onQueueSelectedSongs.execute(self.selectedSongs)
+        })
     }
     
-    init(promptCoordinator: PromptCoordinating, spotifySearchService: DMSpotifySearchServiceType) {
+    init(promptCoordinator: PromptCoordinating,
+         spotifySearchService: DMSpotifySearchServiceType,
+         onQueueSelectedSongs: Action<[DMEventSong], Void>) {
         self.promptCoordinator = promptCoordinator
         self.spotifySearchService = spotifySearchService
+        self.onQueueSelectedSongs = onQueueSelectedSongs
         
         self.refreshTriggerRelay = PublishRelay()
         self.songResultRelay = BehaviorRelay(value: [SongSectionModel.emptySection(item: SectionItem.emptySectionItem)])

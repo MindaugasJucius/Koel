@@ -18,7 +18,6 @@ protocol DMEventSongsRepresentable {
 }
 
 protocol DMEventParticipantSongsEditable {
-    var onSongSearch: CocoaAction { get }
     var onUpvote: (DMEventSong) -> (CocoaAction) { get }
 }
 
@@ -166,44 +165,6 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType, MultipeerVie
         .observeOn(MainScheduler.instance)
     }
     
-    //MARK: - Song search
-    
-    lazy var onSongSearch: CocoaAction = {
-        return CocoaAction { [unowned self] in
-
-            return .just(())
-//            let spotifyAuthService = DMSpotifyAuthService()
-//            let spotifySearchService = DMSpotifySearchService(authService: spotifyAuthService,
-//                                                              reachabilityService: self.reachabilityService)
-//
-//            let spotifySongSearchViewModel = DMSpotifySongSearchViewModel(
-//                sceneCoordinator: self.sceneCoordinator,
-//                spotifySearchService: spotifySearchService,
-//                onClose: self.onSearchClose()
-//            )
-//
-//            return self.sceneCoordinator.transition(
-//                to: Scene.searchSpotify(spotifySongSearchViewModel),
-//                type: .modal
-//            )
-        }
-    }()
-    
-    private func onSearchClose() -> Action<[DMEventSong], Void> {
-        return Action<[DMEventSong], Void>(workFactory: { [unowned self] (songs) -> Observable<Void> in
-            return .just(())
-//            return self.songPersistenceService
-//                .store(songs: songs)
-//                .filter { !$0.isEmpty }
-//                .share(withMultipeerService: self.multipeerService, sharingService: DMEntitySharingService<[DMEventSong]>())
-//                .map { _ in }
-//                .do(onCompleted: { [unowned self] in
-//                    self.sceneCoordinator.pop(animated: true)
-//                }
-//            )
-        })
-    }
-    
     //MARK: - Song creation
   
     private lazy var createAction: Action<DMEventSong, DMEventSong> = {
@@ -263,7 +224,7 @@ private extension Results where Element: DMEventSong {
     
 }
 
-private extension Observable where Element: Codable {
+extension Observable where Element: Codable {
     
     func share<SharingService: DMEntitySharingServiceType>(withMultipeerService multipeerService: DMEventMultipeerService, sharingService: SharingService) -> Observable<Void> where Element == SharingService.Entity {
         

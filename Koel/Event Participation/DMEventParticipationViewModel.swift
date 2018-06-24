@@ -31,7 +31,6 @@ class DMEventParticipationViewModel: DMEventParticipationViewModelType, Multipee
     let sceneCoordinator: SceneCoordinatorType
     
     let songsSectioned: Observable<[SongSection]>
-    let onSongSearch: CocoaAction
     let onUpvote: (DMEventSong) -> (CocoaAction)
     
     var backgroundTaskID = UIBackgroundTaskInvalid
@@ -85,7 +84,6 @@ class DMEventParticipationViewModel: DMEventParticipationViewModelType, Multipee
         self.sceneCoordinator = sceneCoordinator
         self.host = host
         self.songsSectioned = songsSectionsRepresenter.songsSectioned
-        self.onSongSearch = songsEditor.onSongSearch
         self.onUpvote = songsEditor.onUpvote
         self.multipeerService = multipeerService
         

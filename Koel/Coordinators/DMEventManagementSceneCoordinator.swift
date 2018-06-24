@@ -8,9 +8,10 @@
 
 import UIKit
 import RxSwift
+import Action
 
 protocol RootTransitioning {
-    func beginCoordinating(withWindow window: UIWindow)
+    func beginCoordinating(withWindow window: UIWindow) -> Observable<Void>
 }
 
 private enum ManagementScene {
@@ -34,18 +35,36 @@ class DMEventManagementSceneCoordinator: NSObject {
                                                                                       .songs: songsViewController,
                                                                                       .search: searchViewController]
     
+    //MARK: - View Models
+    
+    private lazy var songPersistenceService = DMEventSongPersistenceService(selfPeer: multipeerService.myEventPeer)
+    
+    private lazy var songSharingViewModel = DMEventSongSharingViewModel(songPersistenceService: songPersistenceService,
+                                                                        reachabilityService: self.reachabilityService,
+                                                                        songSharingService: DMEntitySharingService(),
+                                                                        multipeerService: multipeerService)
+    
+    private lazy var manageEventViewModel = DMEventManagementViewModel(multipeerService: multipeerService,
+                                                                       reachabilityService: self.reachabilityService,
+                                                                       promptCoordinator: self,
+                                                                       songsRepresenter: songSharingViewModel,
+                                                                       songsEditor: songSharingViewModel)
+    
+    //MARK: - Shared Observables
+    
+    private func onQueueSelectedSongs() -> Action<[DMEventSong], Void> {
+        return Action(workFactory: { songs -> Observable<Void> in
+            return self.songPersistenceService
+                .store(songs: songs)
+                .filter { !$0.isEmpty }
+                .share(withMultipeerService: self.multipeerService, sharingService: DMEntitySharingService<[DMEventSong]>())
+                .flatMap { return self.transition(toManagementScene: .songs, animated: true) }
+        })
+    }
+    
+    //MARK: - Controllers
+    
     private lazy var songsViewController: UINavigationController = {
-        let songPersistenceService = DMEventSongPersistenceService(selfPeer: multipeerService.myEventPeer)
-        let songSharingViewModel = DMEventSongSharingViewModel(songPersistenceService: songPersistenceService,
-                                                               reachabilityService: self.reachabilityService,
-                                                               songSharingService: DMEntitySharingService(),
-                                                               multipeerService: multipeerService)
-        
-        let manageEventViewModel = DMEventManagementViewModel(multipeerService: multipeerService,
-                                                              reachabilityService: self.reachabilityService,
-                                                              promptCoordinator: self,
-                                                              songsRepresenter: songSharingViewModel,
-                                                              songsEditor: songSharingViewModel)
         let managementVC = DMEventManagementViewController(withViewModel: manageEventViewModel)
         managementVC.setupForViewModel()
         return UINavigationController(rootViewController: managementVC)
@@ -65,7 +84,8 @@ class DMEventManagementSceneCoordinator: NSObject {
                                                           reachabilityService: self.reachabilityService)
         
         let spotifySongSearchViewModel = DMSpotifySongSearchViewModel(promptCoordinator: self,
-                                                                      spotifySearchService: spotifySearchService)
+                                                                      spotifySearchService: spotifySearchService,
+                                                                      onQueueSelectedSongs: onQueueSelectedSongs())
         
         let spotifySearchVC = DMSpotifySongSearchViewController(withViewModel: spotifySongSearchViewModel)
         spotifySearchVC.setupForViewModel()
@@ -74,19 +94,31 @@ class DMEventManagementSceneCoordinator: NSObject {
     
 }
 
-extension DMEventManagementSceneCoordinator: RootTransitioning {
+extension DMEventManagementSceneCoordinator {
     
-    func beginCoordinating(withWindow window: UIWindow) {
-        guard let songsVC = scenesViewControllerDict[.songs] else {
-            return
+    private func transition(toManagementScene scene: ManagementScene, animated: Bool) -> Observable<Void> {
+        let subject = PublishSubject<Void>()
+
+        guard let viewController = scenesViewControllerDict[scene] else {
+            return .empty()
         }
         
-        pageViewController.setViewControllers([songsVC],
-                                              direction: .forward,
-                                              animated: false,
-                                              completion: nil)
-        pageViewController.dataSource = self
+        pageViewController.setViewControllers([viewController], direction: .reverse, animated: animated) { _ in
+            subject.onCompleted()
+        }
+
+        return subject
+    }
+    
+}
+
+extension DMEventManagementSceneCoordinator: RootTransitioning {
+    
+    func beginCoordinating(withWindow window: UIWindow) -> Observable<Void> {
         window.rootViewController = pageViewController
+        pageViewController.dataSource = self
+        
+        return transition(toManagementScene: .songs, animated: false)
     }
     
 }

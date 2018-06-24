@@ -109,7 +109,7 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
     
     func bindViewModel() {
         
-        viewModel.hasSelectedSongs.debug("lulz", trimOutput: true).bind(to: addSongsButton.rx.isEnabled)
+        addSongsButton.rx.action = viewModel.queueSelectedSongs
         
         let dataSource = DMSpotifySongSearchViewController.spotifySongDataSource(withViewModel: self.viewModel)
         

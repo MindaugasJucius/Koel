@@ -39,7 +39,6 @@ class DMEventManagementViewModel: DMEventManagementViewModelType, MultipeerViewM
     
     let songsSectioned: Observable<[SongSection]>
     
-    let onSongSearch: CocoaAction
     let onSongsDelete: CocoaAction
     let onUpvote: (DMEventSong) -> (CocoaAction)
     let updateSongToState: (DMEventSong, DMEventSongState) -> (Observable<Void>)
@@ -70,7 +69,6 @@ class DMEventManagementViewModel: DMEventManagementViewModelType, MultipeerViewM
                                                            upNextSong: songsRepresenter.upNextSong)
         
         self.onSongsDelete = self.songsEditor.onSongsDelete
-        self.onSongSearch = self.songsEditor.onSongSearch
         self.onUpvote = self.songsEditor.onUpvote
         self.updateSongToState = self.songsEditor.updateSongToState
         

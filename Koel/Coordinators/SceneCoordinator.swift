@@ -161,11 +161,10 @@ extension SceneCoordinator: CoordinatorTransitioning {
         switch coordinatorScene {
         case .management:
             let managementCoordinator = DMEventManagementSceneCoordinator()
-            managementCoordinator.beginCoordinating(withWindow: window)
+            return managementCoordinator.beginCoordinating(withWindow: window)
         default:
-            print("lul")
+            return .just(())
         }
-        return .just(())
     }
     
     
