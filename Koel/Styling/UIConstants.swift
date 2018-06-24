@@ -13,6 +13,7 @@ struct UIConstants {
     struct colors {
 
         static let koelPink = UIColor(red: 235/255, green: 2/255, blue: 141/255, alpha: 1)
+        static let koelDisabled = UIColor.colorWithHexString(hex: "BDC3C7")
         static let koelBlue = UIColor.colorWithHexString(hex: "#19B5FE")
         static let koelSkyBlue = UIColor.colorWithHexString(hex: "#EC6EAD")
         static let koelPurple = UIColor.colorWithHexString(hex: "#3494E6")
@@ -35,18 +36,20 @@ struct UIConstants {
         static let later = NSLocalizedString("LATER", comment: "")
         static let authenticate = NSLocalizedString("AUTHENTICATE", comment: "")
         
-        //SPT Actions
+        // Song Search
+        static let addSelectedSongs = NSLocalizedString("ADD_SELECTED_SONGS", comment: "")
+        
+        // SPT Actions
         static let SPTActionPlayback = NSLocalizedString("SPT_ACTION_PLAYBACK", comment: "")
         static let SPTSearchTracks = NSLocalizedString("SPT_ACTION_SEARCH_TRACKS", comment: "")
         
-        //SPT General
+        // SPT General
         static let pleaseLoginToPerformAction = NSLocalizedString("PLEASE_LOGIN_TO_PERFORM_ACTION", comment: "")
         
-        //SPT Errors
+        // SPT Errors
         static let loginToPerformActionError = NSLocalizedString("NEED_TO_LOGIN_TO_PERFORM_ACTION_ERROR", comment: "")
 
         // Management
-        static let addSong = NSLocalizedString("ADD_SONG", comment: "")
         static let deleteSongs = NSLocalizedString("DELETE_SONGS", comment: "")
         static let invite = NSLocalizedString("INVITE", comment: "")
         static let managementTitle = NSLocalizedString("MANAGEMENT_TITLE", comment: "")
@@ -57,7 +60,7 @@ struct UIConstants {
         // Participate
         static let participateTitle = NSLocalizedString("PARTICIPATE_TITLE", comment: "")
         
-        // Search
+        // Event Search
         static let searchScreenTitle = NSLocalizedString("SEARCH_SCREEN_TITLE", comment: "")
         static let searchScreenButtonStartEventTitle = NSLocalizedString("SEARCH_SCREEN_TITLE_START", comment: "")
     }
