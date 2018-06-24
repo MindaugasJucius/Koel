@@ -141,6 +141,7 @@ class DMEventManagementViewModel: DMEventManagementViewModelType, MultipeerViewM
     }
     
     private func setupConnectionObservables() {
+        
         participantWantsJoinRequests
             .subscribe(onNext: { [unowned self] invitation in
 //                let alert = UIAlertController(title: "Connection request", message: "\(invitation.0.peerID?.displayName) wants to join your party", preferredStyle: .alert)

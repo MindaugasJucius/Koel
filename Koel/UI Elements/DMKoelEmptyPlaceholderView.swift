@@ -23,6 +23,7 @@ class DMKoelEmptyPlaceholderTableViewCell: UITableViewCell, ReusableView {
     
     private func configure() {
         translatesAutoresizingMaskIntoConstraints = false
+        selectionStyle = .none
         contentView.addSubview(placeholderView)
         let placeholderViewConstraints = [placeholderView.leftAnchor.constraint(equalTo: contentView.leftAnchor),
                                           placeholderView.rightAnchor.constraint(equalTo: contentView.rightAnchor),

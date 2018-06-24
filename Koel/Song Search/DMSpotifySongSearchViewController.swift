@@ -33,13 +33,7 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
     
     //MARK: UI Elements
     
-    private lazy var doneButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle(UIConstants.strings.done, for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 25)
-        return button
-    }()
+    private var addSongsButton = DMKoelButton()
     
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
@@ -107,31 +101,30 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
         ]
         NSLayoutConstraint.activate(tableViewConstraints)
         
-        view.addSubview(doneButton)
-        let buttonConstraints = [
-            doneButton.leftAnchor.constraintEqualToSystemSpacingAfter(view.safeAreaLayoutGuide.leftAnchor, multiplier: 2),
-            doneButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
-        ]
-        NSLayoutConstraint.activate(buttonConstraints)
-        
+        view.addSubview(addSongsButton)
+        addSongsButton.setTitle(UIConstants.strings.addSelectedSongs, for: .normal)
+        addSongsButton.addConstraints(inSuperview: view)
         self.tableView.tableFooterView = tableViewLoadingFooter
     }
     
     func bindViewModel() {
-        let dataSource = DMSpotifySongSearchViewController.persistedSongDataSource(withViewModel: self.viewModel)
+        
+        viewModel.hasSelectedSongs.debug("lulz", trimOutput: true).bind(to: addSongsButton.rx.isEnabled)
+        
+        let dataSource = DMSpotifySongSearchViewController.spotifySongDataSource(withViewModel: self.viewModel)
         
         self.viewModel.songResults
             .drive(tableView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
-        
+
         tableView.rx
-            .modelSelected(DMEventSong.self)
-            .subscribe(viewModel.addSelectedSong.inputs)
+            .modelSelected(SectionItem.self)
+            .subscribe(viewModel.sectionItemSelected.inputs)
             .disposed(by: disposeBag)
         
         tableView.rx
-            .modelDeselected(DMEventSong.self)
-            .subscribe(viewModel.removeSelectedSong.inputs)
+            .modelDeselected(SectionItem.self)
+            .subscribe(viewModel.sectionItemDeselected.inputs)
             .disposed(by: disposeBag)
         
         bindLoadingTrigger()
@@ -217,7 +210,7 @@ extension DMSpotifySongSearchViewController {
 
 extension DMSpotifySongSearchViewController {
     
-    static func persistedSongDataSource(withViewModel viewModel: DMSpotifySongSearchViewModelType) -> RxTableViewSectionedReloadDataSource<SongSectionModel> {
+    static func spotifySongDataSource(withViewModel viewModel: DMSpotifySongSearchViewModelType) -> RxTableViewSectionedReloadDataSource<SongSectionModel> {
         return RxTableViewSectionedReloadDataSource<SongSectionModel>(
             configureCell: { (dataSource, tableView, indexPath, element) -> UITableViewCell in
                 let cell = tableView.dequeueReusableCell(withIdentifier: DMSpotifySongTableViewCell.reuseIdentifier,

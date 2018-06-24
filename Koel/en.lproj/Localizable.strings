@@ -14,6 +14,9 @@
 "LATER" = "Later";
 "AUTHENTICATE" = "Login";
 
+// Song search
+"ADD_SELECTED_SONGS" = "Queue selected tracks";
+
 //SPT Errors
 "NEED_TO_LOGIN_TO_PERFORM_ACTION_ERROR" = "You need to login with Spotify to %@.";
 
@@ -27,7 +30,6 @@
 // Management
 "NEARBY_PEERS_SECTION_TITLE" = "Nearby";
 "JOINED_PEERS_SECTION_TITLE" = "Joined";
-"ADD_SONG" = "Add a Song";
 "DELETE_SONGS" = "Delete All Songs";
 "INVITE" = "Invite";
 "MANAGEMENT_TITLE" = "Manage";
@@ -35,6 +37,6 @@
 // Participation
 "PARTICIPATE_TITLE" = "Participate";
 
-// Search
+// Event Search
 "SEARCH_SCREEN_TITLE" = "Party Hosts Near You";
 "SEARCH_SCREEN_TITLE_START" = "Start Your Own Party";
