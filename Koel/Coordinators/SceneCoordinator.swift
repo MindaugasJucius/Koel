@@ -157,15 +157,16 @@ class SceneCoordinator: NSObject, SceneCoordinatorType {
 }
 
 extension SceneCoordinator: CoordinatorTransitioning {
-    func transition(to coordinatorScene: CoordinatorScene) -> Observable<Void> {
-        switch coordinatorScene {
-        case .management:
-            let managementCoordinator = DMEventManagementSceneCoordinator()
-            return managementCoordinator.beginCoordinating(withWindow: window)
-        default:
-            return .just(())
-        }
+
+    func transitionToHostScene() -> Observable<Void> {
+        let managementCoordinator = DMEventSceneCoordinator()
+        return managementCoordinator.beginCoordinating(withWindow: window)
     }
     
-    
+    func transitionToParticipationScene(withMultipeerService multipeerService: DMEventMultipeerService,
+                                        eventHost: DMEventPeer) -> Observable<Void> {
+        let participationCoordinator = DMEventSceneCoordinator(withMultipeerService: multipeerService,
+                                                               eventHost: eventHost)
+        return participationCoordinator.beginCoordinating(withWindow: window)
+    }    
 }

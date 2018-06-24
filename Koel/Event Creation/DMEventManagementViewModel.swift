@@ -139,21 +139,17 @@ class DMEventManagementViewModel: DMEventManagementViewModelType, MultipeerViewM
     }
     
     private func setupConnectionObservables() {
-        
         participantWantsJoinRequests
-            .subscribe(onNext: { [unowned self] invitation in
-//                let alert = UIAlertController(title: "Connection request", message: "\(invitation.0.peerID?.displayName) wants to join your party", preferredStyle: .alert)
-//                let connectAction = UIAlertAction(title: "Yes", style: UIAlertActionStyle.default, handler: { action in
-//                    let invitationHandler = invitation.1
-//                    invitationHandler(true)
-//                })
-//                alert.addAction(connectAction)
-//                self.sceneCoordinator.currentViewController.present(
-//                    alert,
-//                    animated: true,
-//                    completion: nil
-//                )
-            })
+            .flatMap { (peer, invitationHandler) -> Observable<String> in
+                return self.promptCoordinator.promptFor("\(String(describing: peer.peerID?.displayName)) wants to join your party",
+                    cancelAction: "Deny",
+                    actions: ["Accept"])
+                    .do(onNext: { action in
+                        let hasAccepted = action == "Accept"
+                        invitationHandler(hasAccepted)
+                    })
+            }
+            .subscribe()
             .disposed(by: disposeBag)
         
         participantWantsReconnectRequests

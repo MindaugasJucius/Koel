@@ -8,7 +8,6 @@
 
 import Foundation
 import UIKit
-import SafariServices
 
 enum Scene {
     //MARK: Shared
@@ -16,10 +15,6 @@ enum Scene {
 
     //MARK: Participant
     case participation(DMEventParticipationViewModel)
-    
-    //MARK: Spotify
-    case authenticateSpotify(URL)
-    case searchSpotify(DMSpotifySongSearchViewModelType)
 }
 
 extension Scene {
@@ -35,14 +30,6 @@ extension Scene {
             let eventParticipationVC = DMEventParticipationViewController(withViewModel: viewModel)
             eventParticipationVC.setupForViewModel()
             return eventParticipationVC
-        //MARK: Spotify
-        case .authenticateSpotify(let authenticationURL):
-            let authenticationController = SFSafariViewController(url: authenticationURL)
-            return authenticationController
-        case .searchSpotify(let viewModel):
-            let searchViewController = DMSpotifySongSearchViewController(withViewModel: viewModel)
-            searchViewController.setupForViewModel()
-            return searchViewController
         }
     }
 }

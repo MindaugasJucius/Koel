@@ -20,11 +20,12 @@ private enum ManagementScene {
     case search
 }
 
-class DMEventManagementSceneCoordinator: NSObject {
+class DMEventSceneCoordinator: NSObject {
 
     private var currentViewController: UIViewController?
     private let reachabilityService = try! DefaultReachabilityService()
-    private let multipeerService = DMEventMultipeerService(asEventHost: true)
+    private let multipeerService: DMEventMultipeerService
+    private let isEventHost: Bool
     
     private let pageViewController = UIPageViewController(transitionStyle: .scroll,
                                                           navigationOrientation: .horizontal,
@@ -34,6 +35,21 @@ class DMEventManagementSceneCoordinator: NSObject {
     private lazy var scenesViewControllerDict: [ManagementScene: UIViewController] = [.invites: invitesViewController,
                                                                                       .songs: songsViewController,
                                                                                       .search: searchViewController]
+    
+    init(withMultipeerService multipeerService: DMEventMultipeerService = DMEventMultipeerService(asEventHost: true),
+         asHost: Bool = true) {
+        self.multipeerService = multipeerService
+        self.isEventHost = asHost
+        super.init()
+    }
+    
+    convenience init(withMultipeerService multipeerService: DMEventMultipeerService, eventHost: DMEventPeer) {
+        self.init(withMultipeerService: multipeerService, asHost: false)
+        participateEventViewModel = DMEventParticipationViewModel(host: eventHost,
+                                                                  multipeerService: multipeerService,
+                                                                  songsSectionsRepresenter: songSharingViewModel,
+                                                                  songsEditor: songSharingViewModel)
+    }
     
     //MARK: - View Models
     
@@ -50,6 +66,8 @@ class DMEventManagementSceneCoordinator: NSObject {
                                                                        songsRepresenter: songSharingViewModel,
                                                                        songsEditor: songSharingViewModel)
     
+    private var participateEventViewModel: DMEventParticipationViewModel?
+    
     //MARK: - Shared Observables
     
     private func onQueueSelectedSongs() -> Action<[DMEventSong], Void> {
@@ -65,9 +83,19 @@ class DMEventManagementSceneCoordinator: NSObject {
     //MARK: - Controllers
     
     private lazy var songsViewController: UINavigationController = {
-        let managementVC = DMEventManagementViewController(withViewModel: manageEventViewModel)
-        managementVC.setupForViewModel()
-        return UINavigationController(rootViewController: managementVC)
+        var songsViewController: UIViewController
+        if isEventHost {
+            let managementViewController = DMEventManagementViewController(withViewModel: manageEventViewModel)
+            managementViewController.setupForViewModel()
+            songsViewController = managementViewController
+        } else {
+            //TODO: oops
+            let participationViewController = DMEventParticipationViewController(withViewModel: participateEventViewModel!)
+            participationViewController.setupForViewModel()
+            songsViewController = participationViewController
+        }
+
+        return UINavigationController(rootViewController: songsViewController)
     }()
     
     private lazy var invitesViewController: UINavigationController = {
@@ -94,7 +122,7 @@ class DMEventManagementSceneCoordinator: NSObject {
     
 }
 
-extension DMEventManagementSceneCoordinator {
+extension DMEventSceneCoordinator {
     
     private func transition(toManagementScene scene: ManagementScene, animated: Bool) -> Observable<Void> {
         let subject = PublishSubject<Void>()
@@ -112,7 +140,7 @@ extension DMEventManagementSceneCoordinator {
     
 }
 
-extension DMEventManagementSceneCoordinator: RootTransitioning {
+extension DMEventSceneCoordinator: RootTransitioning {
     
     func beginCoordinating(withWindow window: UIWindow) -> Observable<Void> {
         window.rootViewController = pageViewController
@@ -123,7 +151,7 @@ extension DMEventManagementSceneCoordinator: RootTransitioning {
     
 }
 
-extension DMEventManagementSceneCoordinator: UIPageViewControllerDataSource {
+extension DMEventSceneCoordinator: UIPageViewControllerDataSource {
     
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
         
@@ -166,7 +194,7 @@ extension DMEventManagementSceneCoordinator: UIPageViewControllerDataSource {
     
 }
 
-extension DMEventManagementSceneCoordinator: PromptCoordinating {
+extension DMEventSceneCoordinator: PromptCoordinating {
     
     func promptFor<Action : CustomStringConvertible>(_ message: String, cancelAction: Action, actions: [Action]?) -> Observable<Action> {
         return Observable.create { observer in

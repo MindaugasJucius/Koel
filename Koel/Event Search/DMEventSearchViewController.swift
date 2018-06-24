@@ -64,7 +64,7 @@ class DMEventSearchViewController: UIViewController, BindableType {
     func bindViewModel() {
         viewModel.incommingInvitations
             .subscribe(onNext: { invitation in
-                let alert = UIAlertController(title: "Connection request", message: "connect to \(invitation.0.peerID?.displayName)?", preferredStyle: .alert)
+                let alert = UIAlertController(title: "Connection request", message: "Join \(invitation.0.peerID?.displayName)'s event?", preferredStyle: .alert)
                 let connectAction = UIAlertAction(title: "Yes", style: UIAlertActionStyle.default, handler: { action in
                     let invitationHandler = invitation.1
                     invitationHandler(true)

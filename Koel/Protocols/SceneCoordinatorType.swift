@@ -18,10 +18,8 @@ enum SceneTransitionType {
 
 protocol CoordinatorTransitioning {
 
-    /// transition to another coordinator
-    @discardableResult
-    func transition(to coordinatorScene: CoordinatorScene) -> Observable<Void>
-    
+    func transitionToHostScene() -> Observable<Void>
+    func transitionToParticipationScene(withMultipeerService multipeerService: DMEventMultipeerService, eventHost: DMEventPeer) -> Observable<Void>
 }
 
 protocol PromptCoordinating {

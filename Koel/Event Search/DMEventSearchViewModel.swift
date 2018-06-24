@@ -45,26 +45,11 @@ class DMEventSearchViewModel: MultipeerViewModelType {
     private lazy var pushEventParticipation: Action<DMEventPeer, Void> = {
         return Action (
             workFactory: { [unowned self] host in
-
-                let songSharingViewModel = DMEventSongSharingViewModel(
-                    songPersistenceService: DMEventSongPersistenceService(selfPeer: self.multipeerService.myEventPeer),
-                    reachabilityService: self.reachabilityService,
-                    songSharingService: DMEntitySharingService(),
-                    multipeerService: self.multipeerService
-                )
-                
-                let participationModel = DMEventParticipationViewModel(
-                    host: host,
-                    multipeerService: self.multipeerService,
-                    sceneCoordinator: self.sceneCoordinator,
-                    songsSectionsRepresenter: songSharingViewModel,
-                    songsEditor: songSharingViewModel
-                )
-                
-                return self.sceneCoordinator.transition(
-                    to: Scene.participation(participationModel),
-                    type: .rootWithNavigationVC
-                )
+//                let fakehost = DMEventPeer.peer(withPeerID: MCPeerID(displayName: "lul"), storeAsSelf: false, storeAsHost: true, uuid: "nilnil")
+//                return self.sceneCoordinator.transitionToParticipationScene(withMultipeerService: self.multipeerService,
+//                                                                            eventHost: )
+                return self.sceneCoordinator.transitionToParticipationScene(withMultipeerService: self.multipeerService,
+                                                                            eventHost: host)
             }
         )
     }()
@@ -74,7 +59,7 @@ class DMEventSearchViewModel: MultipeerViewModelType {
             self.multipeerService.stopAdvertising()
             self.multipeerService.stopBrowsing()
             self.multipeerService.disconnect()
-            return self.sceneCoordinator.transition(to: .management)
+            return self.sceneCoordinator.transitionToHostScene()
         }
     }()
 

@@ -10,11 +10,10 @@ import Foundation
 import RxSwift
 import Action
 
-protocol DMEventParticipationViewModelType: ViewModelType, DMEventSongsRepresentable, DMEventParticipantSongsEditable {
+protocol DMEventParticipationViewModelType: DMEventSongsRepresentable, DMEventParticipantSongsEditable {
     
     init(host: DMEventPeer,
          multipeerService: DMEventMultipeerService,
-         sceneCoordinator: SceneCoordinatorType,
          songsSectionsRepresenter: DMEventSongsRepresentable,
          songsEditor: DMEventParticipantSongsEditable)
     
@@ -28,7 +27,6 @@ class DMEventParticipationViewModel: DMEventParticipationViewModelType, Multipee
     private let host: DMEventPeer
     
     let multipeerService: DMEventMultipeerService
-    let sceneCoordinator: SceneCoordinatorType
     
     let songsSectioned: Observable<[SongSection]>
     let onUpvote: (DMEventSong) -> (CocoaAction)
@@ -77,11 +75,9 @@ class DMEventParticipationViewModel: DMEventParticipationViewModelType, Multipee
     
     required init(host: DMEventPeer,
                   multipeerService: DMEventMultipeerService,
-                  sceneCoordinator: SceneCoordinatorType,
                   songsSectionsRepresenter: DMEventSongsRepresentable,
                   songsEditor: DMEventParticipantSongsEditable) {
         
-        self.sceneCoordinator = sceneCoordinator
         self.host = host
         self.songsSectioned = songsSectionsRepresenter.songsSectioned
         self.onUpvote = songsEditor.onUpvote
