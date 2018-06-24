@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		031D904420566AE4007D1156 /* ReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 031D904320566AE4007D1156 /* ReusableView.swift */; };
 		031D904620566EB3007D1156 /* SongSharingViewModelType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 031D904520566EB3007D1156 /* SongSharingViewModelType.swift */; };
-		0342D4E120C4550F00C6B020 /* DMErrorHandlerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0342D4E020C4550F00C6B020 /* DMErrorHandlerService.swift */; };
 		035596DA2066B4D20067A737 /* Bindable+PersistedSongs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035596D92066B4D20067A737 /* Bindable+PersistedSongs.swift */; };
 		035596DC2067FA020067A737 /* DMSpotifySearchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035596DB2067FA020067A737 /* DMSpotifySearchService.swift */; };
 		035596DF206804330067A737 /* DMSpotifySongSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035596DE206804330067A737 /* DMSpotifySongSearchViewController.swift */; };
@@ -43,7 +42,6 @@
 		5F601D3D1FD04851003DE897 /* DMEventInvitationsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F601D3C1FD04851003DE897 /* DMEventInvitationsViewModel.swift */; };
 		5F8186121FBB6EDB00477C71 /* DMKoelLogoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F8186111FBB6EDB00477C71 /* DMKoelLogoView.swift */; };
 		5F8186141FD2ADA800477C71 /* DMEventPeer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F8186131FD2ADA800477C71 /* DMEventPeer.swift */; };
-		5F8186161FD3F62000477C71 /* Scene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F8186151FD3F62000477C71 /* Scene.swift */; };
 		5F8186181FD3F7F200477C71 /* BindableType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F8186171FD3F7F200477C71 /* BindableType.swift */; };
 		5F81861A1FD3FA6800477C71 /* SceneCoordinatorType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F8186191FD3FA6800477C71 /* SceneCoordinatorType.swift */; };
 		5F81861C1FD3FAB000477C71 /* SceneCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F81861B1FD3FAB000477C71 /* SceneCoordinator.swift */; };
@@ -89,7 +87,6 @@
 /* Begin PBXFileReference section */
 		031D904320566AE4007D1156 /* ReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReusableView.swift; sourceTree = "<group>"; };
 		031D904520566EB3007D1156 /* SongSharingViewModelType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongSharingViewModelType.swift; sourceTree = "<group>"; };
-		0342D4E020C4550F00C6B020 /* DMErrorHandlerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMErrorHandlerService.swift; sourceTree = "<group>"; };
 		035596D92066B4D20067A737 /* Bindable+PersistedSongs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bindable+PersistedSongs.swift"; sourceTree = "<group>"; };
 		035596DB2067FA020067A737 /* DMSpotifySearchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMSpotifySearchService.swift; sourceTree = "<group>"; };
 		035596DE206804330067A737 /* DMSpotifySongSearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMSpotifySongSearchViewController.swift; sourceTree = "<group>"; };
@@ -130,7 +127,6 @@
 		5F601D3C1FD04851003DE897 /* DMEventInvitationsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventInvitationsViewModel.swift; sourceTree = "<group>"; };
 		5F8186111FBB6EDB00477C71 /* DMKoelLogoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMKoelLogoView.swift; sourceTree = "<group>"; };
 		5F8186131FD2ADA800477C71 /* DMEventPeer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventPeer.swift; sourceTree = "<group>"; };
-		5F8186151FD3F62000477C71 /* Scene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scene.swift; sourceTree = "<group>"; };
 		5F8186171FD3F7F200477C71 /* BindableType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BindableType.swift; sourceTree = "<group>"; };
 		5F8186191FD3FA6800477C71 /* SceneCoordinatorType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneCoordinatorType.swift; sourceTree = "<group>"; };
 		5F81861B1FD3FAB000477C71 /* SceneCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneCoordinator.swift; sourceTree = "<group>"; };
@@ -299,7 +295,6 @@
 				5F37D8891FF3D0A6002E0ACD /* DMSpotifyAuthService.swift */,
 				5FD9306B2073DCEA00943D5C /* DMSpotifyPlaybackService.swift */,
 				035596DB2067FA020067A737 /* DMSpotifySearchService.swift */,
-				0342D4E020C4550F00C6B020 /* DMErrorHandlerService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -386,7 +381,6 @@
 		5FB665DA1FA346C5005C5165 /* Coordinators */ = {
 			isa = PBXGroup;
 			children = (
-				5F8186151FD3F62000477C71 /* Scene.swift */,
 				5F81861B1FD3FAB000477C71 /* SceneCoordinator.swift */,
 				03A2F73E20DE8CA10045B2E7 /* DMEventSceneCoordinator.swift */,
 			);
@@ -660,8 +654,6 @@
 				035596E1206804460067A737 /* DMSpotifySongSearchViewModel.swift in Sources */,
 				5F8186181FD3F7F200477C71 /* BindableType.swift in Sources */,
 				5F81861A1FD3FA6800477C71 /* SceneCoordinatorType.swift in Sources */,
-				5F8186161FD3F62000477C71 /* Scene.swift in Sources */,
-				0342D4E120C4550F00C6B020 /* DMErrorHandlerService.swift in Sources */,
 				5FDEB6BA1F99235500070930 /* DMInitialLoadingViewController.swift in Sources */,
 				5F84FFB01FDC3AB0003332B4 /* DMEventPeerPersistenceService.swift in Sources */,
 				5FB2C93E1FE8073B001D532F /* Style.swift in Sources */,
