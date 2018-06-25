@@ -139,3 +139,13 @@ extension DMEventSong: IdentifiableType {
         return self.isInvalidated ? "" : uuid
     }
 }
+
+extension DMEventSong {
+    static func from(searchResultSong: DMSearchResultSong) -> DMEventSong {
+        let eventSong = DMEventSong()
+        eventSong.spotifyURI = searchResultSong.spotifyURI
+        eventSong.artistTitle = searchResultSong.artistName
+        eventSong.title = searchResultSong.title
+        return eventSong
+    }
+}

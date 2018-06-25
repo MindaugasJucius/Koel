@@ -22,7 +22,7 @@ protocol DMSpotifySearchServiceType {
     var resultError: Observable<Error> { get }
     
     func savedTracks(resetResults reset: Bool) -> Driver<[SongSectionModel]>
-    
+    func map(searchResults: [DMSearchResultSong]) -> [DMEventSong]
 }
 
 class DMSpotifySearchService: DMSpotifySearchServiceType {
@@ -31,7 +31,7 @@ class DMSpotifySearchService: DMSpotifySearchServiceType {
     private let reachabilityService: ReachabilityService
     
     private var latestSavedTracksPagingObject: PagingObject<SavedTrack>? = nil
-    private var allSavedTracks: [DMEventSong] = []
+    private var allSavedTracks: [DMSearchResultSong] = []
     
     private let resultErrorRelay: PublishRelay<Error> = PublishRelay()
 
@@ -105,7 +105,7 @@ class DMSpotifySearchService: DMSpotifySearchServiceType {
         }
         
         let valueOnError = allSavedTracks.isEmpty ? [SongSectionModel.emptySection(item: SectionItem.emptySectionItem)] : []
-        
+
         return self.authService.spotifySession(forAction: UIConstants.strings.SPTSearchTracks)
             .flatMap { [unowned self] _ in
                 return Observable.just(self.latestSavedTracksPagingObject)
@@ -124,18 +124,19 @@ class DMSpotifySearchService: DMSpotifySearchServiceType {
             .do(onNext: { [unowned self] pagingObject in
                 self.latestSavedTracksPagingObject = pagingObject
             })
-            .map { pagingObject -> [DMEventSong] in
-                return pagingObject.items.map { savedTrack -> DMEventSong in
-                    let eventSong = DMEventSong()
-                    eventSong.spotifyURI = savedTrack.track.uri
-                    eventSong.title = savedTrack.track.name
-                    let artistTitle = savedTrack.track.album.artists.reduce("", { currentTitle, artist in
+            .map { pagingObject -> [DMSearchResultSong] in
+                return pagingObject.items.map { savedTrack -> DMSearchResultSong in
+                    let artistName = savedTrack.track.album.artists.reduce("", { currentTitle, artist in
                         return currentTitle.appending("\(artist.name!) ")
                     })
-                    eventSong.artistTitle = artistTitle
-                    return eventSong
+                    return DMSearchResultSong(title: savedTrack.track.name,
+                                              artistName: artistName,
+                                              spotifyURI: savedTrack.track.uri,
+                                              durationMilliseconds: savedTrack.track.durationMs,
+                                              albumArtworkImageURL: savedTrack.track.album.images[0].url)
                 }
             }
+
             .map { [unowned self] newSavedTracks in
                 self.allSavedTracks.append(contentsOf: newSavedTracks)
                 return self.allSavedTracks.map { SectionItem.songSectionItem(song: $0) }
@@ -146,6 +147,11 @@ class DMSpotifySearchService: DMSpotifySearchServiceType {
             .subscribeOn(concurrentScheduler)
             .asDriver(onErrorJustReturn: valueOnError)
     }
+    
+    func map(searchResults: [DMSearchResultSong]) -> [DMEventSong] {
+        return searchResults.map { DMEventSong.from(searchResultSong: $0) }
+    }
+
 
 }
 

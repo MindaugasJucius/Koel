@@ -18,6 +18,7 @@
 		039A2C6E207A438A00C58BE5 /* Array+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 039A2C6D207A438A00C58BE5 /* Array+Extensions.swift */; };
 		039A726D20C866AB0078D0CD /* ReachabilityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 039A726B20C866AB0078D0CD /* ReachabilityService.swift */; };
 		03A2F73F20DE8CA10045B2E7 /* DMEventSceneCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03A2F73E20DE8CA10045B2E7 /* DMEventSceneCoordinator.swift */; };
+		03E47D4420E0C88D0000F480 /* DMSearchResultSong.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03E47D4320E0C88D0000F480 /* DMSearchResultSong.swift */; };
 		33CD43033F2349BABFA21363 /* Pods_Koel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 859C054680781DDB43D6FFC3 /* Pods_Koel.framework */; };
 		47ADB8775C90C90A34CB0B4E /* Pods_KoelTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C68936EB8AF29A19F4BC4C74 /* Pods_KoelTests.framework */; };
 		5F014BD41FB9E20000079009 /* WaveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F014BD31FB9E20000079009 /* WaveView.swift */; };
@@ -96,6 +97,7 @@
 		039A2C6D207A438A00C58BE5 /* Array+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Extensions.swift"; sourceTree = "<group>"; };
 		039A726B20C866AB0078D0CD /* ReachabilityService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReachabilityService.swift; sourceTree = "<group>"; };
 		03A2F73E20DE8CA10045B2E7 /* DMEventSceneCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventSceneCoordinator.swift; sourceTree = "<group>"; };
+		03E47D4320E0C88D0000F480 /* DMSearchResultSong.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMSearchResultSong.swift; sourceTree = "<group>"; };
 		1EEEA22101255BEC78867464 /* Pods-Koel.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Koel.release.xcconfig"; path = "Pods/Target Support Files/Pods-Koel/Pods-Koel.release.xcconfig"; sourceTree = "<group>"; };
 		2F9833A4A17A19528964480E /* Pods-Koel.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Koel.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Koel/Pods-Koel.debug.xcconfig"; sourceTree = "<group>"; };
 		4BFB7D7E45702A7F3768CF64 /* Pods-KoelTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KoelTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-KoelTests/Pods-KoelTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -280,6 +282,7 @@
 				5F8186131FD2ADA800477C71 /* DMEventPeer.swift */,
 				5F84FFA21FDAEC82003332B4 /* DMEventSong.swift */,
 				039A2C6B2078AAE100C58BE5 /* DMEntity.swift */,
+				03E47D4320E0C88D0000F480 /* DMSearchResultSong.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -640,6 +643,7 @@
 				039A2C6E207A438A00C58BE5 /* Array+Extensions.swift in Sources */,
 				039A726D20C866AB0078D0CD /* ReachabilityService.swift in Sources */,
 				5F01EC231F925EB200E47E6A /* CKRecord+Extensions.swift in Sources */,
+				03E47D4420E0C88D0000F480 /* DMSearchResultSong.swift in Sources */,
 				5F601D3B1FD043DC003DE897 /* DMEventMultipeerService.swift in Sources */,
 				5F54458E1FD198C40059A975 /* DMEventInvitationsViewController.swift in Sources */,
 				031D904420566AE4007D1156 /* ReusableView.swift in Sources */,

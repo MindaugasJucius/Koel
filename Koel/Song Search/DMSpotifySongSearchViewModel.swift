@@ -13,7 +13,7 @@ import RxCocoa
 import RxDataSources
 
 enum SectionItem {
-    case songSectionItem(song: DMEventSong)
+    case songSectionItem(song: DMSearchResultSong)
     case loadingSectionItem
     case emptySectionItem
 }
@@ -92,13 +92,14 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
     let promptCoordinator: PromptCoordinating
     let spotifySearchService: DMSpotifySearchServiceType
    
-    private var selectedSongsRelay = BehaviorRelay<[DMEventSong]>(value: [])
+    private var selectedSongsRelay = BehaviorRelay<[DMSearchResultSong]>(value: [])
     var onQueueSelectedSongs: Action<[DMEventSong], Void>
     
     lazy var queueSelectedSongs: CocoaAction = {
         let enabledIf = selectedSongsRelay.map { $0.count > 0 }.distinctUntilChanged()
         return CocoaAction(enabledIf: enabledIf, workFactory: { _ -> Observable<Void> in
-            return self.onQueueSelectedSongs.execute(self.selectedSongsRelay.value)
+            let persistableSongs = self.spotifySearchService.map(searchResults: self.selectedSongsRelay.value)
+            return self.onQueueSelectedSongs.execute(persistableSongs)
         })
     }()
     

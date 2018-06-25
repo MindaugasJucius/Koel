@@ -51,8 +51,8 @@ class DMSpotifySongTableViewCell: UITableViewCell, ReusableView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configure(withSong song: DMEventSong) {
+    func configure(withSong song: DMSearchResultSong) {
         titleLabel.text = song.title
-        artistTitleLabel.text = song.artistTitle
+        artistTitleLabel.text = song.artistName
     }
 }

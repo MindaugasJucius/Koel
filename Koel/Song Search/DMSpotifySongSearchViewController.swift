@@ -94,7 +94,7 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
         tableView.refreshControl = refreshControl
         
         let tableViewConstraints = [
-            tableView.topAnchor.constraint(equalTo: view.readableContentGuide.topAnchor),
+            tableView.topAnchor.constraint(equalTo: view.topAnchor),
             tableView.leftAnchor.constraint(equalTo: view.readableContentGuide.leftAnchor),
             tableView.rightAnchor.constraint(equalTo: view.readableContentGuide.rightAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.readableContentGuide.bottomAnchor)
