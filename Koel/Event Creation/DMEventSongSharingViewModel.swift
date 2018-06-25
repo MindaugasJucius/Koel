@@ -23,6 +23,7 @@ protocol DMEventParticipantSongsEditable {
 
 protocol DMEventHostSongsEditable {
     var onSongsDelete: CocoaAction { get }
+    var skipSongForward: Observable<Void> { get }
     var updateSongToState: (DMEventSong, DMEventSongState) -> (Observable<Void>) { get }
 }
 
@@ -200,12 +201,25 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType, MultipeerVie
         }
     }()
     
-    lazy var updateSongToState: (DMEventSong, DMEventSongState) -> (Observable<Void>) = {
+    lazy var updateSongToState: (DMEventSong, DMEventSongState) -> Observable<Void> = {
         return { song, state in
             self.songPersistenceService
                 .update(song: song, toState: state)
                 .share(withMultipeerService: self.multipeerService, sharingService: self.songSharingService)
         }
+    }()
+    
+    lazy var skipSongForward: Observable<Void> = {
+        let upNext = upNextSong.filterNil()
+        return playingSong.filterNil()
+            .take(1)
+            .flatMap { song in
+                return self.updateSongToState(song, .played)
+            }
+            .withLatestFrom(upNext)
+            .flatMap { upNextSong in
+                return self.updateSongToState(upNextSong, .playing)
+            }
     }()
     
     lazy var onSongsDelete: CocoaAction = {
@@ -247,5 +261,7 @@ extension Observable where Element: Codable {
         }
         .flatMap { $0 }
     }
+
+    
     
 }

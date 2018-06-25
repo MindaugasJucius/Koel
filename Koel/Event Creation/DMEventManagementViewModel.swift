@@ -13,13 +13,17 @@ import RealmSwift
 import MultipeerConnectivity
 import RxDataSources
 
-protocol DMEventManagementViewModelType: DMEventSongsRepresentable, DMEventParticipantSongsEditable, DMEventHostSongsEditable {
+protocol DMEventManagementViewModelType: DMEventSongsRepresentable, DMEventParticipantSongsEditable {
     
     init(multipeerService: DMEventMultipeerService,
          reachabilityService: ReachabilityService,
          promptCoordinator: PromptCoordinating,
          songsRepresenter: DMEventSongsRepresentable & DMEventSongsManagerSeparatable,
          songsEditor: DMEventParticipantSongsEditable & DMEventHostSongsEditable)
+
+    var onSongsDelete: CocoaAction { get }
+    var onUpvote: (DMEventSong) -> CocoaAction { get }
+    var skipSongForward: Observable<Void> { get }
     
     var playbackEnabled: Observable<Bool> { get }
     var isPlaying: Observable<Bool> { get }
@@ -30,7 +34,7 @@ protocol DMEventManagementViewModelType: DMEventSongsRepresentable, DMEventParti
 }
 
 class DMEventManagementViewModel: DMEventManagementViewModelType, MultipeerViewModelType, BackgroundDisconnectType {
-    
+
     private let disposeBag = DisposeBag()
     private let sptPlaybackService: DMSpotifyPlaybackServiceType
 
@@ -40,8 +44,8 @@ class DMEventManagementViewModel: DMEventManagementViewModelType, MultipeerViewM
     let songsSectioned: Observable<[SongSection]>
     
     let onSongsDelete: CocoaAction
-    let onUpvote: (DMEventSong) -> (CocoaAction)
-    let updateSongToState: (DMEventSong, DMEventSongState) -> (Observable<Void>)
+    let onUpvote: (DMEventSong) -> CocoaAction
+    let skipSongForward: Observable<Void>
     
     let promptCoordinator: PromptCoordinating
     let multipeerService: DMEventMultipeerService
@@ -63,14 +67,15 @@ class DMEventManagementViewModel: DMEventManagementViewModelType, MultipeerViewM
         
         self.sptPlaybackService = DMSpotifyPlaybackService(authService: sptAuthService,
                                                            reachabilityService: reachabilityService,
+                                                           skipSongForward: songsEditor.skipSongForward,
                                                            updateSongToState: songsEditor.updateSongToState,
                                                            addedSongs: songsRepresenter.addedSongs,
                                                            playingSong: songsRepresenter.playingSong,
                                                            upNextSong: songsRepresenter.upNextSong)
         
-        self.onSongsDelete = self.songsEditor.onSongsDelete
-        self.onUpvote = self.songsEditor.onUpvote
-        self.updateSongToState = self.songsEditor.updateSongToState
+        self.onSongsDelete = songsEditor.onSongsDelete
+        self.onUpvote = songsEditor.onUpvote
+        self.skipSongForward = songsEditor.skipSongForward
         
         self.songsSectioned = songsRepresenter.songsSectioned
         
@@ -162,26 +167,7 @@ class DMEventManagementViewModel: DMEventManagementViewModelType, MultipeerViewM
     // MARK: - Playback bindables
     
     lazy var onNext: CocoaAction = {
-        return Action(
-            enabledIf: sptPlaybackService.nextEnabled(),
-            workFactory: { [unowned self] in
-                let upNext = self.songsRepresenter.upNextSong.filterNil()
-                
-                return self.songsRepresenter.playingSong.filterNil()
-                    .take(1)
-                    .flatMap { song in
-                        return self.songsEditor.updateSongToState(song, .played)
-                    }
-                    .flatMap { _ -> Observable<Void> in
-                        return self.sptPlaybackService.nextSong()
-                    }
-                    .withLatestFrom(upNext)
-                    .flatMap { upNextSong in
-                        return self.songsEditor.updateSongToState(upNextSong, .playing)
-                    }
-                }
-        )
-
+        self.sptPlaybackService.onNext
     }()
     
     lazy var onPlay: CocoaAction = {

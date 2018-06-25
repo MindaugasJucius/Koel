@@ -19,14 +19,10 @@ enum PlaybackError: Error {
 
 protocol DMSpotifyPlaybackServiceType {
     
-    var authService: DMSpotifyAuthService { get }
-
     var isPlaying: Observable<Bool> { get }
-    
     var togglePlayback: Observable<Void> { get }
-    
-    func nextSong() -> Observable<Void>
-    func nextEnabled() -> Observable<Bool>
+    var onNext: CocoaAction { get }
+
 }
 
 
@@ -34,13 +30,14 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
 
     private let disposeBag = DisposeBag()
     
-    var authService: DMSpotifyAuthService
+    let authService: DMSpotifyAuthService
     
-    var addedSongs: Observable<[DMEventSong]>
-    var playingSong: Observable<DMEventSong?>
-    var upNextSong: Observable<DMEventSong?>
+    let addedSongs: Observable<[DMEventSong]>
+    let playingSong: Observable<DMEventSong?>
+    let upNextSong: Observable<DMEventSong?>
 
-    var updateSongToState: (DMEventSong, DMEventSongState) -> (Observable<Void>)
+    let updateSongToState: (DMEventSong, DMEventSongState) -> (Observable<Void>)
+    let skipSongForward: Observable<Void>
     
     private let player: SPTAudioStreamingController = SPTAudioStreamingController.sharedInstance()
     
@@ -53,10 +50,6 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
     
     private var playingURI: Observable<String?> {
         return playingURISubject.asObservable()
-    }
-    
-    var isPlaying: Observable<Bool> {
-        return isPlayingSubject.asObservable()
     }
     
     private var metadataMatchesPlayingTrackURI: Observable<Bool> {
@@ -72,6 +65,7 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
     
     init(authService: DMSpotifyAuthService,
          reachabilityService: ReachabilityService,
+         skipSongForward: Observable<Void>,
          updateSongToState: @escaping (DMEventSong, DMEventSongState) -> (Observable<Void>),
          addedSongs: Observable<[DMEventSong]>,
          playingSong: Observable<DMEventSong?>,
@@ -79,6 +73,7 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
         
         self.authService = authService
         self.reachabilityService = reachabilityService
+        self.skipSongForward = skipSongForward
         self.updateSongToState = updateSongToState
         self.addedSongs = addedSongs
         self.playingSong = playingSong
@@ -121,6 +116,10 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
     
     //MARK: - Public
     
+    lazy var isPlaying: Observable<Bool> = {
+        return isPlayingSubject.asObservable()
+    }()
+    
     lazy var togglePlayback: Observable<Void> = {
         return Observable
             .combineLatest(playingSong, addedSongs, isPlaying, playingURI)
@@ -141,19 +140,28 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
             }
     }()
     
-    func nextSong() -> Observable<Void> {
+    lazy var onNext: CocoaAction = {
+        return Action(
+            enabledIf: nextEnabled(),
+            workFactory: { [unowned self] in
+                return self.nextSong().flatMap { self.skipSongForward }
+            }
+        )
+    }()
+    
+    //MARK: - Private
+    
+    private func nextSong() -> Observable<Void> {
         return Observable.create { [unowned self] observer -> Disposable in
             self.player.skipNext(self.sptObservableCallback(withObserver: observer))
             return Disposables.create()
         }
     }
     
-    func nextEnabled() -> Observable<Bool> {
+    private func nextEnabled() -> Observable<Bool> {
         return Observable.combineLatest(upNextSong.map { $0 != nil }, isPlaying.filter { $0 })
             .map { $0 && $1 }
     }
-    
-    //MARK: - Private
     
     private func login() -> Observable<Bool> {
         return reachabilityService.reachability
@@ -182,7 +190,7 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
                     self.player.playSpotifyURI(
                         song.spotifyURI,
                         startingWith: 0,
-                        startingWithPosition: 0,
+                        startingWithPosition: 310,
                         callback: self.sptObservableCallback(withObserver: observer)
                     )
                     return Disposables.create()
