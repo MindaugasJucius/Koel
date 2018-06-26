@@ -34,12 +34,14 @@ class DMEventSong: Object, Codable, DMEntity {
         case upvoteCount
         case uuid
         case spotifyURI
+        case durationSeconds
     }
     
     dynamic var uuid = NSUUID().uuidString
     dynamic var title: String = ""
     dynamic var artistTitle: String = ""
     dynamic var spotifyURI: String = ""
+    dynamic var durationSeconds: TimeInterval = 0
     dynamic var added: Date? = nil
     dynamic var played: Date? = nil
     dynamic var addedBy: DMEventPeer? = nil
@@ -73,6 +75,7 @@ class DMEventSong: Object, Codable, DMEntity {
         try container.encode(addedBy?.uuid, forKey: .addedByUUID)
         try container.encode(upvoteCount, forKey: .upvoteCount)
         try container.encode(spotifyURI, forKey: .spotifyURI)
+        try container.encode(durationSeconds, forKey: .durationSeconds)
         
         var upvoteesPeerIDDataArray = container.nestedUnkeyedContainer(forKey: .upvotedByUUIDs)
         try upvotees
@@ -92,6 +95,7 @@ class DMEventSong: Object, Codable, DMEntity {
         let addedByUUID = try container.decodeIfPresent(String.self, forKey: .addedByUUID)
         let upvoteCount = try container.decode(Int.self, forKey: .upvoteCount)
         let spotifyURI = try container.decode(String.self, forKey: .spotifyURI)
+        let durationSeconds = try container.decode(TimeInterval.self, forKey: .durationSeconds)
         
         var upvoteesPeerUUIDsContainer = try container.nestedUnkeyedContainer(forKey: .upvotedByUUIDs)
         var upvoteesPeerUUIDs: [String] = []
@@ -111,6 +115,7 @@ class DMEventSong: Object, Codable, DMEntity {
         self.upvotedByUUIDs = upvoteesPeerUUIDs
         self.addedByUUID = addedByUUID
         self.spotifyURI = spotifyURI
+        self.durationSeconds = durationSeconds
     }
 
     required init(value: Any, schema: RLMSchema) {
@@ -146,6 +151,7 @@ extension DMEventSong {
         eventSong.spotifyURI = searchResultSong.spotifyURI
         eventSong.artistTitle = searchResultSong.artistName
         eventSong.title = searchResultSong.title
+        eventSong.durationSeconds = searchResultSong.durationSeconds
         return eventSong
     }
 }

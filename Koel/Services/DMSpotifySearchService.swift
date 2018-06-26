@@ -126,14 +126,7 @@ class DMSpotifySearchService: DMSpotifySearchServiceType {
             })
             .map { pagingObject -> [DMSearchResultSong] in
                 return pagingObject.items.map { savedTrack -> DMSearchResultSong in
-                    let artistName = savedTrack.track.album.artists.reduce("", { currentTitle, artist in
-                        return currentTitle.appending("\(artist.name!) ")
-                    })
-                    return DMSearchResultSong(title: savedTrack.track.name,
-                                              artistName: artistName,
-                                              spotifyURI: savedTrack.track.uri,
-                                              durationMilliseconds: savedTrack.track.durationMs,
-                                              albumArtworkImageURL: savedTrack.track.album.images[0].url)
+                    return DMSearchResultSong.create(from: savedTrack)
                 }
             }
 

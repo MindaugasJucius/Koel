@@ -7,14 +7,31 @@
 //
 
 import Foundation
+import Spartan
 
 struct DMSearchResultSong {
+    
     let title: String
     let artistName: String
     let spotifyURI: String
-    let durationMilliseconds: Int
+    let durationSeconds: TimeInterval
     let albumArtworkImageURL: String
     
+}
+
+extension DMSearchResultSong {
+    
+    static func create(from savedTrack: SavedTrack) -> DMSearchResultSong {
+        let artistName = savedTrack.track.album.artists.reduce("", { currentTitle, artist in
+            return currentTitle.appending("\(artist.name!) ")
+        })
+        return DMSearchResultSong(title: savedTrack.track.name,
+                                  artistName: artistName,
+                                  spotifyURI: savedTrack.track.uri,
+                                  durationSeconds: TimeInterval(savedTrack.track.durationMs) / 1000,
+                                  albumArtworkImageURL: savedTrack.track.album.images[0].url)
+
+    }
     
 }
 

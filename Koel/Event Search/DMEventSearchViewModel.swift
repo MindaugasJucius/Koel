@@ -45,9 +45,6 @@ class DMEventSearchViewModel: MultipeerViewModelType {
     private lazy var pushEventParticipation: Action<DMEventPeer, Void> = {
         return Action (
             workFactory: { [unowned self] host in
-//                let fakehost = DMEventPeer.peer(withPeerID: MCPeerID(displayName: "lul"), storeAsSelf: false, storeAsHost: true, uuid: "nilnil")
-//                return self.sceneCoordinator.transitionToParticipationScene(withMultipeerService: self.multipeerService,
-//                                                                            eventHost: )
                 return self.sceneCoordinator.transitionToParticipationScene(withMultipeerService: self.multipeerService,
                                                                             eventHost: host)
             }

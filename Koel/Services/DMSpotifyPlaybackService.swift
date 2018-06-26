@@ -44,8 +44,10 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
     private let isLoggedIn: BehaviorSubject<Bool> = BehaviorSubject(value: false)
     private let isPlayingSubject: BehaviorSubject<Bool> = BehaviorSubject(value: false)
     private let playingURISubject: BehaviorSubject<String?> = BehaviorSubject(value: .none)
-    private let metadataCurrentURISubject: BehaviorSubject<String?> = BehaviorSubject(value: .none)
     
+    private let metadataCurrentURISubject: PublishSubject<String?> = PublishSubject()
+    private let trackPositionSubject: PublishSubject<TimeInterval> = PublishSubject()
+
     private let reachabilityService: ReachabilityService
     
     private var playingURI: Observable<String?> {
@@ -112,6 +114,24 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
             }
             .subscribe()
             .disposed(by: disposeBag)
+        
+        // Update persisted DMEventSong state on track end
+        
+        let trackEndsSoon = trackPositionSubject.asObservable()
+            .withLatestFrom(playingSong.filterNil()) { (trackPosition, playingSong) -> Double in
+                let durationInSeconds = playingSong.durationSeconds
+                print("remaining \(trackPosition / durationInSeconds)")
+                return trackPosition / durationInSeconds
+            }
+            .map { $0 >= 0.995 }
+
+        Observable.zip(playingURI.filter { $0 != nil }.skip(1),
+                       trackEndsSoon.filter { $0 })
+            .flatMap { _ in
+                return self.skipSongForward
+            }
+            .subscribe()
+            .disposed(by: disposeBag)
     }
     
     //MARK: - Public
@@ -123,7 +143,7 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
     lazy var togglePlayback: Observable<Void> = {
         return Observable
             .combineLatest(playingSong, addedSongs, isPlaying, playingURI)
-            .take(1) // addedSongs changes on toggling, causing combineLatest to fire multiple times
+            .take(1) // addedSongs changes on toggling, causing combineLatest to fire repeatedly
             .flatMap { (playingSong, addedSongs, isPlaying, playingURI) -> Observable<Void> in
                 if let firstAdded = addedSongs.first, playingSong == nil {
                     return self.play(song: firstAdded)
@@ -190,7 +210,7 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
                     self.player.playSpotifyURI(
                         song.spotifyURI,
                         startingWith: 0,
-                        startingWithPosition: 310,
+                        startingWithPosition: 0,
                         callback: self.sptObservableCallback(withObserver: observer)
                     )
                     return Disposables.create()
@@ -230,7 +250,6 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
     private func sptObservableCallback(withObserver observer: AnyObserver<Void>) -> SPTErrorableOperationCallback {
         return { error in
             guard error == nil else {
-                print(error?.localizedDescription)
                 observer.onError(error!)
                 return
             }
@@ -254,7 +273,7 @@ extension DMSpotifyPlaybackService: SPTAudioStreamingPlaybackDelegate {
     }
     
     func audioStreaming(_ audioStreaming: SPTAudioStreamingController!, didChangePosition position: TimeInterval) {
-        //print(position)
+        trackPositionSubject.onNext(position)
     }
     
     func audioStreaming(_ audioStreaming: SPTAudioStreamingController!, didStartPlayingTrack trackUri: String!) {
