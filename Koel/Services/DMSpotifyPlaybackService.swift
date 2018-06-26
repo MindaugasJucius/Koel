@@ -22,6 +22,7 @@ protocol DMSpotifyPlaybackServiceType {
     var isPlaying: Observable<Bool> { get }
     var togglePlayback: Observable<Void> { get }
     var onNext: CocoaAction { get }
+    var trackPlaybackPercentCompleted: Observable<Double> { get }
 
 }
 
@@ -109,6 +110,11 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
         
         Observable.zip(distinctFirstAddedSong, metadataMatchesPlayingTrackURI.filter { $0 })
             .map { $0.0 }
+            .flatMap { songToEnqueue -> Observable<DMEventSong> in
+                return self.isPlaying.asObservable()
+                    .filter { $0 }
+                    .map { _ in songToEnqueue }
+            }
             .flatMap { [unowned self] songToEnqueue in
                 return self.enqueue(song: songToEnqueue)
             }
@@ -117,16 +123,11 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
         
         // Update persisted DMEventSong state on track end
         
-        let trackEndsSoon = trackPositionSubject.asObservable()
-            .withLatestFrom(playingSong.filterNil()) { (trackPosition, playingSong) -> Double in
-                let durationInSeconds = playingSong.durationSeconds
-                print("remaining \(trackPosition / durationInSeconds)")
-                return trackPosition / durationInSeconds
-            }
+        let isTrackEnding = trackPlaybackPercentCompleted
             .map { $0 >= 0.995 }
 
-        Observable.zip(playingURI.filter { $0 != nil }.skip(1),
-                       trackEndsSoon.filter { $0 })
+        Observable.zip(playingURI.filter { $0 != nil }.skip(1), // nil when track playback has ended
+                       isTrackEnding.filter { $0 }) // in case if track playback ended due to an error, prevent state edit
             .flatMap { _ in
                 return self.skipSongForward
             }
@@ -138,6 +139,15 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
     
     lazy var isPlaying: Observable<Bool> = {
         return isPlayingSubject.asObservable()
+    }()
+    
+    lazy var trackPlaybackPercentCompleted: Observable<Double> = {
+        return trackPositionSubject.asObservable()
+            .withLatestFrom(playingSong.filterNil()) { (trackPosition, playingSong) -> Double in
+                let durationInSeconds = playingSong.durationSeconds
+                print("remaining \(trackPosition / durationInSeconds)")
+                return trackPosition / durationInSeconds
+            }
     }()
     
     lazy var togglePlayback: Observable<Void> = {
