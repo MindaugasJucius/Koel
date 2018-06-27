@@ -35,7 +35,6 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
     
     let addedSongs: Observable<[DMEventSong]>
     let playingSong: Observable<DMEventSong?>
-    let upNextSong: Observable<DMEventSong?>
 
     let updateSongToState: (DMEventSong, DMEventSongState) -> (Observable<Void>)
     let skipSongForward: Observable<Void>
@@ -43,36 +42,18 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
     private let player: SPTAudioStreamingController = SPTAudioStreamingController.sharedInstance()
     
     private let isLoggedIn: BehaviorSubject<Bool> = BehaviorSubject(value: false)
-    private let isPlayingSubject: BehaviorSubject<Bool> = BehaviorSubject(value: false)
-    private let playingURISubject: BehaviorSubject<String?> = BehaviorSubject(value: .none)
-    
-    private let metadataCurrentURISubject: PublishSubject<String?> = PublishSubject()
+    private let isPlaybackActiveSubject: BehaviorSubject<Bool> = BehaviorSubject(value: false)
+    private let isTrackPlayingSubject: BehaviorSubject<Bool> = BehaviorSubject(value: false)
     private let trackPositionSubject: PublishSubject<TimeInterval> = PublishSubject()
 
     private let reachabilityService: ReachabilityService
-    
-    private var playingURI: Observable<String?> {
-        return playingURISubject.asObservable()
-    }
-    
-    private var metadataMatchesPlayingTrackURI: Observable<Bool> {
-        let currentURI = metadataCurrentURISubject
-            .asObservable()
-            .filterNil()
-        
-        return Observable.combineLatest(currentURI, playingSong.filterNil()) { (currentURI, playing) -> Bool in
-            return currentURI == playing.spotifyURI
-        }
-        .distinctUntilChanged()
-    }
     
     init(authService: DMSpotifyAuthService,
          reachabilityService: ReachabilityService,
          skipSongForward: Observable<Void>,
          updateSongToState: @escaping (DMEventSong, DMEventSongState) -> (Observable<Void>),
          addedSongs: Observable<[DMEventSong]>,
-         playingSong: Observable<DMEventSong?>,
-         upNextSong: Observable<DMEventSong?>) {
+         playingSong: Observable<DMEventSong?>) {
         
         self.authService = authService
         self.reachabilityService = reachabilityService
@@ -80,7 +61,6 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
         self.updateSongToState = updateSongToState
         self.addedSongs = addedSongs
         self.playingSong = playingSong
-        self.upNextSong = upNextSong
         
         super.init()
         player.delegate = self
@@ -88,48 +68,17 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
         
         try! player.start(withClientId: SPTAuth.defaultInstance().clientID)
         
-        let distinctFirstAddedSong = addedSongs
-            .map { $0.first }
-            .filterNil()
-            .distinctUntilChanged()
-            .skip(1)
-        
-        // Start playback flow:
-        // 1. `distinctFirstAddedSong` fires only after initial song has had
-        //    `playSpotifyURI` called on it and its state has been changed to `.playing`.
-        // 2. These observables are zipped, thus `distinctFirstAddedSong` waits
-        //    for `metadataMatchesPlayingTrackURI` to fire for current
-        //    index. It only does when `metadata.currentTrack.uri` == `playingSong.spotifyURI`.
-        // 3. `distinctFirstAddedSong` becomes `.upNext`.
-        
-        // Song skipping flow:
-        // 1. On next tap, the queued song becomes `.playing`, and `distinctFirstAddedSong`
-        //    fires with a new value.
-        // 2. It waits for `metadata.currentTrack.uri` to match the now `.playing` song's uri.
-        // 3. `distinctFirstAddedSong` becomes `.upNext`.
-        
-        Observable.zip(distinctFirstAddedSong, metadataMatchesPlayingTrackURI.filter { $0 })
-            .map { $0.0 }
-            .flatMap { songToEnqueue -> Observable<DMEventSong> in
-                return self.isPlaying.asObservable()
-                    .filter { $0 }
-                    .map { _ in songToEnqueue }
-            }
-            .flatMap { [unowned self] songToEnqueue in
-                return self.enqueue(song: songToEnqueue)
-            }
-            .subscribe()
-            .disposed(by: disposeBag)
-        
         // Update persisted DMEventSong state on track end
         
         let isTrackEnding = trackPlaybackPercentCompleted
             .map { $0 >= 0.995 }
-
-        Observable.zip(playingURI.filter { $0 != nil }.skip(1), // nil when track playback has ended
-                       isTrackEnding.filter { $0 }) // in case if track playback ended due to an error, prevent state edit
+        
+        isTrackPlayingSubject.asObservable().filter { !$0 }
+            .skip(1) // nil when track playback has ended
+            .withLatestFrom(isTrackEnding) // in case if track playback ended due to an error, prevent state edit
+            .filter { $0 }
             .flatMap { _ in
-                return self.skipSongForward
+                return self.nextSong()
             }
             .subscribe()
             .disposed(by: disposeBag)
@@ -138,31 +87,26 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
     //MARK: - Public
     
     lazy var isPlaying: Observable<Bool> = {
-        return isPlayingSubject.asObservable()
+        return isPlaybackActiveSubject.asObservable()
     }()
     
     lazy var trackPlaybackPercentCompleted: Observable<Double> = {
         return trackPositionSubject.asObservable()
             .withLatestFrom(playingSong.filterNil()) { (trackPosition, playingSong) -> Double in
                 let durationInSeconds = playingSong.durationSeconds
-                print("remaining \(trackPosition / durationInSeconds)")
                 return trackPosition / durationInSeconds
             }
     }()
     
     lazy var togglePlayback: Observable<Void> = {
-        return Observable
-            .combineLatest(playingSong, addedSongs, isPlaying, playingURI)
+        return Observable.combineLatest(playingSong, addedSongs, isPlaying)
             .take(1) // addedSongs changes on toggling, causing combineLatest to fire repeatedly
-            .flatMap { (playingSong, addedSongs, isPlaying, playingURI) -> Observable<Void> in
+            .flatMap { (playingSong, addedSongs, isPlaying) -> Observable<Void> in
                 if let firstAdded = addedSongs.first, playingSong == nil {
                     return self.play(song: firstAdded)
                 }
                 
-                if let playingSong = playingSong {
-                    if playingURI == nil { // playback hasn't been started yet
-                        return self.play(song: playingSong)
-                    }
+                if let _ = playingSong {
                     return self.togglePlaybackState(isPlaying: !isPlaying)
                 }
 
@@ -174,7 +118,7 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
         return Action(
             enabledIf: nextEnabled(),
             workFactory: { [unowned self] in
-                return self.nextSong().flatMap { self.skipSongForward }
+                return self.nextSong()
             }
         )
     }()
@@ -182,19 +126,20 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
     //MARK: - Private
     
     private func nextSong() -> Observable<Void> {
-        return Observable.create { [unowned self] observer -> Disposable in
-            self.player.skipNext(self.sptObservableCallback(withObserver: observer))
-            return Disposables.create()
-        }
+        return self.skipSongForward
+            .flatMap { self.addedSongs }
+            .map { $0.first }
+            .take(1)
+            .filterNil()
+            .flatMap { self.play(song: $0) }
     }
     
     private func nextEnabled() -> Observable<Bool> {
-        return Observable.combineLatest(upNextSong.map { $0 != nil }, isPlaying.filter { $0 })
-            .map { $0 && $1 }
+        return addedSongs.map { !$0.isEmpty }
     }
     
     private func login() -> Observable<Bool> {
-        return reachabilityService.reachability
+        let performAndWaitForLogin = reachabilityService.reachability
             .flatMap { [unowned self] status -> Observable<SPTSession> in
                 if status.reachable {
                     let sptAction = UIConstants.strings.SPTActionPlayback
@@ -205,22 +150,31 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
             }
             .map { $0.accessToken }
             .do(onNext: { [unowned self] accessToken in
-                    self.player.login(withAccessToken: accessToken)
+                self.player.login(withAccessToken: accessToken)
             })
             .flatMap { [unowned self] _ in
                 return self.isLoggedIn.asObservable().filter { $0 }
+            }
+            .take(1)
+        
+        return isLoggedIn.asObservable()
+            .flatMap { loggedIn -> Observable<Bool> in
+                if loggedIn {
+                    return .just(loggedIn)
+                }
+                return performAndWaitForLogin
             }
     }
     
     private func play(song: DMEventSong) -> Observable<Void> {
         let playObservable = login()
             .map { _ in }
-            .flatMap { [unowned self] in
+            .flatMap { [unowned self] _ in
                 return Observable<Void>.create { observer in
                     self.player.playSpotifyURI(
                         song.spotifyURI,
                         startingWith: 0,
-                        startingWithPosition: 0,
+                        startingWithPosition: song.durationSeconds - 10,
                         callback: self.sptObservableCallback(withObserver: observer)
                     )
                     return Disposables.create()
@@ -247,16 +201,6 @@ class DMSpotifyPlaybackService: NSObject, DMSpotifyPlaybackServiceType {
         }
     }
     
-    private func enqueue(song: DMEventSong) -> Observable<Void> {
-        return Observable.create { [unowned self] observer -> Disposable in
-            self.player.queueSpotifyURI(song.spotifyURI, callback: self.sptObservableCallback(withObserver: observer))
-            return Disposables.create()
-        }
-        .flatMap { [unowned self] in
-            return self.updateSongToState(song, .upNext)
-        }
-    }
-    
     private func sptObservableCallback(withObserver observer: AnyObserver<Void>) -> SPTErrorableOperationCallback {
         return { error in
             guard error == nil else {
@@ -275,7 +219,7 @@ extension DMSpotifyPlaybackService: SPTAudioStreamingPlaybackDelegate {
     
     func audioStreaming(_ audioStreaming: SPTAudioStreamingController!, didChangePlaybackStatus isPlaying: Bool) {
         print("isPlaying \(isPlaying)")
-        isPlayingSubject.onNext(isPlaying)
+        isPlaybackActiveSubject.onNext(isPlaying)
         if isPlaying {
             activateAudioSession()
         } else {
@@ -288,21 +232,19 @@ extension DMSpotifyPlaybackService: SPTAudioStreamingPlaybackDelegate {
     }
     
     func audioStreaming(_ audioStreaming: SPTAudioStreamingController!, didStartPlayingTrack trackUri: String!) {
-        playingURISubject.onNext(trackUri)
         print("start playing: \(trackUri)")
+        isTrackPlayingSubject.onNext(true)
     }
     
     func audioStreaming(_ audioStreaming: SPTAudioStreamingController!, didStopPlayingTrack trackUri: String!) {
-        playingURISubject.onNext(nil)
         print("stop playing: \(trackUri)")
+        isTrackPlayingSubject.onNext(false)
     }
     
     func audioStreaming(_ audioStreaming: SPTAudioStreamingController!, didChange metadata: SPTPlaybackMetadata!) {
         print("metadata")
         print("current track: \(metadata.currentTrack?.name)")
         print("next track: \(metadata.nextTrack?.name)")
-
-        metadataCurrentURISubject.onNext(metadata.currentTrack?.uri)
     }
     
     func audioStreamingDidPopQueue(_ audioStreaming: SPTAudioStreamingController!) {

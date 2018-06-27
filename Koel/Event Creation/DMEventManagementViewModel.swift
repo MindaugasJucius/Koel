@@ -70,8 +70,7 @@ class DMEventManagementViewModel: DMEventManagementViewModelType, MultipeerViewM
                                                            skipSongForward: songsEditor.skipSongForward,
                                                            updateSongToState: songsEditor.updateSongToState,
                                                            addedSongs: songsRepresenter.addedSongs,
-                                                           playingSong: songsRepresenter.playingSong,
-                                                           upNextSong: songsRepresenter.upNextSong)
+                                                           playingSong: songsRepresenter.playingSong)
         
         self.onSongsDelete = songsEditor.onSongsDelete
         self.onUpvote = songsEditor.onUpvote

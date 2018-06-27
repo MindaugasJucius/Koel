@@ -112,7 +112,7 @@ class DMSpotifySearchService: DMSpotifySearchServiceType {
             }
             .flatMap { [unowned self] paggingObject -> Observable<PagingObject<SavedTrack>> in
                 guard let paggingObject = paggingObject else {
-                    return self.initial { Spartan.getSavedTracks(limit: 50, success: $0, failure: $1) }
+                    return self.initial { Spartan.getSavedTracks(limit: 50, market: Spartan.currentCountryCode, success: $0, failure: $1) }
                 }
                 
                 if paggingObject.canMakeNextRequest {

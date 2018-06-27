@@ -30,7 +30,6 @@ protocol DMEventHostSongsEditable {
 protocol DMEventSongsManagerSeparatable {
     var addedSongs: Observable<[DMEventSong]> { get }
     var playedSongs: Observable<[DMEventSong]> { get }
-    var upNextSong: Observable<DMEventSong?> { get }
     var playingSong: Observable<DMEventSong?> { get }
 }
 
@@ -122,18 +121,6 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType, MultipeerVie
             .share(replay: 1, scope: .forever)
     }()
     
-    lazy var upNextSong: Observable<DMEventSong?> = {
-        return songPersistenceService
-            .songs
-            .map { [unowned self] results in
-                return results
-                    .filter(forSongState: .upNext)
-                    .first
-            }
-            .startWith(nil)
-            .share(replay: 1, scope: .forever)
-    }()
-    
     lazy var playingSong: Observable<DMEventSong?> = {
         return songPersistenceService
             .songs
@@ -147,15 +134,11 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType, MultipeerVie
     }()
     
     var songsSectioned: Observable<[SongSection]> {
-        return Observable.combineLatest(addedSongs, playedSongs, playingSong, upNextSong) { (addedSongs, playedSongs, playingSong, upNextSong) in
+        return Observable.combineLatest(addedSongs, playedSongs, playingSong) { (addedSongs, playedSongs, playingSong) in
             var sectionedSongs: [SongSection] = []
             
             if let playing = playingSong {
                 sectionedSongs.append(SongSection(model: "Playing", items: [playing]))
-            }
-            
-            if let upNext = upNextSong {
-                sectionedSongs.append(SongSection(model: "Up next", items: [upNext]))
             }
             
             sectionedSongs.append(contentsOf:  [
@@ -210,15 +193,10 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType, MultipeerVie
     }()
     
     lazy var skipSongForward: Observable<Void> = {
-        let upNext = upNextSong.filterNil()
-        return playingSong.filterNil()
+        return playingSong.filterNil().amb(addedSongs.map { $0.first }.filterNil())
             .take(1)
             .flatMap { song in
                 return self.updateSongToState(song, .played)
-            }
-            .withLatestFrom(upNext)
-            .flatMap { upNextSong in
-                return self.updateSongToState(upNextSong, .playing)
             }
     }()
     
