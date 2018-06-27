@@ -127,7 +127,7 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType, MultipeerVie
             .songs
             .map { [unowned self] results in
                 return results
-                    .filter(forSongState: .queued)
+                    .filter(forSongState: .upNext)
                     .first
             }
             .startWith(nil)
