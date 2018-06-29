@@ -14,13 +14,10 @@ struct UIConstants {
 
         static let koelPink = UIColor(red: 235/255, green: 2/255, blue: 141/255, alpha: 1)
         static let koelDisabled = UIColor.colorWithHexString(hex: "BDC3C7")
-        static let koelBlue = UIColor.colorWithHexString(hex: "#19B5FE")
-        static let koelSkyBlue = UIColor.colorWithHexString(hex: "#EC6EAD")
-        static let koelPurple = UIColor.colorWithHexString(hex: "#3494E6")
         
         struct logoView {
-            static let firstScaleLayerColor = koelBlue.withAlphaComponent(0.4).cgColor
-            static let secondScaleLayerColor = koelBlue.withAlphaComponent(0.6).cgColor
+            static let firstScaleLayerColor = koelPink.withAlphaComponent(0.4).cgColor
+            static let secondScaleLayerColor = koelPink.withAlphaComponent(0.6).cgColor
             
             static let gradientStartColor = UIColor.colorWithHexString(hex: "#00dbde").cgColor
             static let gradientEndColor = UIColor.colorWithHexString(hex: "#fc00ff").cgColor
@@ -38,7 +35,8 @@ struct UIConstants {
         
         // Song Search
         static let addSelectedSongs = NSLocalizedString("ADD_SELECTED_SONGS", comment: "")
-        
+        static let searchSongs = NSLocalizedString("SEARCH_SPOTIFY", comment: "")
+
         // SPT Actions
         static let SPTActionPlayback = NSLocalizedString("SPT_ACTION_PLAYBACK", comment: "")
         static let SPTSearchTracks = NSLocalizedString("SPT_ACTION_SEARCH_TRACKS", comment: "")

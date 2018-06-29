@@ -42,7 +42,6 @@ class DMEventSearchViewController: UIViewController, BindableType {
         title = UIConstants.strings.searchScreenTitle
 
         view.backgroundColor = .white
-        navigationController?.navigationBar.apply(DefaultStylesheet.navigationBarStyle)
 
         tableView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(tableView)

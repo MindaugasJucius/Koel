@@ -15,6 +15,7 @@
 "AUTHENTICATE" = "Login";
 
 // Song search
+"SEARCH_SPOTIFY" = "Find your songs in Spotify";
 "ADD_SELECTED_SONGS" = "Queue selected tracks";
 
 //SPT Errors

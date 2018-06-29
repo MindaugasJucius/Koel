@@ -107,6 +107,10 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
         self.tableView.tableFooterView = tableViewLoadingFooter
     }
     
+}
+
+extension DMSpotifySongSearchViewController {
+    
     func bindViewModel() {
         addSongsButton.rx.action = viewModel.queueSelectedSongs
         
@@ -115,7 +119,7 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
         viewModel.songResults
             .drive(tableView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
-
+        
         viewModel.queueSelectedSongs.executing
             .filter { $0 }
             .debounce(0.3, scheduler: MainScheduler.instance)
