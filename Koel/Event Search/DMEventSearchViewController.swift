@@ -16,8 +16,9 @@ class DMEventSearchViewController: UIViewController, BindableType {
     typealias ViewModelType = DMEventSearchViewModel
     
     var viewModel: DMEventSearchViewModel
+    var themeManager: ThemeManager?
     
-    private var bag = DisposeBag()
+    private var disposeBag = DisposeBag()
     private var startEventButton = DMKoelButton()
     
     //MARK: UI
@@ -26,6 +27,11 @@ class DMEventSearchViewController: UIViewController, BindableType {
     required init(withViewModel viewModel: DMEventSearchViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
+    }
+    
+    convenience init(withViewModel viewModel: DMEventSearchViewModel, themeManager: ThemeManager) {
+        self.init(withViewModel: viewModel)
+        self.themeManager = themeManager
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -38,26 +44,40 @@ class DMEventSearchViewController: UIViewController, BindableType {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
         title = UIConstants.strings.searchScreenTitle
-
-        view.backgroundColor = .white
-
+                
+        themeManager?.currentTheme
+            .do(onNext: { [unowned self] theme in
+                self.view.backgroundColor = theme.backgroundColor
+            })
+            .subscribe()
+        .disposed(by: disposeBag)
+        
+        tableView.backgroundColor = .clear
         tableView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(tableView)
-        additionalSafeAreaInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
         
         let constraints = [
-            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            tableView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
-            tableView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+            tableView.topAnchor.constraint(equalTo: view.topAnchor),
+            tableView.leftAnchor.constraint(equalTo: view.readableContentGuide.leftAnchor),
+            tableView.rightAnchor.constraint(equalTo: view.readableContentGuide.rightAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.readableContentGuide.bottomAnchor)
         ]
         NSLayoutConstraint.activate(constraints)
         
         view.addSubview(startEventButton)
         startEventButton.addConstraints(inSuperview: view)
         startEventButton.setTitle(UIConstants.strings.searchScreenButtonStartEventTitle, for: .normal)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        themeManager?.currentTheme
+            .do(onNext: { [unowned self] theme in
+                self.navigationController?.navigationBar.apply(theme.navigationBarColors())
+            })
+            .subscribe()
+            .disposed(by: disposeBag)
     }
     
     func bindViewModel() {
@@ -71,7 +91,7 @@ class DMEventSearchViewController: UIViewController, BindableType {
                 alert.addAction(connectAction)
                 self.present(alert, animated: true, completion: nil)
             })
-            .disposed(by: bag)
+            .disposed(by: disposeBag)
         
         viewModel.hosts
             .bind(to: tableView.rx.items) { (tableView: UITableView, index: Int, element: DMEventPeer) in
@@ -79,7 +99,7 @@ class DMEventSearchViewController: UIViewController, BindableType {
                 cell.textLabel?.text = element.peerID?.displayName
                 return cell
             }
-            .disposed(by: bag)
+            .disposed(by: disposeBag)
         
         startEventButton.rx.action = viewModel.pushEventManagement
         
@@ -87,7 +107,7 @@ class DMEventSearchViewController: UIViewController, BindableType {
             .modelSelected(DMEventPeer.self)
             .filter { !$0.isConnected }
             .subscribe(viewModel.requestAccess.inputs)
-            .disposed(by: bag)
+            .disposed(by: disposeBag)
     }
     
 }

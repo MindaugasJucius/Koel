@@ -35,10 +35,11 @@ struct Theme {
                              tintColor: koelTint,
                              backgroundColor: koelBackground)
     
-    func navigationBarTextColors() -> Style<UINavigationBar> {
+    func navigationBarColors() -> Style<UINavigationBar> {
         let style = Style<UINavigationBar> {
             let attributes = [NSAttributedStringKey.foregroundColor: self.darkTextColor]
-            $0.barTintColor = self.tintColor
+            $0.tintColor = self.tintColor
+            $0.barTintColor = self.backgroundColor
             $0.largeTitleTextAttributes = attributes
             $0.titleTextAttributes = attributes
         }

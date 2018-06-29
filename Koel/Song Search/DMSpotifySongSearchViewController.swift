@@ -112,6 +112,16 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
 
     }
 
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        ThemeManager.shared.currentTheme
+            .do(onNext: { [unowned self] theme in
+                self.navigationController?.navigationBar.apply(theme.navigationBarColors())
+            })
+            .subscribe()
+            .disposed(by: disposeBag)
+    }
+    
     override func willMove(toParentViewController parent: UIViewController?) {
         (parent as? UINavigationController)?.navigationBar.apply(DefaultStylesheet.navigationBarStyle)
     }

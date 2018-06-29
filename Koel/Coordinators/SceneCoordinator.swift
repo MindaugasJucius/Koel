@@ -19,7 +19,8 @@ private extension Scene {
         switch self {
         //MARK: Shared
         case .search(let viewModel):
-            let eventSearchVC = DMEventSearchViewController(withViewModel: viewModel)
+            let eventSearchVC = DMEventSearchViewController(withViewModel: viewModel,
+                                                            themeManager: ThemeManager.shared)
             eventSearchVC.setupForViewModel()
             return eventSearchVC
        }

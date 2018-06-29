@@ -64,7 +64,6 @@ class DMEventManagementViewController: UIViewController, BindableType {
             tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ]
         
-        
         view.addSubview(playbackControlsView)
         let playbackControlsViewConstraints = [
             playbackControlsView.heightAnchor.constraint(equalToConstant: DMPlaybackControlsView.height),
@@ -72,7 +71,6 @@ class DMEventManagementViewController: UIViewController, BindableType {
             playbackControlsView.rightAnchor.constraint(equalTo: view.rightAnchor),
             playbackControlsView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ]
-
 
         NSLayoutConstraint.activate(playbackControlsViewConstraints)
         NSLayoutConstraint.activate(tableViewConstraints)

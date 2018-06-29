@@ -15,9 +15,7 @@ enum DefaultStylesheet {
     }
     
     static let navigationBarStyle = Style<UINavigationBar> {
-        let titleAttributes = [NSAttributedStringKey.foregroundColor: UIColor.black,
-                               NSAttributedStringKey.font : UIFont.systemFont(ofSize: 18, weight: .bold)]
-        $0.titleTextAttributes = titleAttributes
+        $0.prefersLargeTitles = false
     }
     
 }
@@ -25,12 +23,12 @@ enum DefaultStylesheet {
 enum SongCellStylesheet {
     
     static let titleLabelStyle = Style<UILabel> {
-        $0.font = UIFont.systemFont(ofSize: 18, weight: .medium)
+        $0.font = UIFont.preferredFont(forTextStyle: .headline)
         $0.numberOfLines = 1
     }
     
     static let subtitleLabelStyle = Style<UILabel> {
-        $0.font = UIFont.systemFont(ofSize: 14, weight: .regular)
+        $0.font = UIFont.preferredFont(forTextStyle: .subheadline)
         $0.numberOfLines = 1
     }
     
