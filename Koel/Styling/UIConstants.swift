@@ -11,13 +11,9 @@ import UIKit
 struct UIConstants {
     
     struct colors {
-
-        static let koelPink = UIColor(red: 235/255, green: 2/255, blue: 141/255, alpha: 1)
-        static let koelDisabled = UIColor.colorWithHexString(hex: "BDC3C7")
-        
         struct logoView {
-            static let firstScaleLayerColor = koelPink.withAlphaComponent(0.4).cgColor
-            static let secondScaleLayerColor = koelPink.withAlphaComponent(0.6).cgColor
+            static let firstScaleLayerColor = UIColor.white.cgColor
+            static let secondScaleLayerColor = UIColor.white.cgColor
             
             static let gradientStartColor = UIColor.colorWithHexString(hex: "#00dbde").cgColor
             static let gradientEndColor = UIColor.colorWithHexString(hex: "#fc00ff").cgColor

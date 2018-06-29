@@ -35,10 +35,10 @@ struct KoelButtonStartAppearance: KoelButtonAppearance {
         shadowOffset = CGSize(width: 0, height: 8)
         shadowOpacity = 0.4
         shadowRadius = 5
-        backgroundColor = UIConstants.colors.koelPink.cgColor
+        backgroundColor = ThemeManager.shared.themeValue.primaryActionColor.cgColor
         textColor = .white
         dimmingViewOpacity = 0
-        shadowColor = UIConstants.colors.koelPink.cgColor
+        shadowColor = ThemeManager.shared.themeValue.primaryActionColor.cgColor
     }
 }
 
@@ -58,10 +58,10 @@ struct KoelButtonDisabledAppearance: KoelButtonAppearance {
         shadowOffset = CGSize(width: 0, height: 8)
         shadowOpacity = 0.4
         shadowRadius = 5
-        backgroundColor = UIConstants.colors.koelDisabled.cgColor
+        backgroundColor = ThemeManager.shared.themeValue.disabledColor.cgColor
         textColor = .gray
         dimmingViewOpacity = 0
-        shadowColor = UIConstants.colors.koelDisabled.cgColor
+        shadowColor = ThemeManager.shared.themeValue.disabledColor.cgColor
     }
 }
 
@@ -80,10 +80,10 @@ struct KoelButtonEndAppearance: KoelButtonAppearance {
         shadowOffset = CGSize(width: 0, height: 6)
         shadowOpacity = 0.5
         shadowRadius = 3
-        backgroundColor = UIConstants.colors.koelPink.cgColor
+        backgroundColor = ThemeManager.shared.themeValue.primaryActionColor.cgColor
         textColor = .white
         dimmingViewOpacity = 0.5
-        shadowColor = UIConstants.colors.koelPink.cgColor
+        shadowColor = ThemeManager.shared.themeValue.primaryActionColor.cgColor
     }
 }
 
