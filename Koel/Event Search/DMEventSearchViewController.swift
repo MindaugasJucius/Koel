@@ -33,7 +33,7 @@ class DMEventSearchViewController: UIViewController, BindableType {
     }
     
     override func didMove(toParentViewController parent: UIViewController?) {
-        navigationController?.navigationBar.apply(DefaultStylesheet.navigationBarStyle)
+        navigationController?.navigationBar.apply(DefaultStylesheet.largeNavigationBarStyle)
     }
     
     override func viewDidLoad() {

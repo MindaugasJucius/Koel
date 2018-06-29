@@ -47,20 +47,20 @@ class DMEventManagementViewController: UIViewController, BindableType {
     }
     
     override func didMove(toParentViewController parent: UIViewController?) {
-        navigationController?.navigationBar.apply(DefaultStylesheet.navigationBarStyle)
+        navigationController?.navigationBar.apply(DefaultStylesheet.largeNavigationBarStyle)
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        navigationItem.largeTitleDisplayMode = .always
         title = UIConstants.strings.managementTitle
         view.backgroundColor = .white
         view.addSubview(tableView)
         
         let tableViewConstraints = [
-            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            tableView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
-            tableView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
+            tableView.topAnchor.constraint(equalTo: view.topAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.readableContentGuide.trailingAnchor),
+            tableView.leadingAnchor.constraint(equalTo: view.readableContentGuide.leadingAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ]
         

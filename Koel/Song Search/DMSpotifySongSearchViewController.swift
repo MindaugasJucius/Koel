@@ -47,6 +47,7 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
     }()
     
     private let tableViewLoadingFooter = DMKoelLoadingView()
+    
     private let refreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
         let title = UIConstants.strings.refreshCache
@@ -88,11 +89,14 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .green
+        title = UIConstants.strings.searchSongs
+        let searchController = UISearchController(searchResultsController: nil)
+        navigationItem.searchController = searchController
+        navigationItem.hidesSearchBarWhenScrolling = false
         
         view.addSubview(tableView)
         tableView.refreshControl = refreshControl
-        
+
         let tableViewConstraints = [
             tableView.topAnchor.constraint(equalTo: view.topAnchor),
             tableView.leftAnchor.constraint(equalTo: view.readableContentGuide.leftAnchor),
@@ -105,6 +109,11 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
         addSongsButton.setTitle(UIConstants.strings.addSelectedSongs, for: .normal)
         addSongsButton.addConstraints(inSuperview: view)
         self.tableView.tableFooterView = tableViewLoadingFooter
+
+    }
+
+    override func willMove(toParentViewController parent: UIViewController?) {
+        (parent as? UINavigationController)?.navigationBar.apply(DefaultStylesheet.navigationBarStyle)
     }
     
 }
@@ -184,13 +193,12 @@ extension DMSpotifySongSearchViewController {
             .filter { !$0 }
             .drive(refreshControl.rx.isRefreshing)
             .disposed(by: disposeBag)
-
+        
         refreshControl.rx.controlEvent(.valueChanged).asObservable()
             .debug("what", trimOutput: true)
             .bind(to: viewModel.refreshTriggerRelay)
             .disposed(by: disposeBag)
     }
-    
 }
 
 extension DMSpotifySongSearchViewController {
