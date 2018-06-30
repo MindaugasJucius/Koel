@@ -17,8 +17,8 @@ class DMEventManagementViewController: UIViewController, BindableType {
     typealias ViewModelType = DMEventManagementViewModelType
 
     private let disposeBag = DisposeBag()
-    
-    var viewModel: DMEventManagementViewModelType
+    let viewModel: DMEventManagementViewModelType
+    let themeManager: ThemeManager
     
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
@@ -37,8 +37,9 @@ class DMEventManagementViewController: UIViewController, BindableType {
     
     private let playbackControlsView = DMPlaybackControlsView(frame: .zero)
     
-    required init(withViewModel viewModel: DMEventManagementViewModelType) {
+    init(withViewModel viewModel: DMEventManagementViewModelType, themeManager: ThemeManager) {
         self.viewModel = viewModel
+        self.themeManager = themeManager
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -52,9 +53,8 @@ class DMEventManagementViewController: UIViewController, BindableType {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationItem.largeTitleDisplayMode = .always
+        
         title = UIConstants.strings.managementTitle
-        view.backgroundColor = .white
         view.addSubview(tableView)
         
         let tableViewConstraints = [

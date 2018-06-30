@@ -11,17 +11,17 @@ import RxCocoa
 import Action
 import RxSwift
 
-class DMEventSearchViewController: UIViewController, BindableType {
+class DMEventSearchViewController: UIViewController, BindableType, Themeable {
     
     typealias ViewModelType = DMEventSearchViewModel
     
-    var viewModel: DMEventSearchViewModel
-    var themeManager: ThemeManager
-    
-    private var disposeBag = DisposeBag()
-    private var startEventButton = DMKoelButton()
+    private let disposeBag = DisposeBag()
+    let viewModel: DMEventSearchViewModel
+    let themeManager: ThemeManager
     
     //MARK: UI
+    private var startEventButton = DMKoelButton()
+    
     private let tableView = UITableView()
     
     init(withViewModel viewModel: DMEventSearchViewModel, themeManager: ThemeManager) {
@@ -41,13 +41,7 @@ class DMEventSearchViewController: UIViewController, BindableType {
     override func viewDidLoad() {
         super.viewDidLoad()
         title = UIConstants.strings.searchScreenTitle
-                
-        themeManager.currentTheme
-            .do(onNext: { [unowned self] theme in
-                self.view.backgroundColor = theme.backgroundColor
-            })
-            .subscribe()
-        .disposed(by: disposeBag)
+        bindThemeManager()
         
         tableView.backgroundColor = .clear
         tableView.translatesAutoresizingMaskIntoConstraints = false
@@ -64,16 +58,6 @@ class DMEventSearchViewController: UIViewController, BindableType {
         view.addSubview(startEventButton)
         startEventButton.addConstraints(inSuperview: view)
         startEventButton.setTitle(UIConstants.strings.searchScreenButtonStartEventTitle, for: .normal)
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        themeManager.currentTheme
-            .do(onNext: { [unowned self] theme in
-                self.navigationController?.navigationBar.apply(theme.navigationBarColors())
-            })
-            .subscribe()
-            .disposed(by: disposeBag)
     }
     
     func bindViewModel() {
@@ -103,6 +87,16 @@ class DMEventSearchViewController: UIViewController, BindableType {
             .modelSelected(DMEventPeer.self)
             .filter { !$0.isConnected }
             .subscribe(viewModel.requestAccess.inputs)
+            .disposed(by: disposeBag)
+    }
+    
+    func bindThemeManager() {
+        themeNavigationBar()
+            .subscribe()
+            .disposed(by: disposeBag)
+        
+        themeViewColors()
+            .subscribe()
             .disposed(by: disposeBag)
     }
     

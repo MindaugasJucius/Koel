@@ -55,13 +55,21 @@ struct Theme {
         return style
     }
 
+    func viewColors() -> Style<UIView> {
+        let style = Style<UIView> {
+            $0.tintColor = self.tintColor
+            $0.backgroundColor = self.backgroundColor
+        }
+        return style
+    }
+    
 }
 
 class ThemeManager {
     
     static let shared = ThemeManager()
     
-    private let currentThemeRelay = BehaviorRelay(value: Theme.light)
+    private let currentThemeRelay = BehaviorRelay(value: Theme.dark)
     
     var themeValue: Theme {
         return currentThemeRelay.value

@@ -89,7 +89,8 @@ class DMEventSceneCoordinator: NSObject {
     private lazy var songsViewController: UINavigationController = {
         var songsViewController: UIViewController
         if isEventHost {
-            let managementViewController = DMEventManagementViewController(withViewModel: manageEventViewModel)
+            let managementViewController = DMEventManagementViewController(withViewModel: manageEventViewModel,
+                                                                           themeManager: ThemeManager.shared)
             managementViewController.setupForViewModel()
             songsViewController = managementViewController
         } else {
