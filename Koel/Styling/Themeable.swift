@@ -7,6 +7,7 @@
 //
 
 import RxSwift
+import RxCocoa
 
 protocol Themeable {
     
@@ -17,19 +18,21 @@ protocol Themeable {
 
 extension Themeable where Self: UIViewController {
     
-    func themeNavigationBar() -> Observable<Void> {
-        return rx.methodInvoked(#selector(viewWillAppear))
+    func themeNavigationBar() -> Driver<Void> {
+        return rx.methodInvoked(#selector(viewWillAppear)).asSignal(onErrorJustReturn: [])
             .flatMap { _ in return self.themeManager.currentTheme }
-            .do(onNext: { theme in
-                self.navigationController?.navigationBar.apply(theme.navigationBarColors())
+            .do(onNext: { themeType in
+                let navigationBarStyle = ThemeStylesheet.navigationBarColors(forThemeType: themeType)
+                self.navigationController?.navigationBar.apply(navigationBarStyle)
             })
             .map { _ in}
     }
     
-    func themeViewColors() -> Observable<Void> {
+    func themeViewColors() -> Driver<Void> {
         return themeManager.currentTheme
-            .do(onNext: { [unowned self] theme in
-                self.view.apply(theme.viewColors())
+            .do(onNext: { [unowned self] themeType in
+                let viewColorsStyle = ThemeStylesheet.viewColors(forThemeType: themeType)
+                self.view.apply(viewColorsStyle)
             })
             .map { _ in}
     }

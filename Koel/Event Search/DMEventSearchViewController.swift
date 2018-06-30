@@ -92,11 +92,11 @@ class DMEventSearchViewController: UIViewController, BindableType, Themeable {
     
     func bindThemeManager() {
         themeNavigationBar()
-            .subscribe()
+            .drive()
             .disposed(by: disposeBag)
         
         themeViewColors()
-            .subscribe()
+            .drive()
             .disposed(by: disposeBag)
     }
     

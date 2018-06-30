@@ -18,6 +18,20 @@ private let koelLightText = UIColor.colorWithHexString(hex: "FCFCFC")
 
 private let koelTint = UIColor.colorWithHexString(hex: "268CFF")
 
+enum ThemeType {
+    case light
+    case dark
+    
+    var theme: Theme {
+        switch self {
+        case .dark:
+            return Theme.dark
+        case .light:
+            return Theme.light
+        }
+    }
+}
+
 struct Theme {
     let primaryActionColor: UIColor
     let secondaryActionColor: UIColor
@@ -42,41 +56,20 @@ struct Theme {
                             secondaryTextColor: koelDarkText,
                             tintColor: koelTint,
                             backgroundColor: koelDarkText)
-    
-    
-    func navigationBarColors() -> Style<UINavigationBar> {
-        let style = Style<UINavigationBar> {
-            let attributes = [NSAttributedStringKey.foregroundColor: self.primaryTextColor]
-            $0.tintColor = self.tintColor
-            $0.barTintColor = self.backgroundColor
-            $0.largeTitleTextAttributes = attributes
-            $0.titleTextAttributes = attributes
-        }
-        return style
-    }
-
-    func viewColors() -> Style<UIView> {
-        let style = Style<UIView> {
-            $0.tintColor = self.tintColor
-            $0.backgroundColor = self.backgroundColor
-        }
-        return style
-    }
-    
 }
 
 class ThemeManager {
     
     static let shared = ThemeManager()
     
-    private let currentThemeRelay = BehaviorRelay(value: Theme.dark)
+    private let currentThemeRelay = BehaviorRelay(value: ThemeType.dark)
     
     var themeValue: Theme {
-        return currentThemeRelay.value
+        return currentThemeRelay.value.theme
     }
     
-    var currentTheme: Observable<Theme> {
-        return currentThemeRelay.asObservable().share()
+    var currentTheme: Driver<ThemeType> {
+        return currentThemeRelay.asDriver()
     }
     
 }

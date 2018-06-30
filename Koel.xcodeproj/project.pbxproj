@@ -20,6 +20,7 @@
 		03A2F73F20DE8CA10045B2E7 /* DMEventSceneCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03A2F73E20DE8CA10045B2E7 /* DMEventSceneCoordinator.swift */; };
 		03BC358B20E6C2580099E647 /* ThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03BC358A20E6C2580099E647 /* ThemeManager.swift */; };
 		03BC358D20E7714B0099E647 /* Themeable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03BC358C20E7714B0099E647 /* Themeable.swift */; };
+		03BC358F20E791950099E647 /* ThemeStylesheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03BC358E20E791950099E647 /* ThemeStylesheet.swift */; };
 		03E47D4420E0C88D0000F480 /* DMSearchResultSong.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03E47D4320E0C88D0000F480 /* DMSearchResultSong.swift */; };
 		33CD43033F2349BABFA21363 /* Pods_Koel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 859C054680781DDB43D6FFC3 /* Pods_Koel.framework */; };
 		47ADB8775C90C90A34CB0B4E /* Pods_KoelTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C68936EB8AF29A19F4BC4C74 /* Pods_KoelTests.framework */; };
@@ -101,6 +102,7 @@
 		03A2F73E20DE8CA10045B2E7 /* DMEventSceneCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEventSceneCoordinator.swift; sourceTree = "<group>"; };
 		03BC358A20E6C2580099E647 /* ThemeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeManager.swift; sourceTree = "<group>"; };
 		03BC358C20E7714B0099E647 /* Themeable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Themeable.swift; sourceTree = "<group>"; };
+		03BC358E20E791950099E647 /* ThemeStylesheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeStylesheet.swift; sourceTree = "<group>"; };
 		03E47D4320E0C88D0000F480 /* DMSearchResultSong.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMSearchResultSong.swift; sourceTree = "<group>"; };
 		1EEEA22101255BEC78867464 /* Pods-Koel.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Koel.release.xcconfig"; path = "Pods/Target Support Files/Pods-Koel/Pods-Koel.release.xcconfig"; sourceTree = "<group>"; };
 		2F9833A4A17A19528964480E /* Pods-Koel.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Koel.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Koel/Pods-Koel.debug.xcconfig"; sourceTree = "<group>"; };
@@ -357,6 +359,7 @@
 				5FB2C93F1FE8075F001D532F /* Stylesheet.swift */,
 				03BC358A20E6C2580099E647 /* ThemeManager.swift */,
 				03BC358C20E7714B0099E647 /* Themeable.swift */,
+				03BC358E20E791950099E647 /* ThemeStylesheet.swift */,
 			);
 			path = Styling;
 			sourceTree = "<group>";
@@ -659,6 +662,7 @@
 				031D904620566EB3007D1156 /* SongSharingViewModelType.swift in Sources */,
 				5F37D88A1FF3D0A6002E0ACD /* DMSpotifyAuthService.swift in Sources */,
 				5FAFD146206FF5BE00077E39 /* DMSpotifySongTableViewCell.swift in Sources */,
+				03BC358F20E791950099E647 /* ThemeStylesheet.swift in Sources */,
 				5F014BD61FB9E29700079009 /* UIColor+Extensions.swift in Sources */,
 				5F81861C1FD3FAB000477C71 /* SceneCoordinator.swift in Sources */,
 				035596E1206804460067A737 /* DMSpotifySongSearchViewModel.swift in Sources */,
