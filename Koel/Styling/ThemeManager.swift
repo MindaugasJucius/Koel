@@ -11,10 +11,18 @@ import RxSwift
 
 private let koelPink = UIColor.colorWithHexString(hex: "EB028D")
 private let koelDisabled = UIColor.colorWithHexString(hex: "BDC3C7")
-private let koelBackground = UIColor.colorWithHexString(hex: "FCFCFC")
 
-private let koelDarkText = UIColor.colorWithHexString(hex: "14110E")
-private let koelLightText = UIColor.colorWithHexString(hex: "FCFCFC")
+private let koelBackground = UIColor.colorWithHexString(hex: "FCFCFC")
+private let koelSelectedBackground = UIColor.colorWithHexString(hex: "EBF4FF")
+
+private let koelDarkBackground = UIColor.colorWithHexString(hex: "14110E")
+private let koelDarkSelectedBackground = UIColor.colorWithHexString(hex: "191D2A")
+
+private let koelText = UIColor.colorWithHexString(hex: "14110E")
+private let koelTextSecondary = UIColor.colorWithHexString(hex: "2D313D")
+
+private let koelTextOnDark = UIColor.colorWithHexString(hex: "FCFCFC")
+private let koelTextSecondaryOnDark = UIColor.colorWithHexString(hex: "BEBEBE")
 
 private let koelTint = UIColor.colorWithHexString(hex: "268CFF")
 
@@ -40,22 +48,25 @@ struct Theme {
     let secondaryTextColor: UIColor
     let tintColor: UIColor
     let backgroundColor: UIColor
+    let selectedBackground: UIColor
     
     static let light = Theme(primaryActionColor: koelPink,
                              secondaryActionColor: koelTint,
                              disabledColor: koelDisabled,
-                             primaryTextColor: koelDarkText,
-                             secondaryTextColor: koelLightText,
+                             primaryTextColor: koelText,
+                             secondaryTextColor: koelTextSecondary,
                              tintColor: koelTint,
-                             backgroundColor: koelBackground)
+                             backgroundColor: koelBackground,
+                             selectedBackground: koelSelectedBackground)
 
     static let dark = Theme(primaryActionColor: koelTint,
                             secondaryActionColor: koelPink,
                             disabledColor: koelDisabled,
-                            primaryTextColor: koelLightText,
-                            secondaryTextColor: koelDarkText,
+                            primaryTextColor: koelTextOnDark,
+                            secondaryTextColor: koelTextSecondaryOnDark,
                             tintColor: koelTint,
-                            backgroundColor: koelDarkText)
+                            backgroundColor: koelDarkBackground,
+                            selectedBackground: koelDarkSelectedBackground)
 }
 
 class ThemeManager {

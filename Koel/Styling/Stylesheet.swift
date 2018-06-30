@@ -23,14 +23,13 @@ enum DefaultStylesheet {
 enum SongCellStylesheet {
     
     static let titleLabelStyle = Style<UILabel> {
-        $0.font = UIFont.preferredFont(forTextStyle: .headline)
+        $0.font = UIFont.preferredFont(forTextStyle: .title2)
         $0.numberOfLines = 1
     }
     
     static let subtitleLabelStyle = Style<UILabel> {
-        $0.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        $0.font = UIFont.preferredFont(forTextStyle: .headline)
         $0.numberOfLines = 1
     }
     
 }
-

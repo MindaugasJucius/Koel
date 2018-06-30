@@ -38,6 +38,9 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType, Themeab
     
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
+        tableView.separatorStyle = .none
+        tableView.clipsToBounds = false
+        tableView.backgroundColor = .clear
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.allowsMultipleSelection = true
         tableView.register(DMSpotifySongTableViewCell.self,
