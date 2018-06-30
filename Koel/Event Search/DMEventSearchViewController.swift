@@ -16,7 +16,7 @@ class DMEventSearchViewController: UIViewController, BindableType {
     typealias ViewModelType = DMEventSearchViewModel
     
     var viewModel: DMEventSearchViewModel
-    var themeManager: ThemeManager?
+    var themeManager: ThemeManager
     
     private var disposeBag = DisposeBag()
     private var startEventButton = DMKoelButton()
@@ -24,14 +24,10 @@ class DMEventSearchViewController: UIViewController, BindableType {
     //MARK: UI
     private let tableView = UITableView()
     
-    required init(withViewModel viewModel: DMEventSearchViewModel) {
+    init(withViewModel viewModel: DMEventSearchViewModel, themeManager: ThemeManager) {
+        self.themeManager = themeManager
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
-    }
-    
-    convenience init(withViewModel viewModel: DMEventSearchViewModel, themeManager: ThemeManager) {
-        self.init(withViewModel: viewModel)
-        self.themeManager = themeManager
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -46,7 +42,7 @@ class DMEventSearchViewController: UIViewController, BindableType {
         super.viewDidLoad()
         title = UIConstants.strings.searchScreenTitle
                 
-        themeManager?.currentTheme
+        themeManager.currentTheme
             .do(onNext: { [unowned self] theme in
                 self.view.backgroundColor = theme.backgroundColor
             })
@@ -72,7 +68,7 @@ class DMEventSearchViewController: UIViewController, BindableType {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        themeManager?.currentTheme
+        themeManager.currentTheme
             .do(onNext: { [unowned self] theme in
                 self.navigationController?.navigationBar.apply(theme.navigationBarColors())
             })

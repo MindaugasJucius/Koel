@@ -22,22 +22,31 @@ struct Theme {
     let primaryActionColor: UIColor
     let secondaryActionColor: UIColor
     let disabledColor: UIColor
-    let lightTextColor: UIColor
-    let darkTextColor: UIColor
+    let primaryTextColor: UIColor
+    let secondaryTextColor: UIColor
     let tintColor: UIColor
     let backgroundColor: UIColor
     
     static let light = Theme(primaryActionColor: koelPink,
                              secondaryActionColor: koelTint,
                              disabledColor: koelDisabled,
-                             lightTextColor: koelLightText,
-                             darkTextColor: koelDarkText,
+                             primaryTextColor: koelDarkText,
+                             secondaryTextColor: koelLightText,
                              tintColor: koelTint,
                              backgroundColor: koelBackground)
+
+    static let dark = Theme(primaryActionColor: koelPink,
+                            secondaryActionColor: koelTint,
+                            disabledColor: koelDisabled,
+                            primaryTextColor: koelLightText,
+                            secondaryTextColor: koelDarkText,
+                            tintColor: koelTint,
+                            backgroundColor: koelDarkText)
+    
     
     func navigationBarColors() -> Style<UINavigationBar> {
         let style = Style<UINavigationBar> {
-            let attributes = [NSAttributedStringKey.foregroundColor: self.darkTextColor]
+            let attributes = [NSAttributedStringKey.foregroundColor: self.primaryTextColor]
             $0.tintColor = self.tintColor
             $0.barTintColor = self.backgroundColor
             $0.largeTitleTextAttributes = attributes

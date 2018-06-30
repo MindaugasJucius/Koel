@@ -19,8 +19,6 @@ protocol BindableType {
     
     var viewModel: ViewModelType { get }
     
-    init(withViewModel viewModel: ViewModelType)
-    
     func bindViewModel()
 }
 
