@@ -7,13 +7,14 @@
 //
 
 import UIKit
+import RxSwift
 
 protocol KoelButtonColorable {
     var textColor: UIColor { get set }
     var backgroundColor: CGColor { get set }
     var shadowColor: CGColor { get set }
 
-    init(theme: Theme)
+    init(themeType: ThemeType)
 }
 
 private struct KoelButtonColors: KoelButtonColorable {
@@ -21,7 +22,8 @@ private struct KoelButtonColors: KoelButtonColorable {
     var backgroundColor: CGColor
     var shadowColor: CGColor
 
-    init(theme: Theme) {
+    init(themeType: ThemeType) {
+        let theme = themeType.theme
         self.textColor = .white
         self.backgroundColor = theme.primaryActionColor.cgColor
         self.shadowColor = theme.primaryActionColor.cgColor
@@ -33,7 +35,8 @@ private struct KoelButtonDisabledColors: KoelButtonColorable {
     var backgroundColor: CGColor
     var shadowColor: CGColor
     
-    init(theme: Theme) {
+    init(themeType: ThemeType) {
+        let theme = themeType.theme
         self.textColor = .gray
         self.backgroundColor = theme.disabledColor.cgColor
         self.shadowColor = theme.disabledColor.cgColor
@@ -46,7 +49,7 @@ protocol KoelButtonAppearance {
     var shadowOpacity: Float { get }
     var shadowRadius: CGFloat { get }
     var dimmingViewOpacity: Float { get }
-    var colors: KoelButtonColorable { get }
+    var colors: KoelButtonColorable { get set }
 }
 
 private struct KoelButtonStartAppearance: KoelButtonAppearance {
@@ -56,7 +59,7 @@ private struct KoelButtonStartAppearance: KoelButtonAppearance {
     let shadowOpacity: Float
     let shadowRadius: CGFloat
     let dimmingViewOpacity: Float
-    let colors: KoelButtonColorable
+    var colors: KoelButtonColorable
     
     init(buttonColors: KoelButtonColorable) {
         transform = CATransform3DIdentity
@@ -75,7 +78,7 @@ private struct KoelButtonDisabledAppearance: KoelButtonAppearance {
     let shadowOpacity: Float
     let shadowRadius: CGFloat
     let dimmingViewOpacity: Float
-    let colors: KoelButtonColorable
+    var colors: KoelButtonColorable
     
     init(buttonColors: KoelButtonColorable) {
         transform = CATransform3DIdentity
@@ -93,7 +96,7 @@ struct KoelButtonEndAppearance: KoelButtonAppearance {
     let shadowOpacity: Float
     let shadowRadius: CGFloat
     let dimmingViewOpacity: Float
-    let colors: KoelButtonColorable
+    var colors: KoelButtonColorable
     
     init(buttonColors: KoelButtonColorable) {
         transform = CATransform3DMakeScale(0.98, 0.98, 1)
@@ -110,15 +113,17 @@ private let CornerRadius: CGFloat = 25
 private let Insets = UIEdgeInsets(top: 0, left: 50, bottom: 25, right: 50)
 private let Height: CGFloat = 50
 
-class DMKoelButton: UIButton {
+class DMKoelButton: UIButton, Themeable {
+
+    private let disposeBag = DisposeBag()
     
-    private var themeManager: ThemeManager
+    let themeManager: ThemeManager
     
-    private var currentAppearance: KoelButtonAppearance
+    private var currentAppearance: KoelButtonAppearance!
     
-    private let startAppearance: KoelButtonAppearance
-    private let endAppearance: KoelButtonAppearance
-    private let disabledAppearance: KoelButtonDisabledAppearance
+    private var startAppearance: KoelButtonAppearance!
+    private var endAppearance: KoelButtonAppearance!
+    private var disabledAppearance: KoelButtonDisabledAppearance!
     
     private lazy var dimmingView: UIView = { this in
         let view = UIView(frame: .zero)
@@ -151,33 +156,55 @@ class DMKoelButton: UIButton {
     
     init(themeManager: ThemeManager) {
         self.themeManager = themeManager
-        let currentTheme = themeManager.themeValue
         
-        self.disabledAppearance = KoelButtonDisabledAppearance(buttonColors: KoelButtonDisabledColors(theme: currentTheme))
-        self.endAppearance = KoelButtonEndAppearance(buttonColors: KoelButtonColors(theme: currentTheme))
-        self.startAppearance = KoelButtonStartAppearance(buttonColors: KoelButtonColors(theme: currentTheme))
-
-        self.currentAppearance = self.startAppearance
         super.init(frame: .zero)
         
+        //updateAppearances(forThemeType: currentTheme)
         initialConfiguration()
-        configure(withAppearance: self.startAppearance)
+        bindThemeManager()
     }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("not implemented")
     }
     
+    func bindThemeManager() {
+        themeManager.currentTheme
+            .do(onNext: { [unowned self] themeType in
+                self.updateAppearances(forThemeType: themeType)
+            })
+            .drive()
+            .disposed(by: disposeBag)
+    }
+    
+    private func updateAppearances(forThemeType themeType: ThemeType) {
+        let disabledColors = KoelButtonDisabledColors(themeType: themeType)
+        let buttonColors = KoelButtonColors(themeType: themeType)
+        
+        let disabledAppearance = KoelButtonDisabledAppearance(buttonColors: disabledColors)
+        let endAppearance = KoelButtonEndAppearance(buttonColors: buttonColors)
+        let startAppearance = KoelButtonStartAppearance(buttonColors: buttonColors)
+        
+        if self.isEnabled {
+            self.currentAppearance = startAppearance
+        } else {
+            self.currentAppearance = disabledAppearance
+        }
+        
+        self.startAppearance = startAppearance
+        self.endAppearance = endAppearance
+        self.disabledAppearance = disabledAppearance
+        
+        configure(withAppearance: self.currentAppearance)
+    }
+    
     private func initialConfiguration() {
         translatesAutoresizingMaskIntoConstraints = false
         titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .medium)
-        setTitleColor(startAppearance.colors.textColor, for: .normal)
-        setTitleColor(endAppearance.colors.textColor, for: .highlighted)
         
         layer.cornerRadius = CornerRadius
         layer.masksToBounds = false
-        layer.shadowColor = currentAppearance.colors.shadowColor
-        
+
         addTarget(self, action: #selector(dragEnter), for: .touchDragEnter)
         addTarget(self, action: #selector(touchDown), for: .touchDown)
         

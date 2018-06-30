@@ -49,8 +49,8 @@ struct Theme {
                              tintColor: koelTint,
                              backgroundColor: koelBackground)
 
-    static let dark = Theme(primaryActionColor: koelPink,
-                            secondaryActionColor: koelTint,
+    static let dark = Theme(primaryActionColor: koelTint,
+                            secondaryActionColor: koelPink,
                             disabledColor: koelDisabled,
                             primaryTextColor: koelLightText,
                             secondaryTextColor: koelDarkText,
@@ -62,10 +62,11 @@ class ThemeManager {
     
     static let shared = ThemeManager()
     
-    private let currentThemeRelay = BehaviorRelay(value: ThemeType.dark)
+    private let currentThemeRelay = BehaviorRelay(value: ThemeType.light)
+
     
-    var themeValue: Theme {
-        return currentThemeRelay.value.theme
+    var themeValue: ThemeType {
+        return currentThemeRelay.value
     }
     
     var currentTheme: Driver<ThemeType> {
