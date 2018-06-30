@@ -8,60 +8,82 @@
 
 import UIKit
 
+protocol KoelButtonColorable {
+    var textColor: UIColor { get set }
+    var backgroundColor: CGColor { get set }
+    var shadowColor: CGColor { get set }
+
+    init(theme: Theme)
+}
+
+private struct KoelButtonColors: KoelButtonColorable {
+    var textColor: UIColor
+    var backgroundColor: CGColor
+    var shadowColor: CGColor
+
+    init(theme: Theme) {
+        self.textColor = .white
+        self.backgroundColor = theme.primaryActionColor.cgColor
+        self.shadowColor = theme.primaryActionColor.cgColor
+    }
+}
+
+private struct KoelButtonDisabledColors: KoelButtonColorable {
+    var textColor: UIColor
+    var backgroundColor: CGColor
+    var shadowColor: CGColor
+    
+    init(theme: Theme) {
+        self.textColor = .gray
+        self.backgroundColor = theme.disabledColor.cgColor
+        self.shadowColor = theme.disabledColor.cgColor
+    }
+}
+
 protocol KoelButtonAppearance {
     var transform: CATransform3D { get }
     var shadowOffset: CGSize { get }
     var shadowOpacity: Float { get }
     var shadowRadius: CGFloat { get }
-    var textColor: UIColor { get }
-    var backgroundColor: CGColor { get }
     var dimmingViewOpacity: Float { get }
-    var shadowColor: CGColor { get }
+    var colors: KoelButtonColorable { get }
 }
 
-struct KoelButtonStartAppearance: KoelButtonAppearance {
+private struct KoelButtonStartAppearance: KoelButtonAppearance {
     
     let transform: CATransform3D
     let shadowOffset: CGSize
     let shadowOpacity: Float
     let shadowRadius: CGFloat
-    let backgroundColor: CGColor
-    let textColor: UIColor
     let dimmingViewOpacity: Float
-    let shadowColor: CGColor
+    let colors: KoelButtonColorable
     
-    init() {
+    init(buttonColors: KoelButtonColorable) {
         transform = CATransform3DIdentity
         shadowOffset = CGSize(width: 0, height: 8)
         shadowOpacity = 0.4
         shadowRadius = 5
-        backgroundColor = ThemeManager.shared.themeValue.primaryActionColor.cgColor
-        textColor = .white
+        colors = buttonColors
         dimmingViewOpacity = 0
-        shadowColor = ThemeManager.shared.themeValue.primaryActionColor.cgColor
     }
 }
 
-struct KoelButtonDisabledAppearance: KoelButtonAppearance {
+private struct KoelButtonDisabledAppearance: KoelButtonAppearance {
     
     let transform: CATransform3D
     let shadowOffset: CGSize
     let shadowOpacity: Float
     let shadowRadius: CGFloat
-    let backgroundColor: CGColor
-    let textColor: UIColor
     let dimmingViewOpacity: Float
-    let shadowColor: CGColor
+    let colors: KoelButtonColorable
     
-    init() {
+    init(buttonColors: KoelButtonColorable) {
         transform = CATransform3DIdentity
         shadowOffset = CGSize(width: 0, height: 8)
         shadowOpacity = 0.4
         shadowRadius = 5
-        backgroundColor = ThemeManager.shared.themeValue.disabledColor.cgColor
-        textColor = .gray
+        colors = buttonColors
         dimmingViewOpacity = 0
-        shadowColor = ThemeManager.shared.themeValue.disabledColor.cgColor
     }
 }
 
@@ -70,20 +92,16 @@ struct KoelButtonEndAppearance: KoelButtonAppearance {
     let shadowOffset: CGSize
     let shadowOpacity: Float
     let shadowRadius: CGFloat
-    let backgroundColor: CGColor
-    let textColor: UIColor
     let dimmingViewOpacity: Float
-    let shadowColor: CGColor
+    let colors: KoelButtonColorable
     
-    init() {
+    init(buttonColors: KoelButtonColorable) {
         transform = CATransform3DMakeScale(0.98, 0.98, 1)
         shadowOffset = CGSize(width: 0, height: 6)
         shadowOpacity = 0.5
         shadowRadius = 3
-        backgroundColor = ThemeManager.shared.themeValue.primaryActionColor.cgColor
-        textColor = .white
+        colors = buttonColors
         dimmingViewOpacity = 0.5
-        shadowColor = ThemeManager.shared.themeValue.primaryActionColor.cgColor
     }
 }
 
@@ -94,10 +112,12 @@ private let Height: CGFloat = 50
 
 class DMKoelButton: UIButton {
     
+    private var themeManager: ThemeManager
+    
     private var currentAppearance: KoelButtonAppearance
     
-    private var startAppearance: KoelButtonAppearance
-    private var endAppearance: KoelButtonAppearance
+    private let startAppearance: KoelButtonAppearance
+    private let endAppearance: KoelButtonAppearance
     private let disabledAppearance: KoelButtonDisabledAppearance
     
     private lazy var dimmingView: UIView = { this in
@@ -129,16 +149,19 @@ class DMKoelButton: UIButton {
         }
     }
     
-    init(withInitialAppearance initialAppearance: KoelButtonAppearance = KoelButtonStartAppearance(),
-         endAppearance: KoelButtonAppearance = KoelButtonEndAppearance()) {
-        self.currentAppearance = initialAppearance
-        self.startAppearance = initialAppearance
-        self.endAppearance = endAppearance
-        self.disabledAppearance = KoelButtonDisabledAppearance()
+    init(themeManager: ThemeManager) {
+        self.themeManager = themeManager
+        let currentTheme = themeManager.themeValue
+        
+        self.disabledAppearance = KoelButtonDisabledAppearance(buttonColors: KoelButtonDisabledColors(theme: currentTheme))
+        self.endAppearance = KoelButtonEndAppearance(buttonColors: KoelButtonColors(theme: currentTheme))
+        self.startAppearance = KoelButtonStartAppearance(buttonColors: KoelButtonColors(theme: currentTheme))
+
+        self.currentAppearance = self.startAppearance
         super.init(frame: .zero)
         
         initialConfiguration()
-        configure(withAppearance: initialAppearance)
+        configure(withAppearance: self.startAppearance)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -148,12 +171,12 @@ class DMKoelButton: UIButton {
     private func initialConfiguration() {
         translatesAutoresizingMaskIntoConstraints = false
         titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .medium)
-        setTitleColor(startAppearance.textColor, for: .normal)
-        setTitleColor(endAppearance.textColor, for: .highlighted)
+        setTitleColor(startAppearance.colors.textColor, for: .normal)
+        setTitleColor(endAppearance.colors.textColor, for: .highlighted)
         
         layer.cornerRadius = CornerRadius
         layer.masksToBounds = false
-        layer.shadowColor = currentAppearance.shadowColor
+        layer.shadowColor = currentAppearance.colors.shadowColor
         
         addTarget(self, action: #selector(dragEnter), for: .touchDragEnter)
         addTarget(self, action: #selector(touchDown), for: .touchDown)
@@ -184,9 +207,9 @@ class DMKoelButton: UIButton {
         layer.shadowRadius = appearance.shadowRadius
         layer.shadowOffset = appearance.shadowOffset
         layer.shadowOpacity = appearance.shadowOpacity
-        layer.shadowColor = appearance.shadowColor
-        layer.backgroundColor = appearance.backgroundColor
-        setTitleColor(appearance.textColor, for: .normal)
+        layer.shadowColor = appearance.colors.shadowColor
+        layer.backgroundColor = appearance.colors.backgroundColor
+        setTitleColor(appearance.colors.textColor, for: .normal)
         dimmingView.layer.opacity = appearance.dimmingViewOpacity
     }
     
@@ -218,8 +241,8 @@ class DMKoelButton: UIButton {
         shadowRadiusAnimation.toValue = appearance.shadowRadius
         
         let shadowColorAnimation = CABasicAnimation(keyPath: "shadowColor")
-        shadowColorAnimation.fromValue = currentAppearance.shadowColor
-        shadowColorAnimation.toValue = appearance.shadowColor
+        shadowColorAnimation.fromValue = currentAppearance.colors.shadowColor
+        shadowColorAnimation.toValue = appearance.colors.shadowColor
         
         let shadowGroup = CAAnimationGroup()
         shadowGroup.animations = [shadowOffsetAnimation,
@@ -230,8 +253,8 @@ class DMKoelButton: UIButton {
 
         // Button's view animations
         let backgroundColorAnimation = CABasicAnimation(keyPath: "backgroundColor")
-        backgroundColorAnimation.fromValue = currentAppearance.backgroundColor
-        backgroundColorAnimation.toValue = appearance.backgroundColor
+        backgroundColorAnimation.fromValue = currentAppearance.colors.backgroundColor
+        backgroundColorAnimation.toValue = appearance.colors.backgroundColor
         
         let transformAnimation = CABasicAnimation(keyPath: "transform")
         transformAnimation.fromValue = currentAppearance.transform

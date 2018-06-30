@@ -20,13 +20,13 @@ class DMEventSearchViewController: UIViewController, BindableType, Themeable {
     let themeManager: ThemeManager
     
     //MARK: UI
-    private var startEventButton = DMKoelButton()
-    
+    private var startEventButton: DMKoelButton
     private let tableView = UITableView()
     
     init(withViewModel viewModel: DMEventSearchViewModel, themeManager: ThemeManager) {
         self.themeManager = themeManager
         self.viewModel = viewModel
+        self.startEventButton = DMKoelButton(themeManager: themeManager)
         super.init(nibName: nil, bundle: nil)
     }
     

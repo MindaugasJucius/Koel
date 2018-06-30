@@ -33,7 +33,7 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
     
     //MARK: UI Elements
     
-    private var addSongsButton = DMKoelButton()
+    private var addSongsButton = DMKoelButton(themeManager: ThemeManager.shared)
     
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
