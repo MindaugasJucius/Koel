@@ -22,7 +22,7 @@ class DMEventSearchViewController: UIViewController, BindableType, Themeable {
     //MARK: UI
     private var startEventButton: DMKoelButton
     private let tableView = UITableView()
-        
+    
     init(withViewModel viewModel: DMEventSearchViewModel, themeManager: ThemeManager) {
         self.themeManager = themeManager
         self.viewModel = viewModel

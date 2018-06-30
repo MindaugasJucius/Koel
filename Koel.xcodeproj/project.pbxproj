@@ -21,6 +21,7 @@
 		03BC358B20E6C2580099E647 /* ThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03BC358A20E6C2580099E647 /* ThemeManager.swift */; };
 		03BC358D20E7714B0099E647 /* Themeable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03BC358C20E7714B0099E647 /* Themeable.swift */; };
 		03BC358F20E791950099E647 /* ThemeStylesheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03BC358E20E791950099E647 /* ThemeStylesheet.swift */; };
+		03BC359120E7DB100099E647 /* KoelPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03BC359020E7DB100099E647 /* KoelPageViewController.swift */; };
 		03E47D4420E0C88D0000F480 /* DMSearchResultSong.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03E47D4320E0C88D0000F480 /* DMSearchResultSong.swift */; };
 		33CD43033F2349BABFA21363 /* Pods_Koel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 859C054680781DDB43D6FFC3 /* Pods_Koel.framework */; };
 		47ADB8775C90C90A34CB0B4E /* Pods_KoelTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C68936EB8AF29A19F4BC4C74 /* Pods_KoelTests.framework */; };
@@ -30,7 +31,6 @@
 		5F01EBFF1F8FD28400E47E6A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5F01EBFE1F8FD28400E47E6A /* Assets.xcassets */; };
 		5F01EC021F8FD28400E47E6A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5F01EC001F8FD28400E47E6A /* LaunchScreen.storyboard */; };
 		5F01EC0D1F8FD28400E47E6A /* KoelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F01EC0C1F8FD28400E47E6A /* KoelTests.swift */; };
-		5F01EC231F925EB200E47E6A /* CKRecord+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F01EC221F925EB200E47E6A /* CKRecord+Extensions.swift */; };
 		5F37D8821FF3C4CC002E0ACD /* SpotifyMetadata.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F37D87F1FF3C4CB002E0ACD /* SpotifyMetadata.framework */; };
 		5F37D8831FF3C4CC002E0ACD /* SpotifyAudioPlayback.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F37D8801FF3C4CC002E0ACD /* SpotifyAudioPlayback.framework */; };
 		5F37D8841FF3C4CC002E0ACD /* SpotifyAuthentication.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F37D8811FF3C4CC002E0ACD /* SpotifyAuthentication.framework */; };
@@ -103,6 +103,7 @@
 		03BC358A20E6C2580099E647 /* ThemeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeManager.swift; sourceTree = "<group>"; };
 		03BC358C20E7714B0099E647 /* Themeable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Themeable.swift; sourceTree = "<group>"; };
 		03BC358E20E791950099E647 /* ThemeStylesheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeStylesheet.swift; sourceTree = "<group>"; };
+		03BC359020E7DB100099E647 /* KoelPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KoelPageViewController.swift; sourceTree = "<group>"; };
 		03E47D4320E0C88D0000F480 /* DMSearchResultSong.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMSearchResultSong.swift; sourceTree = "<group>"; };
 		1EEEA22101255BEC78867464 /* Pods-Koel.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Koel.release.xcconfig"; path = "Pods/Target Support Files/Pods-Koel/Pods-Koel.release.xcconfig"; sourceTree = "<group>"; };
 		2F9833A4A17A19528964480E /* Pods-Koel.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Koel.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Koel/Pods-Koel.debug.xcconfig"; sourceTree = "<group>"; };
@@ -118,7 +119,6 @@
 		5F01EC0C1F8FD28400E47E6A /* KoelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KoelTests.swift; sourceTree = "<group>"; };
 		5F01EC0E1F8FD28400E47E6A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5F01EC171F8FD2A600E47E6A /* Koel.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Koel.entitlements; sourceTree = "<group>"; };
-		5F01EC221F925EB200E47E6A /* CKRecord+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CKRecord+Extensions.swift"; sourceTree = "<group>"; };
 		5F37D87F1FF3C4CB002E0ACD /* SpotifyMetadata.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SpotifyMetadata.framework; sourceTree = "<group>"; };
 		5F37D8801FF3C4CC002E0ACD /* SpotifyAudioPlayback.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SpotifyAudioPlayback.framework; sourceTree = "<group>"; };
 		5F37D8811FF3C4CC002E0ACD /* SpotifyAuthentication.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SpotifyAuthentication.framework; sourceTree = "<group>"; };
@@ -339,7 +339,6 @@
 			isa = PBXGroup;
 			children = (
 				5F58F0301F9CB793006B9B47 /* UIViewController+Extensions.swift */,
-				5F01EC221F925EB200E47E6A /* CKRecord+Extensions.swift */,
 				5F014BD51FB9E29700079009 /* UIColor+Extensions.swift */,
 				5F81861D1FD3FADB00477C71 /* UINavigationController+Rx.swift */,
 				5FB2C9371FE7F428001D532F /* CALayer+Extensions.swift */,
@@ -386,6 +385,7 @@
 				5F9C2D221FDED1970067BDC4 /* DMKoelButton.swift */,
 				5F93078720D5214B00DE9FD1 /* DMKoelLoadingView.swift */,
 				5F93078920D67E4600DE9FD1 /* DMKoelEmptyPlaceholderView.swift */,
+				03BC359020E7DB100099E647 /* KoelPageViewController.swift */,
 			);
 			path = "UI Elements";
 			sourceTree = "<group>";
@@ -651,7 +651,6 @@
 				5F58F0311F9CB793006B9B47 /* UIViewController+Extensions.swift in Sources */,
 				039A2C6E207A438A00C58BE5 /* Array+Extensions.swift in Sources */,
 				039A726D20C866AB0078D0CD /* ReachabilityService.swift in Sources */,
-				5F01EC231F925EB200E47E6A /* CKRecord+Extensions.swift in Sources */,
 				03E47D4420E0C88D0000F480 /* DMSearchResultSong.swift in Sources */,
 				5F601D3B1FD043DC003DE897 /* DMEventMultipeerService.swift in Sources */,
 				5F54458E1FD198C40059A975 /* DMEventInvitationsViewController.swift in Sources */,
@@ -665,6 +664,7 @@
 				03BC358F20E791950099E647 /* ThemeStylesheet.swift in Sources */,
 				5F014BD61FB9E29700079009 /* UIColor+Extensions.swift in Sources */,
 				5F81861C1FD3FAB000477C71 /* SceneCoordinator.swift in Sources */,
+				03BC359120E7DB100099E647 /* KoelPageViewController.swift in Sources */,
 				035596E1206804460067A737 /* DMSpotifySongSearchViewModel.swift in Sources */,
 				5F8186181FD3F7F200477C71 /* BindableType.swift in Sources */,
 				5F81861A1FD3FA6800477C71 /* SceneCoordinatorType.swift in Sources */,

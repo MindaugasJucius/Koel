@@ -62,8 +62,14 @@ class ThemeManager {
     
     static let shared = ThemeManager()
     
-    private let currentThemeRelay = BehaviorRelay(value: ThemeType.light)
-
+    private let currentThemeRelay = BehaviorRelay(value: ThemeType.dark)
+    
+    init() {
+        Timer.scheduledTimer(withTimeInterval: 3, repeats: true) { timer in
+            let newTheme: ThemeType = self.themeValue == .light ? .dark : .light
+            self.currentThemeRelay.accept(newTheme)
+        }
+    }
     
     var themeValue: ThemeType {
         return currentThemeRelay.value

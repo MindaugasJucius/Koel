@@ -27,13 +27,7 @@ class DMEventSceneCoordinator: NSObject {
     private let multipeerService: DMEventMultipeerService
     private let isEventHost: Bool
     
-    private lazy var pageViewController: UIPageViewController = {
-        let pageViewController = UIPageViewController(transitionStyle: .scroll,
-                                                      navigationOrientation: .horizontal,
-                                                      options: nil)
-        pageViewController.view.backgroundColor = .white
-        return pageViewController
-    }()
+    private lazy var pageViewController = KoelPageViewController(themeManager: ThemeManager.shared)
     
     private let scenes: [ManagementScene] = [.invites, .songs, .search]
     private lazy var scenesViewControllerDict: [ManagementScene: UIViewController] = [.invites: invitesViewController,
