@@ -12,8 +12,8 @@ import RxCocoa
 import RxSwift
 import Action
 
-class DMEventManagementViewController: UIViewController, BindableType {
-    
+class DMEventManagementViewController: UIViewController, BindableType, Themeable {
+
     typealias ViewModelType = DMEventManagementViewModelType
 
     private let disposeBag = DisposeBag()
@@ -23,6 +23,7 @@ class DMEventManagementViewController: UIViewController, BindableType {
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
         tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.backgroundColor = .clear
         tableView.register(DMEventSongPersistedTableViewCell.self, forCellReuseIdentifier: DMEventSongPersistedTableViewCell.reuseIdentifier)
         return tableView
     }()
@@ -53,7 +54,7 @@ class DMEventManagementViewController: UIViewController, BindableType {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        bindThemeManager()
         title = UIConstants.strings.managementTitle
         view.addSubview(tableView)
         
@@ -107,6 +108,16 @@ class DMEventManagementViewController: UIViewController, BindableType {
         
         viewModel.isPlaying.map { $0 ? "PAUSE" : "PLAY" }
             .bind(to: playbackControlsView.playPauseSongButton.rx.title())
+            .disposed(by: disposeBag)
+    }
+    
+    func bindThemeManager() {
+        themeNavigationBar()
+            .drive()
+            .disposed(by: disposeBag)
+
+        themeViewColors()
+            .drive()
             .disposed(by: disposeBag)
     }
     

@@ -23,11 +23,12 @@ extension UIScrollView {
 
 }
 
-class DMSpotifySongSearchViewController: UIViewController, BindableType {
+class DMSpotifySongSearchViewController: UIViewController, BindableType, Themeable {
     
     typealias ViewModelType = DMSpotifySongSearchViewModelType
 
-    var viewModel: DMSpotifySongSearchViewModelType
+    let viewModel: DMSpotifySongSearchViewModelType
+    let themeManager: ThemeManager
 
     private let disposeBag = DisposeBag()
     
@@ -78,8 +79,9 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
         return prefetchTrigger.share()
     }()
     
-    required init(withViewModel viewModel: DMSpotifySongSearchViewModelType) {
+    init(withViewModel viewModel: DMSpotifySongSearchViewModelType, themeManager: ThemeManager) {
         self.viewModel = viewModel
+        self.themeManager = themeManager
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -89,6 +91,7 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        bindThemeManager()
         title = UIConstants.strings.searchSongs
         let searchController = UISearchController(searchResultsController: nil)
         navigationItem.searchController = searchController
@@ -110,6 +113,16 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType {
         addSongsButton.addConstraints(inSuperview: view)
         self.tableView.tableFooterView = tableViewLoadingFooter
 
+    }
+    
+    func bindThemeManager() {
+        themeNavigationBar()
+            .drive()
+            .disposed(by: disposeBag)
+        
+        themeViewColors()
+            .drive()
+            .disposed(by: disposeBag)
     }
     
 }
