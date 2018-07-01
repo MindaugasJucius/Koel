@@ -26,6 +26,7 @@ class DMSpotifySongTableViewCell: UITableViewCell, ReusableView, Themeable {
         bindThemeManager()
         textLabel?.apply(SongCellStylesheet.titleLabelStyle)
         detailTextLabel?.apply(SongCellStylesheet.subtitleLabelStyle)
+
         selectedBackgroundView = UIView()
         contentView.addSubview(durationLabel)
         let constraints = [durationLabel.trailingAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.trailingAnchor),
@@ -52,6 +53,8 @@ class DMSpotifySongTableViewCell: UITableViewCell, ReusableView, Themeable {
         textLabel?.text = song.title
         detailTextLabel?.text = "\(song.artistName) • \(song.albumName)"
         durationLabel.text = String.secondsString(from: song.durationSeconds)
+        imageView?.image = song.image
+        imageView?.layer.cornerRadius = 5
     }
     
     func bindThemeManager() {

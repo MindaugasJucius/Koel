@@ -16,8 +16,8 @@ struct DMSearchResultSong {
     let albumName: String
     let spotifyURI: String
     let durationSeconds: TimeInterval
-    let albumArtworkImageURL: String
-    
+    let albumArtworkImageURL: URL?
+    var image: UIImage?
 }
 
 extension DMSearchResultSong {
@@ -26,12 +26,20 @@ extension DMSearchResultSong {
         let artistName = savedTrack.track.album.artists.reduce("", { currentTitle, artist in
             return currentTitle.appending("\(artist.name!) ")
         })
+        
+        var albumArtworkImageURL: URL? = nil
+        
+        if let smallestImageURL = savedTrack.track.album.images.last?.url {
+            albumArtworkImageURL = URL(string: smallestImageURL)
+        }
+
         return DMSearchResultSong(title: savedTrack.track.name,
                                   artistName: artistName,
                                   albumName: savedTrack.track.album.name,
                                   spotifyURI: savedTrack.track.uri,
                                   durationSeconds: TimeInterval(savedTrack.track.durationMs) / 1000,
-                                  albumArtworkImageURL: savedTrack.track.album.images[0].url)
+                                  albumArtworkImageURL: albumArtworkImageURL,
+                                  image: nil)
 
     }
     

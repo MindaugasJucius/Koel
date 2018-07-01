@@ -67,6 +67,7 @@ protocol DMSpotifySongSearchViewModelType {
 class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
     
     private let disposeBag = DisposeBag()
+    private let imageDownloadService = DMImageDownloadService()
     
     private let isRefreshingRelay = BehaviorRelay(value: false)
     
@@ -113,7 +114,7 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
         self.refreshTriggerRelay = PublishRelay()
         self.songResultRelay = BehaviorRelay(value: [SongSectionModel.emptySection(item: SectionItem.emptySectionItem)])
         self.offsetTriggerRelay = PublishRelay()
-        
+
         spotifySearchService.resultError
             .flatMap { error in
                 promptCoordinator.promptFor(error.localizedDescription, cancelAction: "ok", actions: nil)
