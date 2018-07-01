@@ -50,7 +50,7 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType, Themeab
         return tableView
     }()
     
-    private let tableViewLoadingFooter = DMKoelLoadingView()
+    private let tableViewLoadingFooter: DMKoelLoadingView
     
     private let refreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
@@ -85,6 +85,7 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType, Themeab
     init(withViewModel viewModel: DMSpotifySongSearchViewModelType, themeManager: ThemeManager) {
         self.viewModel = viewModel
         self.themeManager = themeManager
+        self.tableViewLoadingFooter = DMKoelLoadingView(themeManager: themeManager)
         super.init(nibName: nil, bundle: nil)
     }
     
