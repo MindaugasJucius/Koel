@@ -8,6 +8,8 @@
 
 import UIKit
 
+private let isiPad = UIDevice.current.userInterfaceIdiom == UIUserInterfaceIdiom.pad
+
 enum DefaultStylesheet {
     
     static let largeNavigationBarStyle = Style<UINavigationBar> {
@@ -23,12 +25,14 @@ enum DefaultStylesheet {
 enum SongCellStylesheet {
     
     static let titleLabelStyle = Style<UILabel> {
-        $0.font = UIFont.preferredFont(forTextStyle: .title2)
+        let titleStyle: UIFontTextStyle = isiPad ? .title2 : .body
+        $0.font = UIFont.preferredFont(forTextStyle: titleStyle)
         $0.numberOfLines = 1
     }
     
     static let subtitleLabelStyle = Style<UILabel> {
-        $0.font = UIFont.preferredFont(forTextStyle: .headline)
+        let titleStyle: UIFontTextStyle = isiPad ? .headline : .caption1
+        $0.font = UIFont.preferredFont(forTextStyle: titleStyle)
         $0.numberOfLines = 1
     }
     
