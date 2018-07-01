@@ -44,7 +44,7 @@ enum SongSectionModel: SectionModelType {
         }
     }
 
-    case songSection(title: String, items: [SectionItem])
+    case songSection(title: String?, items: [SectionItem])
     case loadingSection(item: SectionItem)
     case emptySection(item: SectionItem)
 }

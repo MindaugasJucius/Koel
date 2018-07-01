@@ -9,6 +9,7 @@
 import UIKit
 import RxSwift
 import Action
+import Spartan
 
 protocol RootTransitioning {
     func beginCoordinating(withWindow window: UIWindow) -> Observable<Void>
@@ -107,9 +108,18 @@ class DMEventSceneCoordinator: NSObject {
     
     private lazy var searchViewController: UINavigationController = {
         let spotifyAuthService = DMSpotifyAuthService(promptCoordinator: self)
-        let spotifySearchService = DMSpotifySearchService(authService: spotifyAuthService,
-                                                          reachabilityService: self.reachabilityService)
         
+        let initialRequest = DMSpotifySearchService.initial(completionBlocks: { (success, failure) in
+            return Spartan.getSavedTracks(limit: 50,
+                                          market: Spartan.currentCountryCode,
+                                          success: success,
+                                          failure: failure)
+
+        })
+        
+        let spotifySearchService = DMSpotifySearchService<SavedTrack>(authService: spotifyAuthService,
+                                                                      reachabilityService: self.reachabilityService,
+                                                                      initialRequest: initialRequest)
         let spotifySongSearchViewModel = DMSpotifySongSearchViewModel(promptCoordinator: self,
                                                                       spotifySearchService: spotifySearchService,
                                                                       onQueueSelectedSongs: onQueueSelectedSongs())

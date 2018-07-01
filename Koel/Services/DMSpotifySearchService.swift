@@ -14,24 +14,27 @@ import ObjectMapper
 
 private let concurrentScheduler = ConcurrentDispatchQueueScheduler(qos: DispatchQoS.userInitiated)
 
-typealias PagingObjectSuccess<T: Paginatable & Mappable> = ((PagingObject<T>) -> Void)
-typealias PagingObjectFailure = (SpartanError) -> (Void)
-
 protocol DMSpotifySearchServiceType {
     
     var resultError: Observable<Error> { get }
     
     func savedTracks(resetResults reset: Bool) -> Driver<[SongSectionModel]>
     func map(searchResults: [DMSearchResultSong]) -> [DMEventSong]
+    
 }
 
-class DMSpotifySearchService: DMSpotifySearchServiceType {
+class DMSpotifySearchService<T: Paginatable & Mappable>: DMSpotifySearchServiceType {
+
+    typealias PagingObjectSuccess = ((PagingObject<T>) -> Void)
+    typealias PagingObjectFailure = (SpartanError) -> (Void)
     
     private let authService: DMSpotifyAuthService
     private let reachabilityService: ReachabilityService
     
-    private var latestSavedTracksPagingObject: PagingObject<SavedTrack>? = nil
-    private var allSavedTracks: [DMSearchResultSong] = []
+    private var latestPagingObject: PagingObject<T>? = nil
+    private var allTracks: [DMSearchResultSong] = []
+    
+    private var initialRequest: Observable<PagingObject<T>>
     
     private let resultErrorRelay: PublishRelay<Error> = PublishRelay()
 
@@ -39,14 +42,21 @@ class DMSpotifySearchService: DMSpotifySearchServiceType {
         return resultErrorRelay.asObservable()
     }
     
-    init(authService: DMSpotifyAuthService, reachabilityService: ReachabilityService) {
-        self.authService = authService
-        self.reachabilityService = reachabilityService
+    private var valueOnError: [SongSectionModel] {
+        return allTracks.isEmpty ? [SongSectionModel.emptySection(item: SectionItem.emptySectionItem)] : []
     }
     
-    private func initial<T: Paginatable & Mappable>(completionBlocks: @escaping ((success: PagingObjectSuccess<T>, failure: PagingObjectFailure)) -> ()) -> Observable<PagingObject<T>> {
+    init(authService: DMSpotifyAuthService,
+         reachabilityService: ReachabilityService,
+         initialRequest: Observable<PagingObject<T>>) {
+        self.authService = authService
+        self.reachabilityService = reachabilityService
+        self.initialRequest = initialRequest
+    }
+    
+    static func initial(completionBlocks: @escaping ((success: PagingObjectSuccess, failure: PagingObjectFailure)) -> ()) -> Observable<PagingObject<T>> {
         return Observable<PagingObject<T>>.create { observer in
-            let completion: (success: PagingObjectSuccess<T>, failure: PagingObjectFailure) = (
+            let completion: (success: PagingObjectSuccess, failure: PagingObjectFailure) = (
                 success: { pagingObject in
                     observer.onNext(pagingObject)
                     observer.onCompleted()
@@ -61,7 +71,7 @@ class DMSpotifySearchService: DMSpotifySearchServiceType {
         }
     }
     
-    private func following<T: Paginatable & Mappable>(pagingObject: PagingObject<T>) -> Observable<PagingObject<T>> {
+    private func following(pagingObject: PagingObject<T>) -> Observable<PagingObject<T>> {
         return Observable<PagingObject<T>>.create { observer in
             pagingObject.getNext(
                 success: { pagingObject in
@@ -100,19 +110,17 @@ class DMSpotifySearchService: DMSpotifySearchServiceType {
     
     func savedTracks(resetResults reset: Bool) -> Driver<[SongSectionModel]> {
         if reset {
-            self.latestSavedTracksPagingObject = nil
-            self.allSavedTracks = []
+            self.latestPagingObject = nil
+            self.allTracks = []
         }
-        
-        let valueOnError = allSavedTracks.isEmpty ? [SongSectionModel.emptySection(item: SectionItem.emptySectionItem)] : []
 
         return self.authService.spotifySession(forAction: UIConstants.strings.SPTSearchTracks)
             .flatMap { [unowned self] _ in
-                return Observable.just(self.latestSavedTracksPagingObject)
+                return Observable.just(self.latestPagingObject)
             }
-            .flatMap { [unowned self] paggingObject -> Observable<PagingObject<SavedTrack>> in
+            .flatMap { [unowned self] paggingObject -> Observable<PagingObject<T>> in
                 guard let paggingObject = paggingObject else {
-                    return self.initial { Spartan.getSavedTracks(limit: 50, market: Spartan.currentCountryCode, success: $0, failure: $1) }
+                    return self.initialRequest
                 }
                 
                 if paggingObject.canMakeNextRequest {
@@ -122,19 +130,18 @@ class DMSpotifySearchService: DMSpotifySearchServiceType {
                 return .empty()
             }
             .do(onNext: { [unowned self] pagingObject in
-                self.latestSavedTracksPagingObject = pagingObject
+                self.latestPagingObject = pagingObject
             })
             .map { pagingObject -> [DMSearchResultSong] in
-                return pagingObject.items.map { savedTrack -> DMSearchResultSong in
+                return pagingObject.items.compactMap { savedTrack -> DMSearchResultSong? in
                     return DMSearchResultSong.create(from: savedTrack)
                 }
             }
-
             .map { [unowned self] newSavedTracks in
-                self.allSavedTracks.append(contentsOf: newSavedTracks)
-                return self.allSavedTracks.map { SectionItem.songSectionItem(song: $0) }
+                self.allTracks.append(contentsOf: newSavedTracks)
+                return self.allTracks.map { SectionItem.songSectionItem(song: $0) }
             }
-            .map { [SongSectionModel.songSection(title: "Results", items: $0)] }
+            .map { [SongSectionModel.songSection(title: nil, items: $0)] }
             .retryWhen(retryHandler)
             .do(onError: { error in self.resultErrorRelay.accept(error) })
             .subscribeOn(concurrentScheduler)
@@ -144,7 +151,6 @@ class DMSpotifySearchService: DMSpotifySearchServiceType {
     func map(searchResults: [DMSearchResultSong]) -> [DMEventSong] {
         return searchResults.map { DMEventSong.from(searchResultSong: $0) }
     }
-
 
 }
 

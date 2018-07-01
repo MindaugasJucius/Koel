@@ -8,6 +8,7 @@
 
 import Foundation
 import Spartan
+import ObjectMapper
 
 struct DMSearchResultSong {
     
@@ -22,7 +23,14 @@ struct DMSearchResultSong {
 
 extension DMSearchResultSong {
     
-    static func create(from savedTrack: SavedTrack) -> DMSearchResultSong {
+    static func create(from paginatableMappable: Paginatable & Mappable) -> DMSearchResultSong? {
+        if let savedTrack = paginatableMappable as? SavedTrack {
+            return DMSearchResultSong.createSavedTrackRepresentable(from: savedTrack)
+        }
+        return nil
+    }
+    
+    private static func createSavedTrackRepresentable(from savedTrack: SavedTrack) -> DMSearchResultSong {
         let artistName = savedTrack.track.album.artists.reduce("", { currentTitle, artist in
             return currentTitle.appending("\(artist.name!) ")
         })
