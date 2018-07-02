@@ -18,7 +18,7 @@ protocol DMSpotifySearchServiceType {
     
     var resultError: Observable<Error> { get }
     
-    func savedTracks(resetResults reset: Bool) -> Driver<[SongSectionModel]>
+    func tracks(resetResults reset: Bool) -> Driver<[SongSectionModel]>
     func map(searchResults: [DMSearchResultSong]) -> [DMEventSong]
     
 }
@@ -27,6 +27,8 @@ class DMSpotifySearchService<T: Paginatable & Mappable>: DMSpotifySearchServiceT
 
     typealias PagingObjectSuccess = ((PagingObject<T>) -> Void)
     typealias PagingObjectFailure = (SpartanError) -> (Void)
+    
+    private let disposeBag = DisposeBag()
     
     private let authService: DMSpotifyAuthService
     private let reachabilityService: ReachabilityService
@@ -37,7 +39,7 @@ class DMSpotifySearchService<T: Paginatable & Mappable>: DMSpotifySearchServiceT
     private var initialRequest: Observable<PagingObject<T>>
     
     private let resultErrorRelay: PublishRelay<Error> = PublishRelay()
-
+    
     var resultError: Observable<Error> {
         return resultErrorRelay.asObservable()
     }
@@ -108,12 +110,7 @@ class DMSpotifySearchService<T: Paginatable & Mappable>: DMSpotifySearchServiceT
             .flatMap { $0 }
     }
     
-    func savedTracks(resetResults reset: Bool) -> Driver<[SongSectionModel]> {
-        if reset {
-            self.latestPagingObject = nil
-            self.allTracks = []
-        }
-
+    private var results: Observable<PagingObject<T>> {
         return self.authService.spotifySession(forAction: UIConstants.strings.SPTSearchTracks)
             .flatMap { [unowned self] _ in
                 return Observable.just(self.latestPagingObject)
@@ -132,11 +129,25 @@ class DMSpotifySearchService<T: Paginatable & Mappable>: DMSpotifySearchServiceT
             .do(onNext: { [unowned self] pagingObject in
                 self.latestPagingObject = pagingObject
             })
+            .retryWhen(retryHandler)
+            .do(onError: { error in self.resultErrorRelay.accept(error) })
+            .subscribeOn(concurrentScheduler)
+            .share()
+    }
+    
+    func tracks(resetResults reset: Bool) -> Driver<[SongSectionModel]> {
+        if reset {
+            self.latestPagingObject = nil
+            self.allTracks = []
+        }
+        
+        return results
             .map { pagingObject -> [DMSearchResultSong] in
                 return pagingObject.items.compactMap { savedTrack -> DMSearchResultSong? in
                     return DMSearchResultSong.create(from: savedTrack)
                 }
             }
+            .downloadImages()
             .map { [unowned self] newSavedTracks in
                 self.allTracks.append(contentsOf: newSavedTracks)
                 return self.allTracks.map { SectionItem.songSectionItem(song: $0) }

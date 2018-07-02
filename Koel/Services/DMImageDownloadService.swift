@@ -13,7 +13,7 @@ private let timeout: TimeInterval = 30
 
 class DMImageDownloadService: NSObject {
     
-    func downloadImage(fromURL url: URL) -> Observable<UIImage?> {
+    static func downloadImage(fromURL url: URL) -> Observable<UIImage?> {
         return URLSession.shared.rx
             .data(request: request(fromURL: url))
             .map { data -> UIImage? in
@@ -22,10 +22,47 @@ class DMImageDownloadService: NSObject {
             .catchErrorJustReturn(nil)
     }
     
-    private func request(fromURL url: URL) -> URLRequest {
+    private static func request(fromURL url: URL) -> URLRequest {
         return URLRequest(url: url,
                           cachePolicy: .returnCacheDataElseLoad,
                           timeoutInterval: timeout)
+    }
+    
+}
+
+extension Observable where Element: Sequence, Element.Element: ImageContaining  {
+    
+    func downloadImages() -> Observable<[Element.Element]> {
+        let downloadObservables = map { $0.map { Observable<Element.Element>.just($0).downloadImage() } }
+        return downloadObservables
+            .flatMap { downloadObservables in
+                return Observable<Element.Element>.merge(downloadObservables)
+            }
+            .reduce([], accumulator: { (array, entity) in
+                return array + [entity]
+            })
+    }
+    
+}
+
+extension Observable where Element: ImageContaining {
+    
+    func downloadImage() -> Observable<Element> {
+        return self.flatMap { imageContaining -> Observable<Element> in
+            guard let imageURL = imageContaining.imageURL else {
+                return .just(imageContaining)
+            }
+            
+            return DMImageDownloadService.downloadImage(fromURL: imageURL)
+                .map { maybeImage -> Element in
+                    guard let image = maybeImage else {
+                        return imageContaining
+                    }
+                    var imageContaining = imageContaining
+                    imageContaining.image = image
+                    return imageContaining
+                }
+        }
     }
     
 }

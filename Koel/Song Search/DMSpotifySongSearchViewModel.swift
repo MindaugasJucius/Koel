@@ -133,7 +133,7 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
             .filter { !$0 }
             .do(onNext: { _ in self.isRefreshingRelay.accept(true) })
             .flatMap { [unowned self] _ in
-                self.spotifySearchService.savedTracks(resetResults: true)
+                self.spotifySearchService.tracks(resetResults: true)
             }
             .do(onNext: { _ in self.isRefreshingRelay.accept(false) })
             .bind(to: songResultRelay)
@@ -144,7 +144,7 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
             .filter { !$0 }
             .do(onNext: { _ in self.isLoadingRelay.accept(true) })
             .flatMap { [unowned self] _ in
-                self.spotifySearchService.savedTracks(resetResults: false)
+                self.spotifySearchService.tracks(resetResults: false)
             }
             .do(onNext: { _ in self.isLoadingRelay.accept(false) })
             .bind(to: songResultRelay)

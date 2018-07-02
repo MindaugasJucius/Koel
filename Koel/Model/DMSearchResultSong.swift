@@ -10,14 +10,19 @@ import Foundation
 import Spartan
 import ObjectMapper
 
-struct DMSearchResultSong {
+protocol ImageContaining {
+    var imageURL: URL? { get }
+    var image: UIImage? { get set }
+}
+
+struct DMSearchResultSong: ImageContaining {
     
     let title: String
     let artistName: String
     let albumName: String
     let spotifyURI: String
     let durationSeconds: TimeInterval
-    let albumArtworkImageURL: URL?
+    let imageURL: URL?
     var image: UIImage?
 }
 
@@ -46,7 +51,7 @@ extension DMSearchResultSong {
                                   albumName: savedTrack.track.album.name,
                                   spotifyURI: savedTrack.track.uri,
                                   durationSeconds: TimeInterval(savedTrack.track.durationMs) / 1000,
-                                  albumArtworkImageURL: albumArtworkImageURL,
+                                  imageURL: albumArtworkImageURL,
                                   image: nil)
 
     }
