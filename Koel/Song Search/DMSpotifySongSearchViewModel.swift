@@ -94,19 +94,18 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
     let spotifySearchService: DMSpotifySearchServiceType
    
     private var selectedSongsRelay = BehaviorRelay<[DMSearchResultSong]>(value: [])
-    var onQueueSelectedSongs: Action<[DMEventSong], Void>
-    
+    var onQueueSelectedSongs: Action<[DMSearchResultSong], Void>
+        
     lazy var queueSelectedSongs: CocoaAction = {
         let enabledIf = selectedSongsRelay.map { $0.count > 0 }.distinctUntilChanged()
         return CocoaAction(enabledIf: enabledIf, workFactory: { _ -> Observable<Void> in
-            let persistableSongs = self.spotifySearchService.map(searchResults: self.selectedSongsRelay.value)
-            return self.onQueueSelectedSongs.execute(persistableSongs)
+            return self.onQueueSelectedSongs.execute(self.selectedSongsRelay.value)
         })
     }()
     
     init(promptCoordinator: PromptCoordinating,
          spotifySearchService: DMSpotifySearchServiceType,
-         onQueueSelectedSongs: Action<[DMEventSong], Void>) {
+         onQueueSelectedSongs: Action<[DMSearchResultSong], Void>) {
         self.promptCoordinator = promptCoordinator
         self.spotifySearchService = spotifySearchService
         self.onQueueSelectedSongs = onQueueSelectedSongs

@@ -19,7 +19,6 @@ protocol DMSpotifySearchServiceType {
     var resultError: Observable<Error> { get }
     
     func tracks(resetResults reset: Bool) -> Driver<[SongSectionModel]>
-    func map(searchResults: [DMSearchResultSong]) -> [DMEventSong]
     
 }
 
@@ -157,10 +156,6 @@ class DMSpotifySearchService<T: Paginatable & Mappable>: DMSpotifySearchServiceT
             .do(onError: { error in self.resultErrorRelay.accept(error) })
             .subscribeOn(concurrentScheduler)
             .asDriver(onErrorJustReturn: valueOnError)
-    }
-    
-    func map(searchResults: [DMSearchResultSong]) -> [DMEventSong] {
-        return searchResults.map { DMEventSong.from(searchResultSong: $0) }
     }
 
 }

@@ -86,13 +86,9 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType, MultipeerVie
                 }
             }
             .filterNil()
-            .flatMap { songs -> Observable<Observable<DMEventSong>> in
-                let storeObservables = songs.map { song in
-                    return songPersistenceService.store(song: song)
-                }
-                return Observable.from(storeObservables)
+            .flatMap { songsToStore in
+                return self.songPersistenceService.store(songs: songsToStore)
             }
-            .merge()
             .subscribe()
             .disposed(by: disposeBag)
     }
@@ -160,19 +156,19 @@ class DMEventSongSharingViewModel: DMEventSongSharingViewModelType, MultipeerVie
     //MARK: - Created song management
     
     lazy var onUpvote: (DMEventSong) -> (CocoaAction) = {
-        return { song in
-            let canBeUpvotedBySelf = song.rx.observe(Bool.self, "upvotedBySelfPeer")
-                .filterNil() //never nil (default value in DMEventSong = false)
-                .map { !$0 }
-        
-            let songNotPlayed = song.rx.observe(Date.self, "played")
-                .map { $0 == nil }
+        return { [unowned self] song in
+
+            let selfUUID = self.multipeerService.myEventPeer.primaryKeyRef
+            let selfHasUpvoted = song.upvotees.map { $0.uuid }.contains(selfUUID)
+            let canBeUpvotedBySelf = Observable.just(!selfHasUpvoted)
+
+            let songStateIsAdded = song.rx.observe(DMEventSongState.self, "state")
+                .map { $0 == .added }
             
             let canBeUpvoted = Observable
-                .combineLatest(canBeUpvotedBySelf, songNotPlayed)
+                .combineLatest(canBeUpvotedBySelf, songStateIsAdded)
                 .map { $0 && $1 }
 
-            
             return CocoaAction(
                 enabledIf: canBeUpvoted,
                 workFactory: { [unowned self] in

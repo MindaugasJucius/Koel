@@ -16,7 +16,6 @@ typealias SongSection = AnimatableSectionModel<String, DMEventSong>
 
 @objc enum DMEventSongState: Int {
     case added
-    case upNext
     case playing
     case played
 }
@@ -46,7 +45,6 @@ class DMEventSong: Object, Codable, DMEntity {
     dynamic var played: Date? = nil
     dynamic var addedBy: DMEventPeer? = nil
     dynamic var upvoteCount: Int = 0
-    dynamic var upvotedBySelfPeer: Bool = false
     dynamic var state: DMEventSongState = .added
     
     let upvotees = List<DMEventPeer>()
@@ -146,12 +144,14 @@ extension DMEventSong: IdentifiableType {
 }
 
 extension DMEventSong {
-    static func from(searchResultSong: DMSearchResultSong) -> DMEventSong {
+    static func from(searchResultSong: DMSearchResultSong, addedBy: DMEventPeer) -> DMEventSong {
         let eventSong = DMEventSong()
         eventSong.spotifyURI = searchResultSong.spotifyURI
         eventSong.artistTitle = searchResultSong.artistName
         eventSong.title = searchResultSong.title
         eventSong.durationSeconds = searchResultSong.durationSeconds
+        eventSong.addedByUUID = addedBy.primaryKeyRef
+        eventSong.upvotedByUUIDs = [addedBy.primaryKeyRef]
         return eventSong
     }
 }

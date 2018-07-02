@@ -86,7 +86,6 @@ class DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
                         let upvotees = realm.objects(DMEventPeer.self).filter(uuidPredicate)
                         song.upvotees.append(objectsIn: upvotees)
                         song.upvoteCount = upvotees.count
-                        song.upvotedBySelfPeer = song.upvotedByUUIDs.contains(self.selfPeer.primaryKeyRef)
                         song.primaryKeyRef = song.uuid
                     }
 
@@ -129,7 +128,6 @@ class DMEventSongPersistenceService: DMEventSongPersistenceServiceType {
                 try realm.write {
                     resolvedSong.upvotees.append(fetchedUser)
                     resolvedSong.upvoteCount = resolvedSong.upvoteCount + 1
-                    resolvedSong.upvotedBySelfPeer = true
                 }
                 return resolvedSong
         }

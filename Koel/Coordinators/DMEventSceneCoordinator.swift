@@ -69,10 +69,11 @@ class DMEventSceneCoordinator: NSObject {
     
     //MARK: - Shared Observables
     
-    private func onQueueSelectedSongs() -> Action<[DMEventSong], Void> {
-        return Action(workFactory: { songs -> Observable<Void> in
+    private func onQueueSelectedSongs() -> Action<[DMSearchResultSong], Void> {
+        return Action(workFactory: { [unowned self] songs -> Observable<Void> in
+            let persistableSongs = songs.map { DMEventSong.from(searchResultSong: $0, addedBy: self.multipeerService.myEventPeer) }
             return self.songPersistenceService
-                .store(songs: songs)
+                .store(songs: persistableSongs)
                 .filter { !$0.isEmpty }
                 .share(withMultipeerService: self.multipeerService, sharingService: DMEntitySharingService<[DMEventSong]>())
                 .flatMap { return self.transition(toManagementScene: .songs, animated: true) }
