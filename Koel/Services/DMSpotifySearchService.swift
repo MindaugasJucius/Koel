@@ -18,7 +18,10 @@ protocol DMSpotifySearchServiceType {
     
     var resultError: Observable<Error> { get }
     
-    func tracks(resetResults reset: Bool) -> Driver<[SongSectionModel]>
+    var trackResults: Driver<[SongSectionModel]> { get }
+    
+    var offsetTriggerRelay: PublishSubject<()> { get }
+    var refreshTriggerRelay: PublishSubject<()> { get }
     
 }
 
@@ -38,6 +41,23 @@ class DMSpotifySearchService<T: Paginatable & Mappable>: DMSpotifySearchServiceT
     private var initialRequest: Observable<PagingObject<T>>
     
     private let resultErrorRelay: PublishRelay<Error> = PublishRelay()
+
+    let offsetTriggerRelay: PublishSubject<()>
+    let refreshTriggerRelay: PublishSubject<()>
+    
+    private let resultsSubject: PublishSubject<[DMSearchResultSong]> = PublishSubject()
+    
+    var trackResults: Driver<[SongSectionModel]> {
+        return resultsSubject.asObservable()
+            .map { [unowned self] newSavedTracks in
+                self.allTracks.append(contentsOf: newSavedTracks)
+                return self.allTracks.map { SectionItem.songSectionItem(song: $0) }
+            }
+            .map { [SongSectionModel.songSection(title: nil, items: $0)] }
+            .asDriver(onErrorJustReturn: valueOnError)
+            .startWith([SongSectionModel.emptySection(item: SectionItem.emptySectionItem)])
+    }
+    
     
     var resultError: Observable<Error> {
         return resultErrorRelay.asObservable()
@@ -50,9 +70,28 @@ class DMSpotifySearchService<T: Paginatable & Mappable>: DMSpotifySearchServiceT
     init(authService: DMSpotifyAuthService,
          reachabilityService: ReachabilityService,
          initialRequest: Observable<PagingObject<T>>) {
+        self.offsetTriggerRelay = PublishSubject()
+        self.refreshTriggerRelay = PublishSubject()
         self.authService = authService
         self.reachabilityService = reachabilityService
         self.initialRequest = initialRequest
+        
+        setupObservables()
+    }
+    
+    private func setupObservables() {
+        offsetTriggerRelay.asObservable()
+            .flatMap { _ in
+                return self.results
+            }
+            .bind(to: resultsSubject)
+            .disposed(by: disposeBag)
+        
+        Observable.zip(offsetTriggerRelay.asObservable(), resultsSubject.asObservable())
+            .map { $0.1 }
+            .downloadImages()
+            .bind(to: resultsSubject)
+            .disposed(by: disposeBag)
     }
     
     static func initial(completionBlocks: @escaping ((success: PagingObjectSuccess, failure: PagingObjectFailure)) -> ()) -> Observable<PagingObject<T>> {
@@ -109,7 +148,7 @@ class DMSpotifySearchService<T: Paginatable & Mappable>: DMSpotifySearchServiceT
             .flatMap { $0 }
     }
     
-    private var results: Observable<PagingObject<T>> {
+    private var results: Observable<[DMSearchResultSong]> {
         return self.authService.spotifySession(forAction: UIConstants.strings.SPTSearchTracks)
             .flatMap { [unowned self] _ in
                 return Observable.just(self.latestPagingObject)
@@ -128,34 +167,14 @@ class DMSpotifySearchService<T: Paginatable & Mappable>: DMSpotifySearchServiceT
             .do(onNext: { [unowned self] pagingObject in
                 self.latestPagingObject = pagingObject
             })
-            .retryWhen(retryHandler)
-            .do(onError: { error in self.resultErrorRelay.accept(error) })
-            .subscribeOn(concurrentScheduler)
-            .share()
-    }
-    
-    func tracks(resetResults reset: Bool) -> Driver<[SongSectionModel]> {
-        if reset {
-            self.latestPagingObject = nil
-            self.allTracks = []
-        }
-        
-        return results
             .map { pagingObject -> [DMSearchResultSong] in
                 return pagingObject.items.compactMap { savedTrack -> DMSearchResultSong? in
                     return DMSearchResultSong.create(from: savedTrack)
                 }
             }
-            .downloadImages()
-            .map { [unowned self] newSavedTracks in
-                self.allTracks.append(contentsOf: newSavedTracks)
-                return self.allTracks.map { SectionItem.songSectionItem(song: $0) }
-            }
-            .map { [SongSectionModel.songSection(title: nil, items: $0)] }
             .retryWhen(retryHandler)
             .do(onError: { error in self.resultErrorRelay.accept(error) })
             .subscribeOn(concurrentScheduler)
-            .asDriver(onErrorJustReturn: valueOnError)
     }
 
 }

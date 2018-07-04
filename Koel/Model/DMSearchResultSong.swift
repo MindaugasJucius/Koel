@@ -24,6 +24,7 @@ struct DMSearchResultSong: ImageContaining {
     let durationSeconds: TimeInterval
     let imageURL: URL?
     var image: UIImage?
+
 }
 
 extension DMSearchResultSong {
@@ -60,7 +61,7 @@ extension DMSearchResultSong {
 
 extension DMSearchResultSong: Equatable {
 
-    static func == (lhs: DMSearchResultSong, rhs: DMSearchResultSong) -> Bool {
+    static func ==(lhs: DMSearchResultSong, rhs: DMSearchResultSong) -> Bool {
         return lhs.spotifyURI == rhs.spotifyURI
     }
     

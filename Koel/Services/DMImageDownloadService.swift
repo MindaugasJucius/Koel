@@ -41,6 +41,7 @@ extension Observable where Element: Sequence, Element.Element: ImageContaining  
             .reduce([], accumulator: { (array, entity) in
                 return array + [entity]
             })
+            .debug("download image", trimOutput: true)
     }
     
 }
@@ -48,7 +49,7 @@ extension Observable where Element: Sequence, Element.Element: ImageContaining  
 extension Observable where Element: ImageContaining {
     
     func downloadImage() -> Observable<Element> {
-        return self.flatMap { imageContaining -> Observable<Element> in
+        return self.flatMap { imageContaining -> Observable<Element> in 
             guard let imageURL = imageContaining.imageURL else {
                 return .just(imageContaining)
             }
