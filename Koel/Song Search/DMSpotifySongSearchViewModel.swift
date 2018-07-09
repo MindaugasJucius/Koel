@@ -57,17 +57,15 @@ protocol DMSpotifySongSearchViewModelType {
     var sectionItemSelected: Action<SectionItem, Void> { get }
     var sectionItemDeselected: Action<SectionItem, Void> { get }
     
-    var offsetTriggerRelay: PublishRelay<()> { get }
-    var refreshTriggerRelay: PublishRelay<()> { get }
+    var offsetTriggerRelay: PublishSubject<()> { get }
+    var refreshTriggerRelay: PublishSubject<()> { get }
     
-
     var queueSelectedSongs: CocoaAction { get }
 }
 
 class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
     
     private let disposeBag = DisposeBag()
-    private let imageDownloadService = DMImageDownloadService()
     
     private let isRefreshingRelay = BehaviorRelay(value: false)
     
@@ -81,14 +79,17 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
         return self.isLoadingRelay.asDriver()
     }
     
-    private let songResultRelay: BehaviorRelay<[SongSectionModel]>
-    
     var songResults: Driver<[SongSectionModel]> {
-        return songResultRelay.asDriver()
+        return spotifySearchService.trackResults
     }
     
-    let offsetTriggerRelay: PublishRelay<()>
-    let refreshTriggerRelay: PublishRelay<()>
+    var offsetTriggerRelay: PublishSubject<()> {
+        return spotifySearchService.offsetTriggerRelay
+    }
+    
+    var refreshTriggerRelay: PublishSubject<()> {
+        return spotifySearchService.refreshTriggerRelay
+    }
     
     let promptCoordinator: PromptCoordinating
     let spotifySearchService: DMSpotifySearchServiceType
@@ -109,10 +110,6 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
         self.promptCoordinator = promptCoordinator
         self.spotifySearchService = spotifySearchService
         self.onQueueSelectedSongs = onQueueSelectedSongs
-        
-        self.refreshTriggerRelay = PublishRelay()
-        self.songResultRelay = BehaviorRelay(value: [SongSectionModel.emptySection(item: SectionItem.emptySectionItem)])
-        self.offsetTriggerRelay = PublishRelay()
 
         spotifySearchService.resultError
             .flatMap { error in
@@ -125,28 +122,6 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
         // remove selected songs on queueing
         queueSelectedSongs.executionObservables.map { _ in [] }
             .bind(to: selectedSongsRelay)
-            .disposed(by: disposeBag)
-        
-        refreshTriggerRelay.asObservable()
-            .withLatestFrom(isLoading.asObservable())
-            .filter { !$0 }
-            .do(onNext: { _ in self.isRefreshingRelay.accept(true) })
-            .flatMap { [unowned self] _ in
-                self.spotifySearchService.tracks(resetResults: true)
-            }
-            .do(onNext: { _ in self.isRefreshingRelay.accept(false) })
-            .bind(to: songResultRelay)
-            .disposed(by: disposeBag)
-
-        offsetTriggerRelay.asObservable()
-            .withLatestFrom(isRefreshing.asObservable())
-            .filter { !$0 }
-            .do(onNext: { _ in self.isLoadingRelay.accept(true) })
-            .flatMap { [unowned self] _ in
-                self.spotifySearchService.tracks(resetResults: false)
-            }
-            .do(onNext: { _ in self.isLoadingRelay.accept(false) })
-            .bind(to: songResultRelay)
             .disposed(by: disposeBag)
     }
     
