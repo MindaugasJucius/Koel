@@ -15,7 +15,7 @@ protocol ImageContaining {
     var image: UIImage? { get set }
 }
 
-struct DMSearchResultSong: ImageContaining {
+struct DMSearchResultSong: Equatable, ImageContaining {
     
     let title: String
     let artistName: String
@@ -24,6 +24,10 @@ struct DMSearchResultSong: ImageContaining {
     let durationSeconds: TimeInterval
     let imageURL: URL?
     var image: UIImage?
+    
+    static func ==(lhs: DMSearchResultSong, rhs: DMSearchResultSong) -> Bool {
+        return lhs.spotifyURI == rhs.spotifyURI && lhs.image == rhs.image
+    }
 
 }
 
@@ -58,12 +62,3 @@ extension DMSearchResultSong {
     }
     
 }
-
-extension DMSearchResultSong: Equatable {
-
-    static func ==(lhs: DMSearchResultSong, rhs: DMSearchResultSong) -> Bool {
-        return lhs.spotifyURI == rhs.spotifyURI
-    }
-    
-}
-

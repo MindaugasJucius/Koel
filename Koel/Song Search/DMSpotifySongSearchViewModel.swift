@@ -12,10 +12,29 @@ import RxSwift
 import RxCocoa
 import RxDataSources
 
-enum SectionItem {
+enum SectionItem: Equatable {
     case songSectionItem(song: DMSearchResultSong)
     case loadingSectionItem
     case emptySectionItem
+    
+    static func ==(lhs: SectionItem, rhs: SectionItem) -> Bool {
+        if case SectionItem.songSectionItem(song: let rhsSong) = rhs,
+            case SectionItem.songSectionItem(song: let lhsSong) = lhs {
+            return rhsSong.image == lhsSong.image && rhsSong.spotifyURI == lhsSong.spotifyURI
+        }
+        return true
+    }
+}
+
+extension SectionItem: IdentifiableType {
+    var identity: String {
+        switch self {
+        case .songSectionItem(song: let song):
+            return song.spotifyURI
+        default:
+            return ""
+        }
+    }
 }
 
 enum SongSectionModel: SectionModelType {
