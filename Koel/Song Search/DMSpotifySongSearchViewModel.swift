@@ -20,7 +20,7 @@ enum SectionItem: Equatable {
     static func ==(lhs: SectionItem, rhs: SectionItem) -> Bool {
         if case SectionItem.songSectionItem(song: let rhsSong) = rhs,
             case SectionItem.songSectionItem(song: let lhsSong) = lhs {
-            return rhsSong.image == lhsSong.image && rhsSong.spotifyURI == lhsSong.spotifyURI
+            return rhsSong == lhsSong
         }
         return true
     }
@@ -37,39 +37,22 @@ extension SectionItem: IdentifiableType {
     }
 }
 
-enum SongSectionModel: SectionModelType {
-    
-    typealias Item = SectionItem
-    
-    var items: [SectionItem] {
-        switch self {
-        case .songSection(title: _, items: let songItems):
-            return songItems
-        case .loadingSection(item: let loadingItem):
-            return [loadingItem]
-        case .emptySection(item: let emptyItem):
-            return [emptyItem]
-        }
-    }
+enum SectionType: String, IdentifiableType {
 
-    init(original: SongSectionModel, items: [SectionItem]) {
-        switch original {
-        case let .songSection(title: title, items: _):
-            self = .songSection(title: title, items: items)
-        case .loadingSection(item: _):
-            self = .loadingSection(item: items.first!)
-        case .emptySection(item: _):
-            self = .emptySection(item: items.first!)
-        }
-    }
+    case empty
+    case loading
+    case songs
 
-    case songSection(title: String?, items: [SectionItem])
-    case loadingSection(item: SectionItem)
-    case emptySection(item: SectionItem)
+    var identity: String {
+        return self.rawValue
+    }
 }
 
+typealias SongSearchResultSectionModel = AnimatableSectionModel<SectionType, SectionItem>
+
+
 protocol DMSpotifySongSearchViewModelType {
-    var songResults: Driver<[SongSectionModel]> { get }
+    var songResults: Driver<[SongSearchResultSectionModel]> { get }
     var isLoading: Driver<Bool> { get }
     var isRefreshing: Driver<Bool> { get }
     
@@ -98,7 +81,7 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
         return self.isLoadingRelay.asDriver()
     }
     
-    var songResults: Driver<[SongSectionModel]> {
+    var songResults: Driver<[SongSearchResultSectionModel]> {
         return spotifySearchService.trackResults
     }
     

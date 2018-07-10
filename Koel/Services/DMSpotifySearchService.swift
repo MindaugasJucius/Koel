@@ -18,7 +18,7 @@ protocol DMSpotifySearchServiceType {
     
     var resultError: Observable<Error> { get }
     
-    var trackResults: Driver<[SongSectionModel]> { get }
+    var trackResults: Driver<[SongSearchResultSectionModel]> { get }
     
     var offsetTriggerRelay: PublishSubject<()> { get }
     var refreshTriggerRelay: PublishSubject<()> { get }
