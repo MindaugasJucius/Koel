@@ -9,33 +9,100 @@
 import UIKit
 import RxSwift
 
+private let cellHeight: CGFloat = 65
+
 class DMSpotifySongTableViewCell: UITableViewCell, ReusableView, Themeable {
     
     private var disposeBag = DisposeBag()
     
     var themeManager: ThemeManager = ThemeManager.shared
     
+    private var hasSetConstraints = false
+
+    private lazy var albumArtImageView: UIImageView = {
+        let imageView = UIImageView(image: nil)
+        imageView.contentMode = .scaleAspectFit
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.backgroundColor = .green
+        return imageView
+    }()
+    
     private lazy var durationLabel: UILabel = {
         let durationLabel = UILabel(style: SongCellStylesheet.subtitleLabelStyle)
         durationLabel.translatesAutoresizingMaskIntoConstraints = false
         return durationLabel
     }()
+
+    private lazy var trackTitleLabel: UILabel = {
+        let label = UILabel(style: SongCellStylesheet.titleLabelStyle)
+        return label
+    }()
+    
+    private lazy var albumAndArtistTitleLabel: UILabel = {
+        let label = UILabel(style: SongCellStylesheet.subtitleLabelStyle)
+        return label
+    }()
+    
+    private lazy var stackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [trackTitleLabel, albumAndArtistTitleLabel])
+        stackView.axis = .vertical
+        stackView.distribution = .fillEqually
+        stackView.spacing = 5
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        return stackView
+    }()
     
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
         bindThemeManager()
-        textLabel?.apply(SongCellStylesheet.titleLabelStyle)
-        detailTextLabel?.apply(SongCellStylesheet.subtitleLabelStyle)
 
         selectedBackgroundView = UIView()
         contentView.addSubview(durationLabel)
-        let constraints = [durationLabel.trailingAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.trailingAnchor),
-                           durationLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)]
-        NSLayoutConstraint.activate(constraints)
+        contentView.addSubview(albumArtImageView)
+        contentView.addSubview(stackView)
     }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func updateConstraints() {
+        guard !hasSetConstraints else {
+            super.updateConstraints()
+            return
+        }
+        
+        hasSetConstraints = true
+        
+        let areaGuide = contentView.safeAreaLayoutGuide
+
+        let durationLabelConstraints = [
+            durationLabel.trailingAnchor.constraint(equalTo: areaGuide.trailingAnchor),
+            durationLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
+        ]
+        
+        NSLayoutConstraint.activate(durationLabelConstraints)
+        
+        let albumArtImageViewConstraints = [
+            albumArtImageView.leadingAnchor.constraintEqualToSystemSpacingAfter(areaGuide.leadingAnchor, multiplier: 1),
+            albumArtImageView.centerYAnchor.constraint(equalTo: areaGuide.centerYAnchor),
+            albumArtImageView.heightAnchor.constraint(equalTo: stackView.heightAnchor, multiplier: 1),
+            albumArtImageView.widthAnchor.constraint(equalTo: albumArtImageView.heightAnchor, multiplier: 1)
+        ]
+        
+        NSLayoutConstraint.activate(albumArtImageViewConstraints)
+        
+        let stackViewConstraints = [
+            stackView.leadingAnchor.constraintEqualToSystemSpacingAfter(albumArtImageView.trailingAnchor, multiplier: 2),
+            durationLabel.leadingAnchor.constraintGreaterThanOrEqualToSystemSpacingAfter(stackView.trailingAnchor, multiplier: 2),
+            stackView.topAnchor.constraintEqualToSystemSpacingBelow(areaGuide.topAnchor, multiplier: 1),
+            areaGuide.bottomAnchor.constraintEqualToSystemSpacingBelow(stackView.bottomAnchor, multiplier: 1),
+            stackView.heightAnchor.constraint(equalToConstant: cellHeight)
+        ]
+        
+        NSLayoutConstraint.activate(stackViewConstraints)
+        
+        super.updateConstraints()
     }
     
     override func setSelected(_ selected: Bool, animated: Bool) {
@@ -44,25 +111,35 @@ class DMSpotifySongTableViewCell: UITableViewCell, ReusableView, Themeable {
     }
     
     override func prepareForReuse() {
+        albumArtImageView.image = nil
         disposeBag = DisposeBag()
         super.prepareForReuse()
         bindThemeManager()
     }
     
     func configure(withSong song: DMSearchResultSong) {
-        textLabel?.text = song.title
-        detailTextLabel?.text = "\(song.artistName) • \(song.albumName)"
+        trackTitleLabel.text = song.title
+        albumAndArtistTitleLabel.text = "\(song.artistName) • \(song.albumName)"
         durationLabel.text = String.secondsString(from: song.durationSeconds)
-        imageView?.image = song.image
-        imageView?.layer.cornerRadius = 5
+
+        Observable.of(song)
+            .downloadImage()
+            .observeOn(MainScheduler.instance)
+            .do(onNext: { songWithImage in
+                self.albumArtImageView.image = songWithImage.image
+            })
+            .subscribe()
+            .disposed(by: disposeBag)
+        
+        setNeedsUpdateConstraints()
     }
     
     func bindThemeManager() {
         themeManager.currentTheme
             .do(onNext: { [unowned self] themeType in
                 self.backgroundColor = themeType.theme.backgroundColor
-                self.textLabel?.textColor = themeType.theme.primaryTextColor
-                self.detailTextLabel?.textColor = themeType.theme.secondaryTextColor
+                self.trackTitleLabel.textColor = themeType.theme.primaryTextColor
+                self.albumAndArtistTitleLabel.textColor = themeType.theme.secondaryTextColor
                 self.durationLabel.textColor = themeType.theme.secondaryTextColor
                 self.tintColor = themeType.theme.tintColor
                 self.selectedBackgroundView?.backgroundColor = themeType.theme.selectedBackground

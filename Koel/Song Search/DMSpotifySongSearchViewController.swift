@@ -248,9 +248,9 @@ extension DMSpotifySongSearchViewController {
     static func spotifySongDataSource(withViewModel viewModel: DMSpotifySongSearchViewModelType) -> RxTableViewSectionedAnimatedDataSource<SongSearchResultSectionModel> {
         
         return RxTableViewSectionedAnimatedDataSource<SongSearchResultSectionModel>(
-            animationConfiguration: AnimationConfiguration(insertAnimation: .right,
-                                                           reloadAnimation: .left,
-                                                           deleteAnimation: .top),
+            animationConfiguration: AnimationConfiguration(insertAnimation: .automatic,
+                                                           reloadAnimation: .none,
+                                                           deleteAnimation: .none),
             configureCell: { (dataSource, tableView, indexPath, element) -> UITableViewCell in
                 let cell = tableView.dequeueReusableCell(withIdentifier: DMSpotifySongTableViewCell.reuseIdentifier,
                                                          for: indexPath)

@@ -36,12 +36,8 @@ extension Observable where Element: Sequence, Element.Element: ImageContaining  
         let downloadObservables = map { $0.map { Observable<Element.Element>.just($0).downloadImage() } }
         return downloadObservables
             .flatMap { downloadObservables in
-                return Observable<Element.Element>.merge(downloadObservables)
+                return Observable<Element.Element>.merge(downloadObservables).toArray()
             }
-            .reduce([], accumulator: { (array, entity) in
-                return array + [entity]
-            })
-            .debug("download image", trimOutput: true)
     }
     
 }
