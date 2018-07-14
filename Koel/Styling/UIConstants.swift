@@ -28,6 +28,7 @@ struct UIConstants {
         static let playedSongs = NSLocalizedString("PLAYED_SONGS_SECTION_TITLE", comment: "")
         static let later = NSLocalizedString("LATER", comment: "")
         static let authenticate = NSLocalizedString("AUTHENTICATE", comment: "")
+        static let noSearchResults = NSLocalizedString("NO_SEARCH_RESULTS", comment: "")
         
         // Song Search
         static let addSelectedSongs = NSLocalizedString("ADD_SELECTED_SONGS", comment: "")

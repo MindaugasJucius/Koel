@@ -13,6 +13,7 @@
 "REFRESH_SONG_CACHE" = "Pull to refresh";
 "LATER" = "Later";
 "AUTHENTICATE" = "Login";
+"NO_SEARCH_RESULTS" = "No songs have been found";
 
 // Song search
 "SEARCH_SPOTIFY" = "Find your songs in Spotify";

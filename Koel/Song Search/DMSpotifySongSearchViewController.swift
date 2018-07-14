@@ -261,6 +261,7 @@ extension DMSpotifySongSearchViewController {
                 case .emptySectionItem:
                     let cell = tableView.dequeueReusableCell(withIdentifier: DMKoelEmptyPlaceholderTableViewCell.reuseIdentifier,
                                                              for: indexPath)
+                    (cell as? DMKoelEmptyPlaceholderTableViewCell)?.placeholderImage = #imageLiteral(resourceName: "empty song screen placeholder")
                     return cell
                 default:
                     return cell
