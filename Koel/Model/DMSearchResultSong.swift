@@ -26,7 +26,7 @@ struct DMSearchResultSong: Equatable, ImageContaining {
     var image: UIImage?
     
     static func ==(lhs: DMSearchResultSong, rhs: DMSearchResultSong) -> Bool {
-        return lhs.spotifyURI == rhs.spotifyURI && lhs.image == rhs.image
+        return lhs.image == rhs.image
     }
 
 }

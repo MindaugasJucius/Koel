@@ -175,7 +175,7 @@ extension DMSpotifySongSearchViewController {
                 self.prefetchTrigger
                     .map { _ in }
                     .debounce(0.1, scheduler: MainScheduler.instance)
-                    .bind(to: self.viewModel.offsetTriggerRelay)
+                    .bind(to: self.viewModel.offsetTriggerObserver)
                     .disposed(by: self.disposeBag)
             }
             .subscribe()
@@ -209,7 +209,7 @@ extension DMSpotifySongSearchViewController {
         
         refreshControl.rx.controlEvent(.valueChanged).asObservable()
             .debug("what", trimOutput: true)
-            .bind(to: viewModel.refreshTriggerRelay)
+            .bind(to: viewModel.refreshTriggerObserver)
             .disposed(by: disposeBag)
     }
 }

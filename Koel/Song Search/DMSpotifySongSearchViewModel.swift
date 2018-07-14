@@ -50,6 +50,10 @@ enum SectionType: String, IdentifiableType {
 
 typealias SongSearchResultSectionModel = AnimatableSectionModel<SectionType, SectionItem>
 
+extension AnimatableSectionModel where Section == SectionType, ItemType == SectionItem {
+    
+    static let empty = AnimatableSectionModel.init(model: .empty, items: [SectionItem.emptySectionItem])
+}
 
 protocol DMSpotifySongSearchViewModelType {
     var songResults: Driver<[SongSearchResultSectionModel]> { get }
@@ -59,8 +63,8 @@ protocol DMSpotifySongSearchViewModelType {
     var sectionItemSelected: Action<SectionItem, Void> { get }
     var sectionItemDeselected: Action<SectionItem, Void> { get }
     
-    var offsetTriggerRelay: PublishSubject<()> { get }
-    var refreshTriggerRelay: PublishSubject<()> { get }
+    var offsetTriggerObserver: AnyObserver<()> { get }
+    var refreshTriggerObserver: AnyObserver<()> { get }
     
     var queueSelectedSongs: CocoaAction { get }
 }
@@ -81,17 +85,23 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
         return self.isLoadingRelay.asDriver()
     }
     
+    private var resultRelay: BehaviorRelay<[SongSearchResultSectionModel]> = BehaviorRelay(value: [SongSearchResultSectionModel.empty])
+    
     var songResults: Driver<[SongSearchResultSectionModel]> {
-        return spotifySearchService.trackResults
+        return resultRelay.asDriver()
     }
     
-    var offsetTriggerRelay: PublishSubject<()> {
-        return spotifySearchService.offsetTriggerRelay
+    var offsetTriggerObserver: AnyObserver<()> {
+        return offsetTriggerRelay.asObserver()
     }
     
-    var refreshTriggerRelay: PublishSubject<()> {
-        return spotifySearchService.refreshTriggerRelay
+    private var offsetTriggerRelay: PublishSubject<()> = PublishSubject()
+    
+    var refreshTriggerObserver: AnyObserver<()> {
+        return refreshTriggerRelay.asObserver()
     }
+    
+    private var refreshTriggerRelay: PublishSubject<()> = PublishSubject()
     
     let promptCoordinator: PromptCoordinating
     let spotifySearchService: DMSpotifySearchServiceType
@@ -121,6 +131,23 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
             .subscribe()
             .disposed(by: disposeBag)
 
+        offsetTriggerRelay.asObservable()
+            .do(onNext: { [unowned self] in self.isLoadingRelay.accept(true) })
+            .flatMap { self.spotifySearchService.trackResults }
+            .do(onNext: { [unowned self] _ in self.isLoadingRelay.accept(false) })
+            .map { newSavedTracks in
+                if newSavedTracks.isNotEmpty {
+                    let songSectionItems = newSavedTracks.map { SectionItem.songSectionItem(song: $0) }
+                    return [SongSearchResultSectionModel.init(model: .songs, items: songSectionItems)]
+                    
+                } else {
+                    return [SongSearchResultSectionModel.empty]
+                }
+            }
+            .bind(to: resultRelay)
+            .disposed(by: disposeBag)
+        
+        
         // remove selected songs on queueing
         queueSelectedSongs.executionObservables.map { _ in [] }
             .bind(to: selectedSongsRelay)

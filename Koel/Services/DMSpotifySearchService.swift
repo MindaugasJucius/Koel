@@ -18,10 +18,7 @@ protocol DMSpotifySearchServiceType {
     
     var resultError: Observable<Error> { get }
     
-    var trackResults: Driver<[SongSearchResultSectionModel]> { get }
-    
-    var offsetTriggerRelay: PublishSubject<()> { get }
-    var refreshTriggerRelay: PublishSubject<()> { get }
+    var trackResults: Driver<[DMSearchResultSong]> { get }
     
 }
 
@@ -36,62 +33,30 @@ class DMSpotifySearchService<T: Paginatable & Mappable>: DMSpotifySearchServiceT
     private let reachabilityService: ReachabilityService
     
     private var latestPagingObject: PagingObject<T>? = nil
-    private var allTracks: [DMSearchResultSong] = []
     
     private var initialRequest: Observable<PagingObject<T>>
     
     private let resultErrorRelay: PublishRelay<Error> = PublishRelay()
-
-    let offsetTriggerRelay: PublishSubject<()>
-    let refreshTriggerRelay: PublishSubject<()>
     
-    private let resultsSubject: PublishSubject<[DMSearchResultSong]> = PublishSubject()
-    
-    var trackResults: Driver<[SongSectionModel]> {
-        return resultsSubject.asObservable()
-            .map { [unowned self] newSavedTracks in
-                self.allTracks.append(contentsOf: newSavedTracks)
-                return self.allTracks.map { SectionItem.songSectionItem(song: $0) }
-            }
-            .map { [SongSectionModel.songSection(title: nil, items: $0)] }
-            .asDriver(onErrorJustReturn: valueOnError)
-            .startWith([SongSectionModel.emptySection(item: SectionItem.emptySectionItem)])
+    private var resultsArray: [DMSearchResultSong] = []    
+    var trackResults: Driver<[DMSearchResultSong]> {
+        return results
+            .retryWhen(retryHandler)
+            .do(onError: { error in self.resultErrorRelay.accept(error) })
+            .subscribeOn(concurrentScheduler)
+            .asDriver(onErrorJustReturn: [])
     }
-    
     
     var resultError: Observable<Error> {
         return resultErrorRelay.asObservable()
     }
     
-    private var valueOnError: [SongSectionModel] {
-        return allTracks.isEmpty ? [SongSectionModel.emptySection(item: SectionItem.emptySectionItem)] : []
-    }
-    
     init(authService: DMSpotifyAuthService,
          reachabilityService: ReachabilityService,
          initialRequest: Observable<PagingObject<T>>) {
-        self.offsetTriggerRelay = PublishSubject()
-        self.refreshTriggerRelay = PublishSubject()
         self.authService = authService
         self.reachabilityService = reachabilityService
         self.initialRequest = initialRequest
-        
-        setupObservables()
-    }
-    
-    private func setupObservables() {
-        offsetTriggerRelay.asObservable()
-            .flatMap { _ in
-                return self.results
-            }
-            .bind(to: resultsSubject)
-            .disposed(by: disposeBag)
-        
-        Observable.zip(offsetTriggerRelay.asObservable(), resultsSubject.asObservable())
-            .map { $0.1 }
-            .downloadImages()
-            .bind(to: resultsSubject)
-            .disposed(by: disposeBag)
     }
     
     static func initial(completionBlocks: @escaping ((success: PagingObjectSuccess, failure: PagingObjectFailure)) -> ()) -> Observable<PagingObject<T>> {
@@ -172,9 +137,12 @@ class DMSpotifySearchService<T: Paginatable & Mappable>: DMSpotifySearchServiceT
                     return DMSearchResultSong.create(from: savedTrack)
                 }
             }
-            .retryWhen(retryHandler)
-            .do(onError: { error in self.resultErrorRelay.accept(error) })
-            .subscribeOn(concurrentScheduler)
+            .map { [unowned self] songs in
+                var currentSongs = self.resultsArray
+                currentSongs.append(contentsOf: songs)
+                self.resultsArray = currentSongs
+                return currentSongs
+            }
     }
 
 }
