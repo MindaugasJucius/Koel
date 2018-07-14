@@ -31,7 +31,7 @@ enum SongCellStylesheet {
     }
     
     static let subtitleLabelStyle = Style<UILabel> {
-        let titleStyle: UIFontTextStyle = isiPad ? .headline : .caption1
+        let titleStyle: UIFontTextStyle = isiPad ? .headline : .callout
         $0.font = UIFont.preferredFont(forTextStyle: titleStyle)
         $0.numberOfLines = 1
     }

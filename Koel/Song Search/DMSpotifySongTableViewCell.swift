@@ -9,7 +9,7 @@
 import UIKit
 import RxSwift
 
-private let cellHeight: CGFloat = 65
+private let cellHeight: CGFloat = 55
 
 class DMSpotifySongTableViewCell: UITableViewCell, ReusableView, Themeable {
     
@@ -46,8 +46,7 @@ class DMSpotifySongTableViewCell: UITableViewCell, ReusableView, Themeable {
     private lazy var stackView: UIStackView = {
         let stackView = UIStackView(arrangedSubviews: [trackTitleLabel, albumAndArtistTitleLabel])
         stackView.axis = .vertical
-        stackView.distribution = .fillEqually
-        stackView.spacing = 5
+        stackView.distribution = .fillProportionally
         stackView.translatesAutoresizingMaskIntoConstraints = false
         return stackView
     }()
