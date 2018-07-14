@@ -23,7 +23,6 @@ class DMSpotifySongTableViewCell: UITableViewCell, ReusableView, Themeable {
         let imageView = UIImageView(image: nil)
         imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.backgroundColor = .green
         return imageView
     }()
     
@@ -46,7 +45,7 @@ class DMSpotifySongTableViewCell: UITableViewCell, ReusableView, Themeable {
     private lazy var stackView: UIStackView = {
         let stackView = UIStackView(arrangedSubviews: [trackTitleLabel, albumAndArtistTitleLabel])
         stackView.axis = .vertical
-        stackView.distribution = .fillProportionally
+        stackView.distribution = .fill
         stackView.translatesAutoresizingMaskIntoConstraints = false
         return stackView
     }()
@@ -120,7 +119,8 @@ class DMSpotifySongTableViewCell: UITableViewCell, ReusableView, Themeable {
         trackTitleLabel.text = song.title
         albumAndArtistTitleLabel.text = "\(song.artistName) • \(song.albumName)"
         durationLabel.text = String.secondsString(from: song.durationSeconds)
-
+        albumArtImageView.image = #imageLiteral(resourceName: "song cell placeholder")
+        
         Observable.of(song)
             .downloadImage()
             .observeOn(MainScheduler.instance)
