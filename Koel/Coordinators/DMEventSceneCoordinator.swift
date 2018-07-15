@@ -121,14 +121,16 @@ class DMEventSceneCoordinator: NSObject {
         let spotifySearchService = DMSpotifySearchService<SavedTrack>(authService: spotifyAuthService,
                                                                       reachabilityService: self.reachabilityService,
                                                                       initialRequest: initialRequest)
+        
         let spotifySongSearchViewModel = DMSpotifySongSearchViewModel(promptCoordinator: self,
                                                                       spotifySearchService: spotifySearchService,
                                                                       onQueueSelectedSongs: onQueueSelectedSongs())
         
-        let spotifySearchVC = DMSpotifySongSearchViewController(withViewModel: spotifySongSearchViewModel,
+        let spotifySearchVC = DMSpotifyTracksViewController(withViewModel: spotifySongSearchViewModel,
                                                                 themeManager: ThemeManager.shared)
         spotifySearchVC.setupForViewModel()
-        return UINavigationController(rootViewController: spotifySearchVC)
+        let navVC = UINavigationController(rootViewController: DMSpotifySearchContainerViewController())
+        return navVC
     }()
     
 }

@@ -1,5 +1,5 @@
 //
-//  DMSpotifySongSearchViewController.swift
+//  DMSpotifyTracksViewController.swift
 //  Koel
 //
 //  Created by Mindaugas on 25/03/2018.
@@ -23,18 +23,18 @@ extension UIScrollView {
 
 }
 
-class DMSpotifySongSearchViewController: UIViewController, BindableType, Themeable {
+class DMSpotifyTracksViewController: UIViewController, BindableType, Themeable {
     
     typealias ViewModelType = DMSpotifySongSearchViewModelType
 
-    let viewModel: DMSpotifySongSearchViewModelType
+    let viewModel: ViewModelType
     let themeManager: ThemeManager
 
     private let disposeBag = DisposeBag()
     
     //MARK: UI Elements
     
-    private var addSongsButton = DMKoelButton(themeManager: ThemeManager.shared)
+    private var addSongsButton: DMKoelButton
     
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
@@ -86,6 +86,7 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType, Themeab
         self.viewModel = viewModel
         self.themeManager = themeManager
         self.tableViewLoadingFooter = DMKoelLoadingView(themeManager: themeManager)
+        self.addSongsButton = DMKoelButton(themeManager: themeManager)
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -128,12 +129,12 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType, Themeab
     
 }
 
-extension DMSpotifySongSearchViewController {
+extension DMSpotifyTracksViewController {
     
     func bindViewModel() {
         addSongsButton.rx.action = viewModel.queueSelectedSongs
         
-        let dataSource = DMSpotifySongSearchViewController.spotifySongDataSource(withViewModel: self.viewModel)
+        let dataSource = DMSpotifyTracksViewController.spotifySongDataSource(withViewModel: self.viewModel)
         
         viewModel.songResults
             .drive(tableView.rx.items(dataSource: dataSource))
@@ -211,7 +212,7 @@ extension DMSpotifySongSearchViewController {
     }
 }
 
-extension DMSpotifySongSearchViewController {
+extension DMSpotifyTracksViewController {
     
     //MARK: - Helpers
     
@@ -240,7 +241,7 @@ extension DMSpotifySongSearchViewController {
     
 }
 
-extension DMSpotifySongSearchViewController {
+extension DMSpotifyTracksViewController {
     
     static func spotifySongDataSource(withViewModel viewModel: DMSpotifySongSearchViewModelType) -> RxTableViewSectionedAnimatedDataSource<SongSearchResultSectionModel> {
         
