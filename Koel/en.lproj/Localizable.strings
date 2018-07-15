@@ -13,8 +13,7 @@
 "REFRESH_SONG_CACHE" = "Pull to refresh";
 "LATER" = "Later";
 "AUTHENTICATE" = "Login";
-"NO_SEARCH_RESULTS" = "No tracks have been found";
-"ENTER_TO_SEARCH" = "Enter a keyword to search Spotify";
+"NO_SEARCH_RESULTS" = "No results";
 
 // Song search
 "SEARCH_SPOTIFY" = "Add your Spotify tracks";
@@ -29,6 +28,8 @@
 
 //SPT General
 "PLEASE_LOGIN_TO_PERFORM_ACTION" = "Please login with Spotify to %@.";
+"ENTER_TO_SEARCH" = "Enter a keyword to search Spotify";
+"USER_SAVED_TRACKS" = "Your saved tracks";
 
 // Management
 "NEARBY_PEERS_SECTION_TITLE" = "Nearby";

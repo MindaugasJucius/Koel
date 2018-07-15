@@ -29,8 +29,7 @@ struct UIConstants {
         static let later = NSLocalizedString("LATER", comment: "")
         static let authenticate = NSLocalizedString("AUTHENTICATE", comment: "")
         static let noSearchResults = NSLocalizedString("NO_SEARCH_RESULTS", comment: "")
-        static let enterToSearch = NSLocalizedString("ENTER_TO_SEARCH", comment: "")
-        
+
         // Song Search
         static let addSelectedSongs = NSLocalizedString("ADD_SELECTED_SONGS", comment: "")
         static let searchSongs = NSLocalizedString("SEARCH_SPOTIFY", comment: "")
@@ -41,6 +40,8 @@ struct UIConstants {
         
         // SPT General
         static let pleaseLoginToPerformAction = NSLocalizedString("PLEASE_LOGIN_TO_PERFORM_ACTION", comment: "")
+        static let enterToSearch = NSLocalizedString("ENTER_TO_SEARCH", comment: "")
+        static let userSavedTracks = NSLocalizedString("USER_SAVED_TRACKS", comment: "")
         
         // SPT Errors
         static let loginToPerformActionError = NSLocalizedString("NEED_TO_LOGIN_TO_PERFORM_ACTION_ERROR", comment: "")

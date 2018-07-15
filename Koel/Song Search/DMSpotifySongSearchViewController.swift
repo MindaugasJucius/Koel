@@ -97,9 +97,6 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType, Themeab
         super.viewDidLoad()
         bindThemeManager()
         title = UIConstants.strings.searchSongs
-        let searchController = UISearchController(searchResultsController: nil)
-        navigationItem.searchController = searchController
-        navigationItem.hidesSearchBarWhenScrolling = false
         
         view.addSubview(tableView)
         tableView.refreshControl = refreshControl
@@ -271,6 +268,12 @@ extension DMSpotifySongSearchViewController {
                     cell.placeholderText = UIConstants.strings.enterToSearch
                     return cell
                 }
+            },
+            titleForHeaderInSection: { dataSource, index in
+                if dataSource.sectionModels[index].identity == SectionType.songs.rawValue {
+                    return UIConstants.strings.userSavedTracks
+                }
+                return nil
             }
         )
     }
