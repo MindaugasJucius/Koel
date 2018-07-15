@@ -248,22 +248,27 @@ extension DMSpotifySongSearchViewController {
     static func spotifySongDataSource(withViewModel viewModel: DMSpotifySongSearchViewModelType) -> RxTableViewSectionedAnimatedDataSource<SongSearchResultSectionModel> {
         
         return RxTableViewSectionedAnimatedDataSource<SongSearchResultSectionModel>(
-            animationConfiguration: AnimationConfiguration(insertAnimation: .automatic,
+            animationConfiguration: AnimationConfiguration(insertAnimation: .none,
                                                            reloadAnimation: .none,
                                                            deleteAnimation: .none),
             configureCell: { (dataSource, tableView, indexPath, element) -> UITableViewCell in
-                let cell = tableView.dequeueReusableCell(withIdentifier: DMSpotifySongTableViewCell.reuseIdentifier,
-                                                         for: indexPath)
                 switch dataSource[indexPath] {
                 case let .songSectionItem(song: item):
-                    (cell as? DMSpotifySongTableViewCell)?.configure(withSong: item)
+                    let cell = tableView.dequeueReusableCell(withIdentifier: DMSpotifySongTableViewCell.reuseIdentifier,
+                                                             for: indexPath) as! DMSpotifySongTableViewCell
+                    cell.configure(withSong: item)
                     return cell
                 case .emptySectionItem:
                     let cell = tableView.dequeueReusableCell(withIdentifier: DMKoelEmptyPlaceholderTableViewCell.reuseIdentifier,
-                                                             for: indexPath)
-                    (cell as? DMKoelEmptyPlaceholderTableViewCell)?.placeholderImage = #imageLiteral(resourceName: "empty song screen placeholder")
+                                                             for: indexPath) as! DMKoelEmptyPlaceholderTableViewCell
+                    cell.placeholderImage = #imageLiteral(resourceName: "empty song screen placeholder")
+                    cell.placeholderText = UIConstants.strings.noSearchResults
                     return cell
-                default:
+                case .initialSectionItem:
+                    let cell = tableView.dequeueReusableCell(withIdentifier: DMKoelEmptyPlaceholderTableViewCell.reuseIdentifier,
+                                                             for: indexPath) as! DMKoelEmptyPlaceholderTableViewCell
+                    cell.placeholderImage = #imageLiteral(resourceName: "empty song screen placeholder")
+                    cell.placeholderText = UIConstants.strings.enterToSearch
                     return cell
                 }
             }

@@ -29,6 +29,7 @@ struct UIConstants {
         static let later = NSLocalizedString("LATER", comment: "")
         static let authenticate = NSLocalizedString("AUTHENTICATE", comment: "")
         static let noSearchResults = NSLocalizedString("NO_SEARCH_RESULTS", comment: "")
+        static let enterToSearch = NSLocalizedString("ENTER_TO_SEARCH", comment: "")
         
         // Song Search
         static let addSelectedSongs = NSLocalizedString("ADD_SELECTED_SONGS", comment: "")

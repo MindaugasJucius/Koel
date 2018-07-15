@@ -13,10 +13,11 @@
 "REFRESH_SONG_CACHE" = "Pull to refresh";
 "LATER" = "Later";
 "AUTHENTICATE" = "Login";
-"NO_SEARCH_RESULTS" = "No songs have been found";
+"NO_SEARCH_RESULTS" = "No tracks have been found";
+"ENTER_TO_SEARCH" = "Enter a keyword to search Spotify";
 
 // Song search
-"SEARCH_SPOTIFY" = "Find your songs in Spotify";
+"SEARCH_SPOTIFY" = "Add your Spotify tracks";
 "ADD_SELECTED_SONGS" = "Queue selected tracks";
 
 //SPT Errors

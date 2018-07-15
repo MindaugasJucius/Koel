@@ -13,9 +13,10 @@ import RxCocoa
 import RxDataSources
 
 enum SectionItem: Equatable {
-    case songSectionItem(song: DMSearchResultSong)
-    case loadingSectionItem
+    
+    case initialSectionItem
     case emptySectionItem
+    case songSectionItem(song: DMSearchResultSong)
     
     static func ==(lhs: SectionItem, rhs: SectionItem) -> Bool {
         if case SectionItem.songSectionItem(song: let rhsSong) = rhs,
@@ -39,8 +40,8 @@ extension SectionItem: IdentifiableType {
 
 enum SectionType: String, IdentifiableType {
 
+    case initial
     case empty
-    case loading
     case songs
 
     var identity: String {
@@ -53,6 +54,8 @@ typealias SongSearchResultSectionModel = AnimatableSectionModel<SectionType, Sec
 extension AnimatableSectionModel where Section == SectionType, ItemType == SectionItem {
     
     static let empty = AnimatableSectionModel.init(model: .empty, items: [SectionItem.emptySectionItem])
+    static let initial = AnimatableSectionModel.init(model: .initial, items: [SectionItem.initialSectionItem])
+    
 }
 
 protocol DMSpotifySongSearchViewModelType {
@@ -85,7 +88,7 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
         return self.isLoadingRelay.asDriver()
     }
     
-    private var resultRelay: BehaviorRelay<[SongSearchResultSectionModel]> = BehaviorRelay(value: [SongSearchResultSectionModel.empty])
+    private var resultRelay: BehaviorRelay<[SongSearchResultSectionModel]> = BehaviorRelay(value: [SongSearchResultSectionModel.initial])
     
     var songResults: Driver<[SongSearchResultSectionModel]> {
         return resultRelay.asDriver()

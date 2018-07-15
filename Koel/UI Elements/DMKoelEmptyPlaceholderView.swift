@@ -21,6 +21,15 @@ class DMKoelEmptyPlaceholderTableViewCell: UITableViewCell, ReusableView {
         }
     }
     
+    var placeholderText: String? {
+        get {
+            return placeholderView.placeholderText
+        }
+        set {
+            placeholderView.placeholderText = newValue
+        }
+    }
+    
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         configure()
@@ -49,9 +58,17 @@ class DMKoelEmptyPlaceholderView: UIView {
         let label = UILabel(style: SongCellStylesheet.titleLabelStyle)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = .gray
-        label.text = UIConstants.strings.noSearchResults
         return label
     }()
+    
+    var placeholderText: String? {
+        get {
+            return label.text
+        }
+        set {
+            label.text = newValue
+        }
+    }
     
     private lazy var placeholderImageView: UIImageView = {
         let imageView = UIImageView(image: nil)
