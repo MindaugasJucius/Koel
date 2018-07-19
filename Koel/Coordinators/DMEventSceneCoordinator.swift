@@ -115,7 +115,7 @@ class DMEventSceneCoordinator: NSObject {
                                                                          onQueueSelectedSongs: onQueueSelectedSongs())
         
         let searchContainerViewController = DMSpotifySearchContainerViewController(viewModel: searchContainerViewModel)
-        
+        searchContainerViewController.bindViewModel()
         return UINavigationController(rootViewController: searchContainerViewController)
     }()
     

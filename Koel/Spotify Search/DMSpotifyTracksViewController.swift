@@ -34,15 +34,14 @@ class DMSpotifyTracksViewController: UIViewController, BindableType, Themeable {
     
     //MARK: UI Elements
     
-    private var addSongsButton: DMKoelButton
-    
     private lazy var tableView: UITableView = {
-        let tableView = UITableView()
+        let tableView = UITableView(frame: .zero, style: .grouped)
         tableView.separatorStyle = .none
         tableView.clipsToBounds = false
         tableView.backgroundColor = .clear
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.allowsMultipleSelection = true
+        tableView.estimatedSectionHeaderHeight = 0
         tableView.register(DMSpotifySongTableViewCell.self,
                            forCellReuseIdentifier: DMSpotifySongTableViewCell.reuseIdentifier)
         tableView.register(DMKoelEmptyPlaceholderTableViewCell.self,
@@ -86,7 +85,6 @@ class DMSpotifyTracksViewController: UIViewController, BindableType, Themeable {
         self.viewModel = viewModel
         self.themeManager = themeManager
         self.tableViewLoadingFooter = DMKoelLoadingView(themeManager: themeManager)
-        self.addSongsButton = DMKoelButton(themeManager: themeManager)
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -110,11 +108,7 @@ class DMSpotifyTracksViewController: UIViewController, BindableType, Themeable {
         ]
         NSLayoutConstraint.activate(tableViewConstraints)
         
-        view.addSubview(addSongsButton)
-        addSongsButton.setTitle(UIConstants.strings.addSelectedSongs, for: .normal)
-        addSongsButton.addConstraints(inSuperview: view)
         self.tableView.tableFooterView = tableViewLoadingFooter
-
     }
     
     func bindThemeManager() {

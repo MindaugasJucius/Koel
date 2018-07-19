@@ -52,12 +52,12 @@ class DMSpotifySongTableViewCell: UITableViewCell, ReusableView, Themeable {
     
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
-        bindThemeManager()
-
         selectedBackgroundView = UIView()
         contentView.addSubview(durationLabel)
         contentView.addSubview(albumArtImageView)
         contentView.addSubview(stackView)
+        
+        bindThemeManager()
     }
     
     required init?(coder aDecoder: NSCoder) {

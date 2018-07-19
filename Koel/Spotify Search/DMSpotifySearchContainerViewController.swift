@@ -48,7 +48,6 @@ class DMSpotifySearchContainerViewController: UISearchContainerViewController, B
         searchController.searchBar.scopeButtonTitles = searchScopes.map { $0.rawValue }
         searchController.hidesNavigationBarDuringPresentation = false
         searchController.dimsBackgroundDuringPresentation = false
-
         navigationController?.navigationBar.prefersLargeTitles = false
         navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = false

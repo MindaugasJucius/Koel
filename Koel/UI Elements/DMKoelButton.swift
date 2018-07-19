@@ -52,26 +52,7 @@ protocol KoelButtonAppearance {
     var colors: KoelButtonColorable { get set }
 }
 
-private struct KoelButtonStartAppearance: KoelButtonAppearance {
-    
-    let transform: CATransform3D
-    let shadowOffset: CGSize
-    let shadowOpacity: Float
-    let shadowRadius: CGFloat
-    let dimmingViewOpacity: Float
-    var colors: KoelButtonColorable
-    
-    init(buttonColors: KoelButtonColorable) {
-        transform = CATransform3DIdentity
-        shadowOffset = CGSize(width: 0, height: 8)
-        shadowOpacity = 0.4
-        shadowRadius = 5
-        colors = buttonColors
-        dimmingViewOpacity = 0
-    }
-}
-
-private struct KoelButtonDisabledAppearance: KoelButtonAppearance {
+private struct KoelButtonDefaultAppearance: KoelButtonAppearance {
     
     let transform: CATransform3D
     let shadowOffset: CGSize
@@ -123,7 +104,7 @@ class DMKoelButton: UIButton, Themeable {
     
     private var startAppearance: KoelButtonAppearance!
     private var endAppearance: KoelButtonAppearance!
-    private var disabledAppearance: KoelButtonDisabledAppearance!
+    private var disabledAppearance: KoelButtonAppearance!
     
     private lazy var dimmingView: UIView = { this in
         let view = UIView(frame: .zero)
@@ -165,7 +146,7 @@ class DMKoelButton: UIButton, Themeable {
     }
     
     required init?(coder aDecoder: NSCoder) {
-        fatalError("not implemented")
+        fatalError("init(coder:) has not been implemented")
     }
     
     func bindThemeManager() {
@@ -181,9 +162,9 @@ class DMKoelButton: UIButton, Themeable {
         let disabledColors = KoelButtonDisabledColors(themeType: themeType)
         let buttonColors = KoelButtonColors(themeType: themeType)
         
-        let disabledAppearance = KoelButtonDisabledAppearance(buttonColors: disabledColors)
+        let disabledAppearance = KoelButtonDefaultAppearance(buttonColors: disabledColors)
+        let startAppearance = KoelButtonDefaultAppearance(buttonColors: buttonColors)
         let endAppearance = KoelButtonEndAppearance(buttonColors: buttonColors)
-        let startAppearance = KoelButtonStartAppearance(buttonColors: buttonColors)
         
         if self.isEnabled {
             self.currentAppearance = startAppearance
@@ -241,7 +222,6 @@ class DMKoelButton: UIButton, Themeable {
     }
     
     func addConstraints(inSuperview superview: UIView) {
-
         let constraints = [
             leftAnchor.constraint(equalTo: superview.safeAreaLayoutGuide.leftAnchor, constant: Insets.left),
             superview.safeAreaLayoutGuide.rightAnchor.constraint(equalTo: rightAnchor, constant: Insets.right),
@@ -252,7 +232,6 @@ class DMKoelButton: UIButton, Themeable {
     }
     
     private func animate(toAppearanceState appearance: KoelButtonAppearance) {
-
         // Shadow transformations
         let shadowOffsetAnimation = CABasicAnimation(keyPath: "shadowOffset")
         
