@@ -59,7 +59,7 @@ class DMSpotifySearchService<T: Paginatable & Mappable>: DMSpotifySearchServiceT
         self.initialRequest = initialRequest
     }
     
-    static func initial(completionBlocks: @escaping ((success: PagingObjectSuccess, failure: PagingObjectFailure)) -> ()) -> Observable<PagingObject<T>> {
+    static func initialRequest(completionBlocks: @escaping ((success: PagingObjectSuccess, failure: PagingObjectFailure)) -> ()) -> Observable<PagingObject<T>> {
         return Observable<PagingObject<T>>.create { observer in
             let completion: (success: PagingObjectSuccess, failure: PagingObjectFailure) = (
                 success: { pagingObject in

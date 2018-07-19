@@ -132,25 +132,13 @@ class DMSpotifyTracksViewController: UIViewController, BindableType, Themeable {
 extension DMSpotifyTracksViewController {
     
     func bindViewModel() {
-        addSongsButton.rx.action = viewModel.queueSelectedSongs
-        
+
         let dataSource = DMSpotifyTracksViewController.spotifySongDataSource(withViewModel: self.viewModel)
         
         viewModel.songResults
             .drive(tableView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
-        
-        viewModel.queueSelectedSongs.executing
-            .filter { $0 }
-            .debounce(0.3, scheduler: MainScheduler.instance)
-            .do(onNext: { _ in
-                self.tableView.indexPathsForSelectedRows?.forEach {
-                    self.tableView.deselectRow(at: $0, animated: false)
-                }
-            })
-            .subscribe()
-            .disposed(by: disposeBag)
-        
+
         tableView.rx
             .modelSelected(SectionItem.self)
             .subscribe(viewModel.sectionItemSelected.inputs)

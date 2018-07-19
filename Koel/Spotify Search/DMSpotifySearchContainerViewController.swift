@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import RxSwift
 
 private enum SpotifySearchScopes: String {
     case tracks
@@ -14,13 +15,25 @@ private enum SpotifySearchScopes: String {
     case playlists
 }
 
-class DMSpotifySearchContainerViewController: UISearchContainerViewController {
+class DMSpotifySearchContainerViewController: UISearchContainerViewController, BindableType {
+
+    typealias ViewModelType = DMSpotifySearchContainerViewModelType
 
     private let searchScopes: [SpotifySearchScopes] = [.tracks, .albums, .playlists]
+    private let disposeBag = DisposeBag()
     
+    var viewModel: DMSpotifySearchContainerViewModelType
     private var addSongsButton: DMKoelButton
+    
+    private lazy var tracksViewController: DMSpotifyTracksViewController = {
+        let spotifyTracksViewController = DMSpotifyTracksViewController(withViewModel: viewModel.tracksViewModel,
+                                                                        themeManager: ThemeManager.shared)
+        spotifyTracksViewController.setupForViewModel()
+        return spotifyTracksViewController
+    }()
 
-    init() {
+    init(viewModel: DMSpotifySearchContainerViewModelType) {
+        self.viewModel = viewModel
         self.addSongsButton = DMKoelButton(themeManager: ThemeManager.shared)
         super.init(searchController: UISearchController(searchResultsController: nil))
     }
@@ -46,8 +59,28 @@ class DMSpotifySearchContainerViewController: UISearchContainerViewController {
         navigationControllerView.addSubview(addSongsButton)
         addSongsButton.setTitle(UIConstants.strings.addSelectedSongs, for: .normal)
         addSongsButton.addConstraints(inSuperview: navigationControllerView)
+    
+        addChildViewController(tracksViewController)
+        view.addSubview(tracksViewController.view)
+        tracksViewController.didMove(toParentViewController: self)
     }
 
+    func bindViewModel() {
+        addSongsButton.rx.action = viewModel.queueSelectedSongs
+        
+        viewModel.queueSelectedSongs.executing
+            .filter { $0 }
+            .debounce(0.3, scheduler: MainScheduler.instance)
+            .do(onNext: { _ in
+//                self.tableView.indexPathsForSelectedRows?.forEach {
+//                    self.tableView.deselectRow(at: $0, animated: false)
+//                }
+            })
+            .subscribe()
+            .disposed(by: disposeBag)
+        
+    }
+    
 }
 
 extension DMSpotifySearchContainerViewController: UISearchBarDelegate {

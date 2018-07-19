@@ -9,7 +9,6 @@
 import UIKit
 import RxSwift
 import Action
-import Spartan
 
 protocol RootTransitioning {
     func beginCoordinating(withWindow window: UIWindow) -> Observable<Void>
@@ -110,27 +109,14 @@ class DMEventSceneCoordinator: NSObject {
     private lazy var searchViewController: UINavigationController = {
         let spotifyAuthService = DMSpotifyAuthService(promptCoordinator: self)
         
-        let initialRequest = DMSpotifySearchService.initial(completionBlocks: { (success, failure) in
-            return Spartan.getSavedTracks(limit: 50,
-                                          market: Spartan.currentCountryCode,
-                                          success: success,
-                                          failure: failure)
-
-        })
+        let searchContainerViewModel = DMSpotifySearchContainerViewModel(reachabilityService: self.reachabilityService,
+                                                                         spotifyAuthService: spotifyAuthService,
+                                                                         promptCoordinator: self,
+                                                                         onQueueSelectedSongs: onQueueSelectedSongs())
         
-        let spotifySearchService = DMSpotifySearchService<SavedTrack>(authService: spotifyAuthService,
-                                                                      reachabilityService: self.reachabilityService,
-                                                                      initialRequest: initialRequest)
+        let searchContainerViewController = DMSpotifySearchContainerViewController(viewModel: searchContainerViewModel)
         
-        let spotifySongSearchViewModel = DMSpotifySongSearchViewModel(promptCoordinator: self,
-                                                                      spotifySearchService: spotifySearchService,
-                                                                      onQueueSelectedSongs: onQueueSelectedSongs())
-        
-        let spotifySearchVC = DMSpotifyTracksViewController(withViewModel: spotifySongSearchViewModel,
-                                                                themeManager: ThemeManager.shared)
-        spotifySearchVC.setupForViewModel()
-        let navVC = UINavigationController(rootViewController: DMSpotifySearchContainerViewController())
-        return navVC
+        return UINavigationController(rootViewController: searchContainerViewController)
     }()
     
 }

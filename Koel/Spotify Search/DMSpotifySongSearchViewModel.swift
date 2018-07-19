@@ -68,8 +68,6 @@ protocol DMSpotifySongSearchViewModelType {
     
     var offsetTriggerObserver: AnyObserver<()> { get }
     var refreshTriggerObserver: AnyObserver<()> { get }
-    
-    var queueSelectedSongs: CocoaAction { get }
 }
 
 class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
@@ -106,25 +104,20 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
     
     private var refreshTriggerRelay: PublishSubject<()> = PublishSubject()
     
+    var songSelected: Action<DMSearchResultSong, Void>
+    var songRemoved: Action<DMSearchResultSong, Void>
+    
     let promptCoordinator: PromptCoordinating
     let spotifySearchService: DMSpotifySearchServiceType
    
-    private var selectedSongsRelay = BehaviorRelay<[DMSearchResultSong]>(value: [])
-    var onQueueSelectedSongs: Action<[DMSearchResultSong], Void>
-        
-    lazy var queueSelectedSongs: CocoaAction = {
-        let enabledIf = selectedSongsRelay.map { $0.count > 0 }.distinctUntilChanged()
-        return CocoaAction(enabledIf: enabledIf, workFactory: { _ -> Observable<Void> in
-            return self.onQueueSelectedSongs.execute(self.selectedSongsRelay.value)
-        })
-    }()
-    
     init(promptCoordinator: PromptCoordinating,
          spotifySearchService: DMSpotifySearchServiceType,
-         onQueueSelectedSongs: Action<[DMSearchResultSong], Void>) {
+         songSelected: Action<DMSearchResultSong, Void>,
+         songRemoved: Action<DMSearchResultSong, Void>) {
         self.promptCoordinator = promptCoordinator
         self.spotifySearchService = spotifySearchService
-        self.onQueueSelectedSongs = onQueueSelectedSongs
+        self.songSelected = songSelected
+        self.songRemoved = songRemoved
 
         spotifySearchService.resultError
             .flatMap { error in
@@ -149,20 +142,12 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
             }
             .bind(to: resultRelay)
             .disposed(by: disposeBag)
-        
-        
-        // remove selected songs on queueing
-        queueSelectedSongs.executionObservables.map { _ in [] }
-            .bind(to: selectedSongsRelay)
-            .disposed(by: disposeBag)
     }
     
     lazy var sectionItemSelected: Action<SectionItem, Void> = {
         return Action(workFactory: { [unowned self] (sectionItem: SectionItem) -> Observable<Void> in
             if case SectionItem.songSectionItem(song: let selectedSong) = sectionItem {
-                var selectedSongs = self.selectedSongsRelay.value
-                selectedSongs.append(selectedSong)
-                self.selectedSongsRelay.accept(selectedSongs)
+                self.songSelected.execute(selectedSong)
             }
             return Observable.just(())
         })
@@ -170,11 +155,8 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
     
     lazy var sectionItemDeselected: Action<SectionItem, Void> = {
         return Action(workFactory: { [unowned self] (sectionItem: SectionItem) -> Observable<Void> in
-            if case SectionItem.songSectionItem(song: let selectedSong) = sectionItem,
-                let songIndex = self.selectedSongsRelay.value.index(of: selectedSong) {
-                var selectedSongs = self.selectedSongsRelay.value
-                selectedSongs.remove(at: songIndex)
-                self.selectedSongsRelay.accept(selectedSongs)
+            if case SectionItem.songSectionItem(song: let selectedSong) = sectionItem {
+                self.songRemoved.execute(selectedSong)
             }
             return Observable.just(())
         })

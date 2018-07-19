@@ -9,7 +9,5 @@
 import Foundation
 
 protocol ViewModelType {
-    
-    var sceneCoordinator: SceneCoordinatorType { get }
 
 }
