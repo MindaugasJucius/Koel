@@ -14,16 +14,8 @@ import ObjectMapper
 
 private let concurrentScheduler = ConcurrentDispatchQueueScheduler(qos: DispatchQoS.userInitiated)
 
-protocol DMSpotifySearchServiceType {
+class DMSpotifySearchService<T: Paginatable & Mappable, RepresentableType: Representing> {
     
-    var resultError: Observable<Error> { get }
-    
-    var trackResults: Driver<[DMSearchResultSong]> { get }
-    
-}
-
-class DMSpotifySearchService<T: Paginatable & Mappable>: DMSpotifySearchServiceType {
-
     typealias PagingObjectSuccess = ((PagingObject<T>) -> Void)
     typealias PagingObjectFailure = (SpartanError) -> (Void)
     
@@ -38,8 +30,8 @@ class DMSpotifySearchService<T: Paginatable & Mappable>: DMSpotifySearchServiceT
     
     private let resultErrorRelay: PublishRelay<Error> = PublishRelay()
     
-    private var resultsArray: [DMSearchResultSong] = []    
-    var trackResults: Driver<[DMSearchResultSong]> {
+    private var resultsArray: [RepresentableType] = []
+    var trackResults: Driver<[RepresentableType]> {
         return results
             .retryWhen(retryHandler)
             .do(onError: { error in self.resultErrorRelay.accept(error) })
@@ -113,7 +105,7 @@ class DMSpotifySearchService<T: Paginatable & Mappable>: DMSpotifySearchServiceT
             .flatMap { $0 }
     }
     
-    private var results: Observable<[DMSearchResultSong]> {
+    private var results: Observable<[RepresentableType]> {
         return self.authService.spotifySession(forAction: UIConstants.strings.SPTSearchTracks)
             .flatMap { [unowned self] _ in
                 return Observable.just(self.latestPagingObject)
@@ -132,9 +124,9 @@ class DMSpotifySearchService<T: Paginatable & Mappable>: DMSpotifySearchServiceT
             .do(onNext: { [unowned self] pagingObject in
                 self.latestPagingObject = pagingObject
             })
-            .map { pagingObject -> [DMSearchResultSong] in
-                return pagingObject.items.compactMap { savedTrack -> DMSearchResultSong? in
-                    return DMSearchResultSong.create(from: savedTrack)
+            .map { pagingObject -> [RepresentableType] in
+                return pagingObject.items.compactMap { item -> RepresentableType? in
+                    return RepresentableType.create(from: item)
                 }
             }
             .map { [unowned self] songs in

@@ -43,6 +43,10 @@ struct UIConstants {
         static let enterToSearch = NSLocalizedString("ENTER_TO_SEARCH", comment: "")
         static let userSavedTracks = NSLocalizedString("USER_SAVED_TRACKS", comment: "")
         
+        static let tracks = NSLocalizedString("TRACKS", comment: "")
+        static let albums = NSLocalizedString("ALBUMS", comment: "")
+        static let playlists = NSLocalizedString("PLAYLISTS", comment: "")
+        
         // SPT Errors
         static let loginToPerformActionError = NSLocalizedString("NEED_TO_LOGIN_TO_PERFORM_ACTION_ERROR", comment: "")
 

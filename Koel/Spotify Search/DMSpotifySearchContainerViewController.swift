@@ -8,11 +8,38 @@
 
 import UIKit
 import RxSwift
+import Spartan
 
 private enum SpotifySearchScopes: String {
     case tracks
     case albums
     case playlists
+}
+
+extension SpotifySearchScopes {
+    
+    var localized: String {
+        switch self {
+        case .albums:
+            return UIConstants.strings.albums
+        case .tracks:
+            return UIConstants.strings.tracks
+        case .playlists:
+            return UIConstants.strings.playlists
+        }
+    }
+    
+    var itemSearchType: ItemSearchType {
+        switch self {
+        case .albums:
+            return ItemSearchType.album
+        case .playlists:
+            return ItemSearchType.playlist
+        case .tracks:
+            return ItemSearchType.track
+        }
+    }
+    
 }
 
 class DMSpotifySearchContainerViewController: UISearchContainerViewController, BindableType {
@@ -45,9 +72,11 @@ class DMSpotifySearchContainerViewController: UISearchContainerViewController, B
     override func viewDidLoad() {
         super.viewDidLoad()
         title = UIConstants.strings.searchSongs
-        searchController.searchBar.scopeButtonTitles = searchScopes.map { $0.rawValue }
+        searchController.searchBar.scopeButtonTitles = searchScopes.map { $0.localized }
+
         searchController.hidesNavigationBarDuringPresentation = false
         searchController.dimsBackgroundDuringPresentation = false
+
         navigationController?.navigationBar.prefersLargeTitles = false
         navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = false
@@ -78,6 +107,34 @@ class DMSpotifySearchContainerViewController: UISearchContainerViewController, B
             .subscribe()
             .disposed(by: disposeBag)
         
+        bindSearchBar()
+    }
+    
+    private func bindSearchBar() {
+        let selectedSearchType = searchController.searchBar.rx.selectedScopeButtonIndex
+            .map { self.searchScopes[$0].itemSearchType }
+        
+        let searchBarText = searchController.searchBar.rx.text
+            .filterNil()
+            .debounce(0.5, scheduler: MainScheduler.instance)
+        
+        Observable.combineLatest(searchBarText, selectedSearchType)
+            .skip(1)
+            .map { self.viewModel.searchViewModel(withQuery: $0, itemType: $1) }
+            .map { searchViewModel -> UIViewController in
+                let searchResultsViewController = DMSpotifyTracksViewController(withViewModel: searchViewModel,
+                                                                                themeManager: ThemeManager.shared)
+                searchResultsViewController.setupForViewModel()
+                return searchResultsViewController
+            }
+            .do(onNext: { [unowned self] viewController in
+                self.addChildViewController(viewController)
+                self.view.addSubview(viewController.view)
+                viewController.didMove(toParentViewController: self)
+            })
+            .subscribe()
+            .disposed(by: disposeBag)
+        
     }
     
 }
@@ -89,4 +146,5 @@ extension DMSpotifySearchContainerViewController: UISearchBarDelegate {
     }
     
 }
+
 

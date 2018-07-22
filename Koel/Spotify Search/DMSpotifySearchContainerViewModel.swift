@@ -18,6 +18,8 @@ protocol DMSpotifySearchContainerViewModelType: ViewModelType {
     var queueSelectedSongs: CocoaAction { get }
     
     var tracksViewModel: DMSpotifySongSearchViewModelType { get }
+    
+    func searchViewModel(withQuery query: String, itemType: ItemSearchType) -> DMSpotifySongSearchViewModelType
 }
 
 class DMSpotifySearchContainerViewModel: NSObject, DMSpotifySearchContainerViewModelType {
@@ -72,7 +74,7 @@ class DMSpotifySearchContainerViewModel: NSObject, DMSpotifySearchContainerViewM
     }
     
     lazy var tracksViewModel: DMSpotifySongSearchViewModelType = {
-        let initialRequest = DMSpotifySearchService.initialRequest(completionBlocks: { (success, failure) in
+        let initialRequest = DMSpotifySearchService<SavedTrack, DMSearchResultSong>.initialRequest(completionBlocks: { (success, failure) in
             return Spartan.getSavedTracks(limit: 50,
                                           market: Spartan.currentCountryCode,
                                           success: success,
@@ -80,7 +82,7 @@ class DMSpotifySearchContainerViewModel: NSObject, DMSpotifySearchContainerViewM
             
         })
         
-        let spotifySearchService = DMSpotifySearchService<SavedTrack>(authService: spotifyAuthService,
+        let spotifySearchService = DMSpotifySearchService<SavedTrack, DMSearchResultSong>(authService: spotifyAuthService,
                                                                       reachabilityService: self.reachabilityService,
                                                                       initialRequest: initialRequest)
         
@@ -89,5 +91,24 @@ class DMSpotifySearchContainerViewModel: NSObject, DMSpotifySearchContainerViewM
                                             songSelected: songSelected,
                                             songRemoved: songRemoved)
     }()
+    
+    func searchViewModel(withQuery query: String, itemType: ItemSearchType) -> DMSpotifySongSearchViewModelType {
+        let initialRequest = DMSpotifySearchService<Track, DMSearchResultSong>.initialRequest(completionBlocks: { (success, failure) in
+            return Spartan.search(query: query,
+                                  type: itemType,
+                                  success: success,
+                                  failure: failure)
+        })
+        
+        let spotifySearchService = DMSpotifySearchService<Track, DMSearchResultSong>(authService: spotifyAuthService,
+                                                                 reachabilityService: self.reachabilityService,
+                                                                 initialRequest: initialRequest)
+        
+        return DMSpotifySongSearchViewModel(promptCoordinator: promptCoordinator,
+                                            spotifySearchService: spotifySearchService,
+                                            songSelected: songSelected,
+                                            songRemoved: songRemoved)
+
+    }
     
 }

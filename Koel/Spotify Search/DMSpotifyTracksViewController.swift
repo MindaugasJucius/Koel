@@ -129,19 +129,19 @@ extension DMSpotifyTracksViewController {
 
         let dataSource = DMSpotifyTracksViewController.spotifySongDataSource(withViewModel: self.viewModel)
         
-        viewModel.songResults
-            .drive(tableView.rx.items(dataSource: dataSource))
-            .disposed(by: disposeBag)
+//        viewModel.songResults
+//            .drive(tableView.rx.items(dataSource: dataSource))
+//            .disposed(by: disposeBag)
 
-        tableView.rx
-            .modelSelected(SectionItem.self)
-            .subscribe(viewModel.sectionItemSelected.inputs)
-            .disposed(by: disposeBag)
-        
-        tableView.rx
-            .modelDeselected(SectionItem.self)
-            .subscribe(viewModel.sectionItemDeselected.inputs)
-            .disposed(by: disposeBag)
+//        tableView.rx
+//            .modelSelected(SectionItem.self)
+//            .subscribe(viewModel.sectionItemSelected.inputs)
+//            .disposed(by: disposeBag)
+//
+//        tableView.rx
+//            .modelDeselected(SectionItem.self)
+//            .subscribe(viewModel.sectionItemDeselected.inputs)
+//            .disposed(by: disposeBag)
         
         bindLoadingTrigger()
         bindLoadingFooterView()
@@ -225,9 +225,9 @@ extension DMSpotifyTracksViewController {
 
 extension DMSpotifyTracksViewController {
     
-    static func spotifySongDataSource(withViewModel viewModel: DMSpotifySongSearchViewModelType) -> RxTableViewSectionedAnimatedDataSource<SongSearchResultSectionModel> {
+    static func spotifySongDataSource(withViewModel viewModel: DMSpotifySongSearchViewModelType) -> RxTableViewSectionedAnimatedDataSource<SongSearchResultSectionModel<DMSearchResultSong>> {
         
-        return RxTableViewSectionedAnimatedDataSource<SongSearchResultSectionModel>(
+        return RxTableViewSectionedAnimatedDataSource<SongSearchResultSectionModel<DMSearchResultSong>>(
             animationConfiguration: AnimationConfiguration(insertAnimation: .none,
                                                            reloadAnimation: .none,
                                                            deleteAnimation: .none),

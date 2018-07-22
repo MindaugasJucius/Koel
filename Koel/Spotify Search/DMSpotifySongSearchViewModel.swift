@@ -11,12 +11,14 @@ import Action
 import RxSwift
 import RxCocoa
 import RxDataSources
+import Spartan
+import ObjectMapper
 
-enum SectionItem: Equatable {
+enum SectionItem<T: Representing>: Equatable {
     
     case initialSectionItem
     case emptySectionItem
-    case songSectionItem(song: DMSearchResultSong)
+    case songSectionItem(song: T)
     
     static func ==(lhs: SectionItem, rhs: SectionItem) -> Bool {
         if case SectionItem.songSectionItem(song: let rhsSong) = rhs,
@@ -31,7 +33,7 @@ extension SectionItem: IdentifiableType {
     var identity: String {
         switch self {
         case .songSectionItem(song: let song):
-            return song.spotifyURI
+            return ""//song.spotifyURI
         default:
             return ""
         }
@@ -49,28 +51,30 @@ enum SectionType: String, IdentifiableType {
     }
 }
 
-typealias SongSearchResultSectionModel = AnimatableSectionModel<SectionType, SectionItem>
+typealias SongSearchResultSectionModel<T: Representing> = AnimatableSectionModel<SectionType, SectionItem<T>>
 
-extension AnimatableSectionModel where Section == SectionType, ItemType == SectionItem {
-    
-    static let empty = AnimatableSectionModel.init(model: .empty, items: [SectionItem.emptySectionItem])
-    static let initial = AnimatableSectionModel.init(model: .initial, items: [SectionItem.initialSectionItem])
-    
-}
+//extension AnimatableSectionModel where Section == SectionType, ItemType == SectionItem {
+//
+//    static let empty = AnimatableSectionModel.init(model: .empty, items: [SectionItem.emptySectionItem])
+//    static let initial = AnimatableSectionModel.init(model: .initial, items: [SectionItem.initialSectionItem])
+//
+//}
 
 protocol DMSpotifySongSearchViewModelType {
-    var songResults: Driver<[SongSearchResultSectionModel]> { get }
+    //var songResults: Driver<[SongSearchResultSectionModel]> { get }
     var isLoading: Driver<Bool> { get }
     var isRefreshing: Driver<Bool> { get }
     
-    var sectionItemSelected: Action<SectionItem, Void> { get }
-    var sectionItemDeselected: Action<SectionItem, Void> { get }
+//    var sectionItemSelected: Action<SectionItem, Void> { get }
+//    var sectionItemDeselected: Action<SectionItem, Void> { get }
     
     var offsetTriggerObserver: AnyObserver<()> { get }
     var refreshTriggerObserver: AnyObserver<()> { get }
 }
 
-class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
+class DMSpotifySongSearchViewModel<Object: Paginatable & Mappable, RepresentableType: Representing>: DMSpotifySongSearchViewModelType {
+    
+    typealias SectionType = SongSearchResultSectionModel<RepresentableType>
     
     private let disposeBag = DisposeBag()
     
@@ -86,9 +90,9 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
         return self.isLoadingRelay.asDriver()
     }
     
-    private var resultRelay: BehaviorRelay<[SongSearchResultSectionModel]> = BehaviorRelay(value: [SongSearchResultSectionModel.initial])
+    private var resultRelay: BehaviorRelay<[SectionType]> = BehaviorRelay(value: [])
     
-    var songResults: Driver<[SongSearchResultSectionModel]> {
+    var songResults: Driver<[SongSearchResultSectionModel<RepresentableType>]> {
         return resultRelay.asDriver()
     }
     
@@ -108,10 +112,10 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
     var songRemoved: Action<DMSearchResultSong, Void>
     
     let promptCoordinator: PromptCoordinating
-    let spotifySearchService: DMSpotifySearchServiceType
+    let spotifySearchService: DMSpotifySearchService<Object, RepresentableType>
    
     init(promptCoordinator: PromptCoordinating,
-         spotifySearchService: DMSpotifySearchServiceType,
+         spotifySearchService: DMSpotifySearchService<Object, RepresentableType>,
          songSelected: Action<DMSearchResultSong, Void>,
          songRemoved: Action<DMSearchResultSong, Void>) {
         self.promptCoordinator = promptCoordinator
@@ -134,32 +138,32 @@ class DMSpotifySongSearchViewModel: DMSpotifySongSearchViewModelType {
             .map { newSavedTracks in
                 if newSavedTracks.isNotEmpty {
                     let songSectionItems = newSavedTracks.map { SectionItem.songSectionItem(song: $0) }
-                    return [SongSearchResultSectionModel.init(model: .songs, items: songSectionItems)]
+                    return [SectionType.init(model: .songs, items: songSectionItems)]
                     
                 } else {
-                    return [SongSearchResultSectionModel.empty]
+                    return []//[SectionType.empty]
                 }
             }
             .bind(to: resultRelay)
             .disposed(by: disposeBag)
     }
     
-    lazy var sectionItemSelected: Action<SectionItem, Void> = {
-        return Action(workFactory: { [unowned self] (sectionItem: SectionItem) -> Observable<Void> in
-            if case SectionItem.songSectionItem(song: let selectedSong) = sectionItem {
-                self.songSelected.execute(selectedSong)
-            }
-            return Observable.just(())
-        })
-    }()
-    
-    lazy var sectionItemDeselected: Action<SectionItem, Void> = {
-        return Action(workFactory: { [unowned self] (sectionItem: SectionItem) -> Observable<Void> in
-            if case SectionItem.songSectionItem(song: let selectedSong) = sectionItem {
-                self.songRemoved.execute(selectedSong)
-            }
-            return Observable.just(())
-        })
-    }()
+//    lazy var sectionItemSelected: Action<SectionItem<RepresentableType>, Void> = {
+//        return Action(workFactory: { [unowned self] (sectionItem: SectionItem) -> Observable<Void> in
+//            if case SectionItem.songSectionItem(song: let selectedSong) = sectionItem {
+//                self.songSelected.execute(selectedSong)
+//            }
+//            return Observable.just(())
+//        })
+//    }()
+//
+//    lazy var sectionItemDeselected: Action<SectionItem<RepresentableType>, Void> = {
+//        return Action(workFactory: { [unowned self] (sectionItem: SectionItem) -> Observable<Void> in
+//            if case SectionItem.songSectionItem(song: let selectedSong) = sectionItem {
+//                self.songRemoved.execute(selectedSong)
+//            }
+//            return Observable.just(())
+//        })
+//    }()
 
 }

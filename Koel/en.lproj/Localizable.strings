@@ -31,6 +31,10 @@
 "ENTER_TO_SEARCH" = "Enter a keyword to search Spotify";
 "USER_SAVED_TRACKS" = "Your saved tracks";
 
+"TRACKS" = "Tracks";
+"ALBUMS" = "Albums";
+"PLAYLISTS" = "Playlists";
+
 // Management
 "NEARBY_PEERS_SECTION_TITLE" = "Nearby";
 "JOINED_PEERS_SECTION_TITLE" = "Joined";
