@@ -233,7 +233,7 @@ extension DMSpotifyTracksViewController {
                                                            deleteAnimation: .none),
             configureCell: { (dataSource, tableView, indexPath, element) -> UITableViewCell in
                 switch dataSource[indexPath] {
-                case let .songSectionItem(song: item):
+                case let .songSectionItem(representable: item):
                     let cell = tableView.dequeueReusableCell(withIdentifier: DMSpotifySongTableViewCell.reuseIdentifier,
                                                              for: indexPath) as! DMSpotifySongTableViewCell
                     cell.configure(withSong: item)

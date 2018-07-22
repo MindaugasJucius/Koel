@@ -18,22 +18,18 @@ enum SectionItem<T: Representing>: Equatable {
     
     case initialSectionItem
     case emptySectionItem
-    case songSectionItem(song: T)
+    case songSectionItem(representable: T)
     
     static func ==(lhs: SectionItem, rhs: SectionItem) -> Bool {
-        if case SectionItem.songSectionItem(song: let rhsSong) = rhs,
-            case SectionItem.songSectionItem(song: let lhsSong) = lhs {
-            return rhsSong == lhsSong
-        }
-        return true
+        return lhs.identity == rhs.identity
     }
 }
 
 extension SectionItem: IdentifiableType {
     var identity: String {
         switch self {
-        case .songSectionItem(song: let song):
-            return ""//song.spotifyURI
+        case .songSectionItem(representable: let representable):
+            return representable.identity
         default:
             return ""
         }
@@ -61,7 +57,8 @@ typealias SongSearchResultSectionModel<T: Representing> = AnimatableSectionModel
 //}
 
 protocol DMSpotifySongSearchViewModelType {
-    //var songResults: Driver<[SongSearchResultSectionModel]> { get }
+    
+    var songResults: Driver<[SongSearchResultSectionModel]> { get }
     var isLoading: Driver<Bool> { get }
     var isRefreshing: Driver<Bool> { get }
     
@@ -137,7 +134,7 @@ class DMSpotifySongSearchViewModel<Object: Paginatable & Mappable, Representable
             .do(onNext: { [unowned self] _ in self.isLoadingRelay.accept(false) })
             .map { newSavedTracks in
                 if newSavedTracks.isNotEmpty {
-                    let songSectionItems = newSavedTracks.map { SectionItem.songSectionItem(song: $0) }
+                    let songSectionItems = newSavedTracks.map { SectionItem.songSectionItem(representable: $0) }
                     return [SectionType.init(model: .songs, items: songSectionItems)]
                     
                 } else {

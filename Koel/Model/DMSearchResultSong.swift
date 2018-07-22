@@ -16,11 +16,14 @@ protocol ImageContaining {
 }
 
 protocol Representing: Equatable {
+    
+    var identity: String { get }
+    
     static func create(from paginatableMappable: Paginatable & Mappable) -> Self?
 }
 
 struct DMSearchResultSong: Representing, ImageContaining {
-    
+
     let title: String
     let artistName: String
     let albumName: String
@@ -28,6 +31,10 @@ struct DMSearchResultSong: Representing, ImageContaining {
     let durationSeconds: TimeInterval
     let imageURL: URL?
     var image: UIImage?
+
+    var identity: String {
+        return spotifyURI
+    }
     
     static func ==(lhs: DMSearchResultSong, rhs: DMSearchResultSong) -> Bool {
         return lhs.image == rhs.image
