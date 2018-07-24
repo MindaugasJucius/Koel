@@ -56,20 +56,37 @@ typealias SongSearchResultSectionModel<T: Representing> = AnimatableSectionModel
 //
 //}
 
-protocol DMSpotifySongSearchViewModelType {
+
+protocol LoadingViewModelType {
     
-    var songResults: Driver<[SongSearchResultSectionModel]> { get }
     var isLoading: Driver<Bool> { get }
     var isRefreshing: Driver<Bool> { get }
-    
-//    var sectionItemSelected: Action<SectionItem, Void> { get }
-//    var sectionItemDeselected: Action<SectionItem, Void> { get }
+
+}
+
+protocol TriggerableViewModelType {
     
     var offsetTriggerObserver: AnyObserver<()> { get }
     var refreshTriggerObserver: AnyObserver<()> { get }
+    
 }
 
-class DMSpotifySongSearchViewModel<Object: Paginatable & Mappable, RepresentableType: Representing>: DMSpotifySongSearchViewModelType {
+protocol ResultsContainingType {
+
+//    var sectionItemSelected: Action<SectionItem, Void> { get }
+//    var sectionItemDeselected: Action<SectionItem, Void> { get }
+
+}
+
+protocol DMSpotifySongSearchViewModelType {
+    
+    associatedtype Model: Representing
+    
+    var songResults: Driver<[SongSearchResultSectionModel<Model>]> { get }
+    
+}
+
+class DMSpotifySongSearchViewModel<Object: Paginatable & Mappable, RepresentableType: Representing>: DMSpotifySongSearchViewModelType, TriggerableViewModelType, LoadingViewModelType {
     
     typealias SectionType = SongSearchResultSectionModel<RepresentableType>
     

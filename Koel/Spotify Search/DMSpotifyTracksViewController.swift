@@ -23,11 +23,12 @@ extension UIScrollView {
 
 }
 
-class DMSpotifyTracksViewController: UIViewController, BindableType, Themeable {
+class DMSpotifyTracksViewController<Representable: Representing>: UIViewController, Themeable {
     
-    typealias ViewModelType = DMSpotifySongSearchViewModelType
-
-    let viewModel: ViewModelType
+    private let resultsViewModel: AnyResultsViewModel<Representable>
+    private let loadingTriggersViewModel: TriggerableViewModelType
+    private let loadingStateViewModel: LoadingViewModelType
+    
     let themeManager: ThemeManager
 
     private let disposeBag = DisposeBag()
@@ -62,7 +63,7 @@ class DMSpotifyTracksViewController: UIViewController, BindableType, Themeable {
     
     private lazy var prefetchTrigger: Observable<Bool> = {
         let willEndDraggingTargetOffset = tableView.rx.willEndDragging.map { $0.1 }
-        let prefetchTrigger = willEndDraggingTargetOffset.withLatestFrom(viewModel.isLoading) { (mutableOffset, loading) -> Bool in
+        let prefetchTrigger = willEndDraggingTargetOffset.withLatestFrom(loadingStateViewModel.isLoading) { (mutableOffset, loading) -> Bool in
                 guard !loading else {
                     return false
                 }
@@ -81,8 +82,13 @@ class DMSpotifyTracksViewController: UIViewController, BindableType, Themeable {
         return prefetchTrigger.share()
     }()
     
-    init(withViewModel viewModel: DMSpotifySongSearchViewModelType, themeManager: ThemeManager) {
-        self.viewModel = viewModel
+    init(withViewModel viewModel: AnyResultsViewModel<Representable>,
+         loadingTriggersViewModel: TriggerableViewModelType,
+         loadingStateViewModel: LoadingViewModelType,
+         themeManager: ThemeManager) {
+        self.resultsViewModel = viewModel
+        self.loadingTriggersViewModel = loadingTriggersViewModel
+        self.loadingStateViewModel = loadingStateViewModel
         self.themeManager = themeManager
         self.tableViewLoadingFooter = DMKoelLoadingView(themeManager: themeManager)
         super.init(nibName: nil, bundle: nil)
@@ -127,7 +133,7 @@ extension DMSpotifyTracksViewController {
     
     func bindViewModel() {
 
-        let dataSource = DMSpotifyTracksViewController.spotifySongDataSource(withViewModel: self.viewModel)
+        let dataSource = DMSpotifyTracksViewController.spotifySongDataSource(withViewModel: resultsViewModel)
         
 //        viewModel.songResults
 //            .drive(tableView.rx.items(dataSource: dataSource))
@@ -155,7 +161,7 @@ extension DMSpotifyTracksViewController {
                 self.prefetchTrigger
                     .map { _ in }
                     .debounce(0.1, scheduler: MainScheduler.instance)
-                    .bind(to: self.viewModel.offsetTriggerObserver)
+                    .bind(to: self.loadingTriggersViewModel.offsetTriggerObserver)
                     .disposed(by: self.disposeBag)
             }
             .subscribe()
@@ -163,14 +169,14 @@ extension DMSpotifyTracksViewController {
     }
     
     private func bindLoadingFooterView() {
-        viewModel.isLoading
+        loadingStateViewModel.isLoading
             .do(onNext: { loading in self.adjustFooter(toVisible: loading) })
             .drive(tableViewLoadingFooter.isAnimating)
             .disposed(by: self.disposeBag)
     }
     
     private func bindRefreshView() {
-        viewModel.isLoading
+        loadingStateViewModel.isLoading
             .do(onNext: { isLoading in
                 // Disable UIRefreshControl if loading
                 if isLoading {
@@ -182,14 +188,14 @@ extension DMSpotifyTracksViewController {
             .drive()
             .disposed(by: disposeBag)
         
-        viewModel.isRefreshing
+        loadingStateViewModel.isRefreshing
             .filter { !$0 }
             .drive(refreshControl.rx.isRefreshing)
             .disposed(by: disposeBag)
         
         refreshControl.rx.controlEvent(.valueChanged).asObservable()
             .debug("what", trimOutput: true)
-            .bind(to: viewModel.refreshTriggerObserver)
+            .bind(to: loadingTriggersViewModel.refreshTriggerObserver)
             .disposed(by: disposeBag)
     }
 }
@@ -225,7 +231,7 @@ extension DMSpotifyTracksViewController {
 
 extension DMSpotifyTracksViewController {
     
-    static func spotifySongDataSource(withViewModel viewModel: DMSpotifySongSearchViewModelType) -> RxTableViewSectionedAnimatedDataSource<SongSearchResultSectionModel<DMSearchResultSong>> {
+    static func spotifySongDataSource(withViewModel viewModel: AnyResultsViewModel<Representable>) -> RxTableViewSectionedAnimatedDataSource<SongSearchResultSectionModel<DMSearchResultSong>> {
         
         return RxTableViewSectionedAnimatedDataSource<SongSearchResultSectionModel<DMSearchResultSong>>(
             animationConfiguration: AnimationConfiguration(insertAnimation: .none,

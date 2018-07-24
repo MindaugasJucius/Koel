@@ -52,9 +52,9 @@ class DMSpotifySearchContainerViewController: UISearchContainerViewController, B
     var viewModel: DMSpotifySearchContainerViewModelType
     private var addSongsButton: DMKoelButton
     
-    private lazy var tracksViewController: DMSpotifyTracksViewController = {
-        let spotifyTracksViewController = DMSpotifyTracksViewController(withViewModel: viewModel.tracksViewModel,
-                                                                        themeManager: ThemeManager.shared)
+    private lazy var tracksViewController: DMSpotifyTracksViewController<DMSearchResultSong> = {
+        let spotifyTracksViewController = DMSpotifyTracksViewController<DMSearchResultSong>(withViewModel: viewModel.tracksViewModel,
+                                                                                            themeManager: ThemeManager.shared)
         spotifyTracksViewController.setupForViewModel()
         return spotifyTracksViewController
     }()
@@ -118,22 +118,22 @@ class DMSpotifySearchContainerViewController: UISearchContainerViewController, B
             .filterNil()
             .debounce(0.5, scheduler: MainScheduler.instance)
         
-        Observable.combineLatest(searchBarText, selectedSearchType)
-            .skip(1)
-            .map { self.viewModel.searchViewModel(withQuery: $0, itemType: $1) }
-            .map { searchViewModel -> UIViewController in
-                let searchResultsViewController = DMSpotifyTracksViewController(withViewModel: searchViewModel,
-                                                                                themeManager: ThemeManager.shared)
-                searchResultsViewController.setupForViewModel()
-                return searchResultsViewController
-            }
-            .do(onNext: { [unowned self] viewController in
-                self.addChildViewController(viewController)
-                self.view.addSubview(viewController.view)
-                viewController.didMove(toParentViewController: self)
-            })
-            .subscribe()
-            .disposed(by: disposeBag)
+//        Observable.combineLatest(searchBarText, selectedSearchType)
+//            .skip(1)
+//            .map { self.viewModel.searchViewModel(withQuery: $0, itemType: $1) }
+//            .map { searchViewModel -> UIViewController in
+//                let searchResultsViewController = DMSpotifyTracksViewController(withViewModel: searchViewModel,
+//                                                                                themeManager: ThemeManager.shared)
+//                searchResultsViewController.setupForViewModel()
+//                return searchResultsViewController
+//            }
+//            .do(onNext: { [unowned self] viewController in
+//                self.addChildViewController(viewController)
+//                self.view.addSubview(viewController.view)
+//                viewController.didMove(toParentViewController: self)
+//            })
+//            .subscribe()
+//            .disposed(by: disposeBag)
         
     }
     
