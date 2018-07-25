@@ -26,8 +26,8 @@ extension UIScrollView {
 class DMSpotifyTracksViewController<Representable: Representing>: UIViewController, Themeable {
     
     private let resultsViewModel: AnyResultsViewModel<Representable>
-    private let loadingTriggersViewModel: TriggerableViewModelType
-    private let loadingStateViewModel: LoadingViewModelType
+    private let loadingTriggersViewModel: TriggerConsumingViewModelType
+    private let loadingStateViewModel: LoadingStateObservingViewModelType
     
     let themeManager: ThemeManager
 
@@ -83,8 +83,8 @@ class DMSpotifyTracksViewController<Representable: Representing>: UIViewControll
     }()
     
     init(withViewModel viewModel: AnyResultsViewModel<Representable>,
-         loadingTriggersViewModel: TriggerableViewModelType,
-         loadingStateViewModel: LoadingViewModelType,
+         loadingTriggersViewModel: TriggerConsumingViewModelType,
+         loadingStateViewModel: LoadingStateObservingViewModelType,
          themeManager: ThemeManager) {
         self.resultsViewModel = viewModel
         self.loadingTriggersViewModel = loadingTriggersViewModel
@@ -171,7 +171,7 @@ extension DMSpotifyTracksViewController {
     private func bindLoadingFooterView() {
         loadingStateViewModel.isLoading
             .do(onNext: { loading in self.adjustFooter(toVisible: loading) })
-            .drive(tableViewLoadingFooter.isAnimating)
+            .bind(to: tableViewLoadingFooter.isAnimating)
             .disposed(by: self.disposeBag)
     }
     
@@ -185,12 +185,12 @@ extension DMSpotifyTracksViewController {
                     self.tableView.refreshControl = self.refreshControl
                 }
             })
-            .drive()
+            .subscribe()
             .disposed(by: disposeBag)
         
         loadingStateViewModel.isRefreshing
             .filter { !$0 }
-            .drive(refreshControl.rx.isRefreshing)
+            .bind(to: refreshControl.rx.isRefreshing)
             .disposed(by: disposeBag)
         
         refreshControl.rx.controlEvent(.valueChanged).asObservable()

@@ -57,25 +57,11 @@ typealias SongSearchResultSectionModel<T: Representing> = AnimatableSectionModel
 //}
 
 
-protocol LoadingViewModelType {
-    
-    var isLoading: Driver<Bool> { get }
-    var isRefreshing: Driver<Bool> { get }
-
-}
-
-protocol TriggerableViewModelType {
-    
-    var offsetTriggerObserver: AnyObserver<()> { get }
-    var refreshTriggerObserver: AnyObserver<()> { get }
-    
-}
-
 protocol ResultsContainingType {
-
-//    var sectionItemSelected: Action<SectionItem, Void> { get }
-//    var sectionItemDeselected: Action<SectionItem, Void> { get }
-
+    
+    //    var sectionItemSelected: Action<SectionItem, Void> { get }
+    //    var sectionItemDeselected: Action<SectionItem, Void> { get }
+    
 }
 
 protocol DMSpotifySongSearchViewModelType {
@@ -86,23 +72,11 @@ protocol DMSpotifySongSearchViewModelType {
     
 }
 
-class DMSpotifySongSearchViewModel<Object: Paginatable & Mappable, RepresentableType: Representing>: DMSpotifySongSearchViewModelType, TriggerableViewModelType, LoadingViewModelType {
+class DMSpotifySongSearchViewModel<Object: Paginatable & Mappable, RepresentableType: Representing>: DMSpotifySongSearchViewModelType {
     
     typealias SectionType = SongSearchResultSectionModel<RepresentableType>
     
     private let disposeBag = DisposeBag()
-    
-    private let isRefreshingRelay = BehaviorRelay(value: false)
-    
-    var isRefreshing: Driver<Bool> {
-        return self.isRefreshingRelay.asDriver()
-    }
-    
-    private let isLoadingRelay = BehaviorRelay(value: false)
-    
-    var isLoading: Driver<Bool> {
-        return self.isLoadingRelay.asDriver()
-    }
     
     private var resultRelay: BehaviorRelay<[SectionType]> = BehaviorRelay(value: [])
     
@@ -110,50 +84,38 @@ class DMSpotifySongSearchViewModel<Object: Paginatable & Mappable, Representable
         return resultRelay.asDriver()
     }
     
-    var offsetTriggerObserver: AnyObserver<()> {
-        return offsetTriggerRelay.asObserver()
-    }
-    
-    private var offsetTriggerRelay: PublishSubject<()> = PublishSubject()
-    
-    var refreshTriggerObserver: AnyObserver<()> {
-        return refreshTriggerRelay.asObserver()
-    }
-    
-    private var refreshTriggerRelay: PublishSubject<()> = PublishSubject()
-    
-    var songSelected: Action<DMSearchResultSong, Void>
-    var songRemoved: Action<DMSearchResultSong, Void>
+    var loadingViewModel: LoadingStateConsumingViewModelType
+    var triggersViewModel: TriggerObservingViewModelType
     
     let promptCoordinator: PromptCoordinating
     let spotifySearchService: DMSpotifySearchService<Object, RepresentableType>
    
     init(promptCoordinator: PromptCoordinating,
          spotifySearchService: DMSpotifySearchService<Object, RepresentableType>,
-         songSelected: Action<DMSearchResultSong, Void>,
-         songRemoved: Action<DMSearchResultSong, Void>) {
+         loadingViewModel: LoadingStateConsumingViewModelType,
+         triggersViewModel: TriggerObservingViewModelType) {
+        
+        self.loadingViewModel = loadingViewModel
+        self.triggersViewModel = triggersViewModel
         self.promptCoordinator = promptCoordinator
         self.spotifySearchService = spotifySearchService
-        self.songSelected = songSelected
-        self.songRemoved = songRemoved
 
         spotifySearchService.resultError
             .flatMap { error in
                 promptCoordinator.promptFor(error.localizedDescription, cancelAction: "ok", actions: nil)
             }
-            .do(onNext: { _ in self.isLoadingRelay.accept(false) }) // let user perform requests after errors
-            .subscribe()
+            .map { _ in false }
+            .bind(to: loadingViewModel.loading)
             .disposed(by: disposeBag)
 
-        offsetTriggerRelay.asObservable()
-            .do(onNext: { [unowned self] in self.isLoadingRelay.accept(true) })
+        triggersViewModel.offsetTrigger
+            .do(onNext: { [unowned self] in self.loadingViewModel.loading.on(.next(true)) })
             .flatMap { self.spotifySearchService.trackResults }
-            .do(onNext: { [unowned self] _ in self.isLoadingRelay.accept(false) })
+            .do(onNext: { [unowned self] _ in self.loadingViewModel.loading.on(.next(false)) })
             .map { newSavedTracks in
                 if newSavedTracks.isNotEmpty {
                     let songSectionItems = newSavedTracks.map { SectionItem.songSectionItem(representable: $0) }
                     return [SectionType.init(model: .songs, items: songSectionItems)]
-                    
                 } else {
                     return []//[SectionType.empty]
                 }

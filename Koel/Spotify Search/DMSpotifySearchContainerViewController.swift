@@ -53,9 +53,22 @@ class DMSpotifySearchContainerViewController: UISearchContainerViewController, B
     private var addSongsButton: DMKoelButton
     
     private lazy var tracksViewController: DMSpotifyTracksViewController<DMSearchResultSong> = {
-        let spotifyTracksViewController = DMSpotifyTracksViewController<DMSearchResultSong>(withViewModel: viewModel.tracksViewModel,
+        let loadingStateViewModel = LoadingStateViewModel()
+        let triggersViewModel = TriggersViewModel()
+        
+        let searchResultsViewModel = DMSpotifySongSearchViewModel(promptCoordinator: self.viewModel.promptCoordinator,
+                                                                  spotifySearchService: self.viewModel.tracksSearchService,
+                                                                  loadingViewModel: loadingStateViewModel,
+                                                                  triggersViewModel: triggersViewModel)
+        
+        let typeErasedResultsViewModel = AnyResultsViewModel(searchResultsViewModel)
+        
+        let spotifyTracksViewController = DMSpotifyTracksViewController<DMSearchResultSong>(withViewModel: typeErasedResultsViewModel,
+                                                                                            loadingTriggersViewModel: triggersViewModel,
+                                                                                            loadingStateViewModel: loadingStateViewModel,
                                                                                             themeManager: ThemeManager.shared)
-        spotifyTracksViewController.setupForViewModel()
+        
+        spotifyTracksViewController.bindViewModel()
         return spotifyTracksViewController
     }()
 

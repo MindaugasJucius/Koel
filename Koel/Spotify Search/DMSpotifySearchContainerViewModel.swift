@@ -16,14 +16,14 @@ protocol DMSpotifySearchContainerViewModelType: ViewModelType {
     
     var reachability: Observable<ReachabilityStatus> { get }
     var queueSelectedSongs: CocoaAction { get }
-    
-    var tracksViewModel: AnyResultsViewModel<DMSearchResultSong> { get }
+    var promptCoordinator: PromptCoordinating { get }
+    var tracksSearchService: DMSpotifySearchService<SavedTrack, DMSearchResultSong> { get }
     
     //func searchViewModel(withQuery query: String, itemType: ItemSearchType) -> DMSpotifySongSearchViewModelType
 }
 
 class DMSpotifySearchContainerViewModel: NSObject, DMSpotifySearchContainerViewModelType {
-
+    
     let reachabilityService: ReachabilityService
     let spotifyAuthService: DMSpotifyAuthService
     let promptCoordinator: PromptCoordinating
@@ -74,7 +74,7 @@ class DMSpotifySearchContainerViewModel: NSObject, DMSpotifySearchContainerViewM
         self.promptCoordinator = promptCoordinator
     }
     
-    lazy var tracksViewModel: AnyResultsViewModel<DMSearchResultSong> = {
+    lazy var tracksSearchService: DMSpotifySearchService<SavedTrack, DMSearchResultSong> = {
         let initialRequest = DMSpotifySearchService<SavedTrack, DMSearchResultSong>.initialRequest(completionBlocks: { (success, failure) in
             return Spartan.getSavedTracks(limit: 50,
                                           market: Spartan.currentCountryCode,
@@ -87,10 +87,7 @@ class DMSpotifySearchContainerViewModel: NSObject, DMSpotifySearchContainerViewM
                                                                                           reachabilityService: self.reachabilityService,
                                                                                           initialRequest: initialRequest)
         
-        return AnyResultsViewModel(DMSpotifySongSearchViewModel(promptCoordinator: promptCoordinator,
-                                                                spotifySearchService: spotifySearchService,
-                                                                songSelected: songSelected,
-                                                                songRemoved: songRemoved))
+        return spotifySearchService
     }()
     
 //    func searchViewModel(withQuery query: String, itemType: ItemSearchType) -> DMSpotifySongSearchViewModelType {
