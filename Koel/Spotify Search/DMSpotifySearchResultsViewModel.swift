@@ -16,9 +16,9 @@ import ObjectMapper
 
 enum SectionItem<T: Representing>: Equatable {
     
-    case initialSectionItem
-    case emptySectionItem
-    case songSectionItem(representable: T)
+    case initial
+    case empty
+    case representable(representable: T)
     
     static func ==(lhs: SectionItem, rhs: SectionItem) -> Bool {
         return lhs.identity == rhs.identity
@@ -28,19 +28,17 @@ enum SectionItem<T: Representing>: Equatable {
 extension SectionItem: IdentifiableType {
     var identity: String {
         switch self {
-        case .songSectionItem(representable: let representable):
+        case .representable(representable: let representable):
             return representable.identity
         default:
-            return ""
+            return String(describing: self)
         }
     }
 }
 
 enum SectionType: String, IdentifiableType {
-
-    case initial
-    case empty
-    case songs
+    
+    case representables
 
     var identity: String {
         return self.rawValue
@@ -48,13 +46,6 @@ enum SectionType: String, IdentifiableType {
 }
 
 typealias SongSearchResultSectionModel<T: Representing> = AnimatableSectionModel<SectionType, SectionItem<T>>
-
-//extension AnimatableSectionModel where Section == SectionType, ItemType == SectionItem {
-//
-//    static let empty = AnimatableSectionModel.init(model: .empty, items: [SectionItem.emptySectionItem])
-//    static let initial = AnimatableSectionModel.init(model: .initial, items: [SectionItem.initialSectionItem])
-//
-//}
 
 
 protocol ResultsContainingType {
@@ -72,13 +63,16 @@ protocol DMSpotifySongSearchViewModelType {
     
 }
 
-class DMSpotifySongSearchViewModel<Object: Paginatable & Mappable, RepresentableType: Representing>: DMSpotifySongSearchViewModelType {
+class DMSpotifySearchResultsViewModel<Object: Paginatable & Mappable, RepresentableType: Representing>: DMSpotifySongSearchViewModelType {
     
     typealias SectionType = SongSearchResultSectionModel<RepresentableType>
     
+    private let empty = [SectionType.init(model: .representables, items: [SectionItem.empty])]
+    private let initial = [SectionType.init(model: .representables, items: [SectionItem.initial])]
+    
     private let disposeBag = DisposeBag()
     
-    private var resultRelay: BehaviorRelay<[SectionType]> = BehaviorRelay(value: [])
+    private lazy var resultRelay: BehaviorRelay<[SectionType]> = BehaviorRelay(value: initial)
     
     var songResults: Driver<[SongSearchResultSectionModel<RepresentableType>]> {
         return resultRelay.asDriver()
@@ -114,10 +108,10 @@ class DMSpotifySongSearchViewModel<Object: Paginatable & Mappable, Representable
             .do(onNext: { [unowned self] _ in self.loadingViewModel.loading.on(.next(false)) })
             .map { newSavedTracks in
                 if newSavedTracks.isNotEmpty {
-                    let songSectionItems = newSavedTracks.map { SectionItem.songSectionItem(representable: $0) }
-                    return [SectionType.init(model: .songs, items: songSectionItems)]
+                    let songSectionItems = newSavedTracks.map { SectionItem.representable(representable: $0) }
+                    return [SectionType.init(model: .representables, items: songSectionItems)]
                 } else {
-                    return []//[SectionType.empty]
+                    return self.empty
                 }
             }
             .bind(to: resultRelay)

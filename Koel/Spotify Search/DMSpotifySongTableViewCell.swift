@@ -11,8 +11,8 @@ import RxSwift
 
 private let cellHeight: CGFloat = 55
 
-class DMSpotifySongTableViewCell: UITableViewCell, ReusableView, Themeable {
-    
+class DMSpotifySongTableViewCell: UITableViewCell, Themeable, RepresentableReusableView {
+
     private var disposeBag = DisposeBag()
     
     var themeManager: ThemeManager = ThemeManager.shared
@@ -115,13 +115,13 @@ class DMSpotifySongTableViewCell: UITableViewCell, ReusableView, Themeable {
         bindThemeManager()
     }
     
-    func configure(withSong song: DMSearchResultSong) {
-        trackTitleLabel.text = song.title
-        albumAndArtistTitleLabel.text = "\(song.artistName) • \(song.albumName)"
-        durationLabel.text = String.secondsString(from: song.durationSeconds)
+    func configure(withRepresentable representable: DMSearchResultSong) {
+        trackTitleLabel.text = representable.title
+        albumAndArtistTitleLabel.text = "\(representable.artistName) • \(representable.albumName)"
+        durationLabel.text = String.secondsString(from: representable.durationSeconds)
         albumArtImageView.image = #imageLiteral(resourceName: "song cell placeholder")
         
-        Observable.of(song)
+        Observable.of(representable)
             .downloadImage()
             .observeOn(MainScheduler.instance)
             .do(onNext: { songWithImage in

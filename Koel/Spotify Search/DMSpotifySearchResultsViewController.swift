@@ -23,12 +23,14 @@ extension UIScrollView {
 
 }
 
-class DMSpotifyTracksViewController<Representable: Representing>: UIViewController, Themeable {
+class DMSpotifySearchResultsViewController<ResultReusableView: RepresentableReusableView>: UIViewController, Themeable {
+    
+    typealias Representable = ResultReusableView.Representable
     
     private let resultsViewModel: AnyResultsViewModel<Representable>
     private let loadingTriggersViewModel: TriggerConsumingViewModelType
     private let loadingStateViewModel: LoadingStateObservingViewModelType
-    
+
     let themeManager: ThemeManager
 
     private let disposeBag = DisposeBag()
@@ -43,8 +45,9 @@ class DMSpotifyTracksViewController<Representable: Representing>: UIViewControll
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.allowsMultipleSelection = true
         tableView.estimatedSectionHeaderHeight = 0
-        tableView.register(DMSpotifySongTableViewCell.self,
-                           forCellReuseIdentifier: DMSpotifySongTableViewCell.reuseIdentifier)
+        
+        tableView.register(ResultReusableView.self,
+                           forCellReuseIdentifier: ResultReusableView.reuseIdentifier)
         tableView.register(DMKoelEmptyPlaceholderTableViewCell.self,
                            forCellReuseIdentifier: DMKoelEmptyPlaceholderTableViewCell.reuseIdentifier)
         return tableView
@@ -129,15 +132,15 @@ class DMSpotifyTracksViewController<Representable: Representing>: UIViewControll
     
 }
 
-extension DMSpotifyTracksViewController {
+extension DMSpotifySearchResultsViewController {
     
     func bindViewModel() {
 
-        let dataSource = DMSpotifyTracksViewController.spotifySongDataSource(withViewModel: resultsViewModel)
-        
-//        viewModel.songResults
-//            .drive(tableView.rx.items(dataSource: dataSource))
-//            .disposed(by: disposeBag)
+        let dataSource = DMSpotifySearchResultsViewController.spotifySongDataSource(withViewModel: resultsViewModel)
+
+        resultsViewModel.songResults
+            .drive(tableView.rx.items(dataSource: dataSource))
+            .disposed(by: disposeBag)
 
 //        tableView.rx
 //            .modelSelected(SectionItem.self)
@@ -200,7 +203,7 @@ extension DMSpotifyTracksViewController {
     }
 }
 
-extension DMSpotifyTracksViewController {
+extension DMSpotifySearchResultsViewController {
     
     //MARK: - Helpers
     
@@ -229,28 +232,28 @@ extension DMSpotifyTracksViewController {
     
 }
 
-extension DMSpotifyTracksViewController {
+extension DMSpotifySearchResultsViewController {
     
-    static func spotifySongDataSource(withViewModel viewModel: AnyResultsViewModel<Representable>) -> RxTableViewSectionedAnimatedDataSource<SongSearchResultSectionModel<DMSearchResultSong>> {
+    static func spotifySongDataSource(withViewModel viewModel: AnyResultsViewModel<Representable>) -> RxTableViewSectionedAnimatedDataSource<SongSearchResultSectionModel<Representable>> {
         
-        return RxTableViewSectionedAnimatedDataSource<SongSearchResultSectionModel<DMSearchResultSong>>(
+        return RxTableViewSectionedAnimatedDataSource<SongSearchResultSectionModel<Representable>>(
             animationConfiguration: AnimationConfiguration(insertAnimation: .none,
                                                            reloadAnimation: .none,
                                                            deleteAnimation: .none),
             configureCell: { (dataSource, tableView, indexPath, element) -> UITableViewCell in
                 switch dataSource[indexPath] {
-                case let .songSectionItem(representable: item):
-                    let cell = tableView.dequeueReusableCell(withIdentifier: DMSpotifySongTableViewCell.reuseIdentifier,
-                                                             for: indexPath) as! DMSpotifySongTableViewCell
-                    cell.configure(withSong: item)
+                case let .representable(representable: item):
+                    let cell = tableView.dequeueReusableCell(withIdentifier: ResultReusableView.reuseIdentifier,
+                                                             for: indexPath) as! ResultReusableView
+                    cell.configure(withRepresentable: item)
                     return cell
-                case .emptySectionItem:
+                case .empty:
                     let cell = tableView.dequeueReusableCell(withIdentifier: DMKoelEmptyPlaceholderTableViewCell.reuseIdentifier,
                                                              for: indexPath) as! DMKoelEmptyPlaceholderTableViewCell
                     cell.placeholderImage = #imageLiteral(resourceName: "empty song screen placeholder")
                     cell.placeholderText = UIConstants.strings.noSearchResults
                     return cell
-                case .initialSectionItem:
+                case .initial:
                     let cell = tableView.dequeueReusableCell(withIdentifier: DMKoelEmptyPlaceholderTableViewCell.reuseIdentifier,
                                                              for: indexPath) as! DMKoelEmptyPlaceholderTableViewCell
                     cell.placeholderImage = #imageLiteral(resourceName: "empty song screen placeholder")
@@ -259,7 +262,7 @@ extension DMSpotifyTracksViewController {
                 }
             },
             titleForHeaderInSection: { dataSource, index in
-                if dataSource.sectionModels[index].identity == SectionType.songs.rawValue {
+                if dataSource.sectionModels[index].identity == SectionType.representables.rawValue {
                     return UIConstants.strings.userSavedTracks
                 }
                 return nil

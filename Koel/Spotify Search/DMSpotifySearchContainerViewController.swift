@@ -52,21 +52,21 @@ class DMSpotifySearchContainerViewController: UISearchContainerViewController, B
     var viewModel: DMSpotifySearchContainerViewModelType
     private var addSongsButton: DMKoelButton
     
-    private lazy var tracksViewController: DMSpotifyTracksViewController<DMSearchResultSong> = {
+    private lazy var tracksViewController: DMSpotifySearchResultsViewController<DMSpotifySongTableViewCell> = {
         let loadingStateViewModel = LoadingStateViewModel()
         let triggersViewModel = TriggersViewModel()
         
-        let searchResultsViewModel = DMSpotifySongSearchViewModel(promptCoordinator: self.viewModel.promptCoordinator,
+        let searchResultsViewModel = DMSpotifySearchResultsViewModel(promptCoordinator: self.viewModel.promptCoordinator,
                                                                   spotifySearchService: self.viewModel.tracksSearchService,
                                                                   loadingViewModel: loadingStateViewModel,
                                                                   triggersViewModel: triggersViewModel)
         
         let typeErasedResultsViewModel = AnyResultsViewModel(searchResultsViewModel)
         
-        let spotifyTracksViewController = DMSpotifyTracksViewController<DMSearchResultSong>(withViewModel: typeErasedResultsViewModel,
-                                                                                            loadingTriggersViewModel: triggersViewModel,
-                                                                                            loadingStateViewModel: loadingStateViewModel,
-                                                                                            themeManager: ThemeManager.shared)
+        let spotifyTracksViewController = DMSpotifySearchResultsViewController<DMSpotifySongTableViewCell>(withViewModel: typeErasedResultsViewModel,
+                                                                                                                               loadingTriggersViewModel: triggersViewModel,
+                                                                                                                               loadingStateViewModel: loadingStateViewModel,
+                                                                                                                               themeManager: ThemeManager.shared)
         
         spotifyTracksViewController.bindViewModel()
         return spotifyTracksViewController

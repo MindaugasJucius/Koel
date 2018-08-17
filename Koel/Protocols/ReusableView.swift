@@ -21,3 +21,10 @@ extension ReusableView {
     }
     
 }
+
+protocol RepresentableReusableView: ReusableView where Self: UITableViewCell {
+    associatedtype Representable: Representing
+        
+    func configure(withRepresentable representable: Representable)
+    
+}
