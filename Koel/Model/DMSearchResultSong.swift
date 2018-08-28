@@ -15,8 +15,15 @@ protocol ImageContaining {
     var image: UIImage? { get set }
 }
 
-struct DMSearchResultSong: Equatable, ImageContaining {
+protocol Representing: Equatable {
     
+    var identity: String { get }
+    
+    static func create(from paginatableMappable: Paginatable & Mappable) -> Self?
+}
+
+struct DMSearchResultSong: Representing, ImageContaining {
+
     let title: String
     let artistName: String
     let albumName: String
@@ -24,9 +31,13 @@ struct DMSearchResultSong: Equatable, ImageContaining {
     let durationSeconds: TimeInterval
     let imageURL: URL?
     var image: UIImage?
+
+    var identity: String {
+        return spotifyURI
+    }
     
     static func ==(lhs: DMSearchResultSong, rhs: DMSearchResultSong) -> Bool {
-        return lhs.spotifyURI == rhs.spotifyURI && lhs.image == rhs.image
+        return lhs.image == rhs.image
     }
 
 }
@@ -35,30 +46,32 @@ extension DMSearchResultSong {
     
     static func create(from paginatableMappable: Paginatable & Mappable) -> DMSearchResultSong? {
         if let savedTrack = paginatableMappable as? SavedTrack {
-            return DMSearchResultSong.createSavedTrackRepresentable(from: savedTrack)
+            return DMSearchResultSong.createTrackRepresentable(from: savedTrack.track)
+        }
+        if let track = paginatableMappable as? Track {
+            return DMSearchResultSong.createTrackRepresentable(from: track)
         }
         return nil
     }
     
-    private static func createSavedTrackRepresentable(from savedTrack: SavedTrack) -> DMSearchResultSong {
-        let artistName = savedTrack.track.album.artists.reduce("", { currentTitle, artist in
+    private static func createTrackRepresentable(from track: Track) -> DMSearchResultSong {
+        let artistName = track.album.artists.reduce("", { currentTitle, artist in
             return currentTitle.appending("\(artist.name!) ")
         })
         
         var albumArtworkImageURL: URL? = nil
         
-        if let smallestImageURL = savedTrack.track.album.images.last?.url {
+        if let smallestImageURL = track.album.images.last?.url {
             albumArtworkImageURL = URL(string: smallestImageURL)
         }
-
-        return DMSearchResultSong(title: savedTrack.track.name,
+        
+        return DMSearchResultSong(title: track.name,
                                   artistName: artistName,
-                                  albumName: savedTrack.track.album.name,
-                                  spotifyURI: savedTrack.track.uri,
-                                  durationSeconds: TimeInterval(savedTrack.track.durationMs) / 1000,
+                                  albumName: track.album.name,
+                                  spotifyURI: track.uri,
+                                  durationSeconds: TimeInterval(track.durationMs) / 1000,
                                   imageURL: albumArtworkImageURL,
                                   image: nil)
-
     }
     
 }

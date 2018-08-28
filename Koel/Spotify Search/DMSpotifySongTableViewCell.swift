@@ -9,10 +9,10 @@
 import UIKit
 import RxSwift
 
-private let cellHeight: CGFloat = 65
+private let cellHeight: CGFloat = 55
 
-class DMSpotifySongTableViewCell: UITableViewCell, ReusableView, Themeable {
-    
+class DMSpotifySongTableViewCell: UITableViewCell, Themeable, RepresentableReusableView {
+
     private var disposeBag = DisposeBag()
     
     var themeManager: ThemeManager = ThemeManager.shared
@@ -23,7 +23,6 @@ class DMSpotifySongTableViewCell: UITableViewCell, ReusableView, Themeable {
         let imageView = UIImageView(image: nil)
         imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.backgroundColor = .green
         return imageView
     }()
     
@@ -46,20 +45,19 @@ class DMSpotifySongTableViewCell: UITableViewCell, ReusableView, Themeable {
     private lazy var stackView: UIStackView = {
         let stackView = UIStackView(arrangedSubviews: [trackTitleLabel, albumAndArtistTitleLabel])
         stackView.axis = .vertical
-        stackView.distribution = .fillEqually
-        stackView.spacing = 5
+        stackView.distribution = .fill
         stackView.translatesAutoresizingMaskIntoConstraints = false
         return stackView
     }()
     
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
-        bindThemeManager()
-
         selectedBackgroundView = UIView()
         contentView.addSubview(durationLabel)
         contentView.addSubview(albumArtImageView)
         contentView.addSubview(stackView)
+        
+        bindThemeManager()
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -117,12 +115,13 @@ class DMSpotifySongTableViewCell: UITableViewCell, ReusableView, Themeable {
         bindThemeManager()
     }
     
-    func configure(withSong song: DMSearchResultSong) {
-        trackTitleLabel.text = song.title
-        albumAndArtistTitleLabel.text = "\(song.artistName) • \(song.albumName)"
-        durationLabel.text = String.secondsString(from: song.durationSeconds)
-
-        Observable.of(song)
+    func configure(withRepresentable representable: DMSearchResultSong) {
+        trackTitleLabel.text = representable.title
+        albumAndArtistTitleLabel.text = "\(representable.artistName) • \(representable.albumName)"
+        durationLabel.text = String.secondsString(from: representable.durationSeconds)
+        albumArtImageView.image = #imageLiteral(resourceName: "song cell placeholder")
+        
+        Observable.of(representable)
             .downloadImage()
             .observeOn(MainScheduler.instance)
             .do(onNext: { songWithImage in

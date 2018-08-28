@@ -1,5 +1,5 @@
 //
-//  DMSpotifySongSearchViewController.swift
+//  DMSpotifyTracksViewController.swift
 //  Koel
 //
 //  Created by Mindaugas on 25/03/2018.
@@ -23,28 +23,31 @@ extension UIScrollView {
 
 }
 
-class DMSpotifySongSearchViewController: UIViewController, BindableType, Themeable {
+class DMSpotifySearchResultsViewController<ResultReusableView: RepresentableReusableView>: UIViewController, Themeable {
     
-    typealias ViewModelType = DMSpotifySongSearchViewModelType
+    typealias Representable = ResultReusableView.Representable
+    
+    private let resultsViewModel: AnyResultsViewModel<Representable>
+    private let loadingTriggersViewModel: TriggerConsumingViewModelType
+    private let loadingStateViewModel: LoadingStateObservingViewModelType
 
-    let viewModel: DMSpotifySongSearchViewModelType
     let themeManager: ThemeManager
 
     private let disposeBag = DisposeBag()
     
     //MARK: UI Elements
     
-    private var addSongsButton = DMKoelButton(themeManager: ThemeManager.shared)
-    
     private lazy var tableView: UITableView = {
-        let tableView = UITableView()
+        let tableView = UITableView(frame: .zero, style: .grouped)
         tableView.separatorStyle = .none
         tableView.clipsToBounds = false
         tableView.backgroundColor = .clear
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.allowsMultipleSelection = true
-        tableView.register(DMSpotifySongTableViewCell.self,
-                           forCellReuseIdentifier: DMSpotifySongTableViewCell.reuseIdentifier)
+        tableView.estimatedSectionHeaderHeight = 0
+        
+        tableView.register(ResultReusableView.self,
+                           forCellReuseIdentifier: ResultReusableView.reuseIdentifier)
         tableView.register(DMKoelEmptyPlaceholderTableViewCell.self,
                            forCellReuseIdentifier: DMKoelEmptyPlaceholderTableViewCell.reuseIdentifier)
         return tableView
@@ -63,7 +66,7 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType, Themeab
     
     private lazy var prefetchTrigger: Observable<Bool> = {
         let willEndDraggingTargetOffset = tableView.rx.willEndDragging.map { $0.1 }
-        let prefetchTrigger = willEndDraggingTargetOffset.withLatestFrom(viewModel.isLoading) { (mutableOffset, loading) -> Bool in
+        let prefetchTrigger = willEndDraggingTargetOffset.withLatestFrom(loadingStateViewModel.isLoading) { (mutableOffset, loading) -> Bool in
                 guard !loading else {
                     return false
                 }
@@ -82,8 +85,13 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType, Themeab
         return prefetchTrigger.share()
     }()
     
-    init(withViewModel viewModel: DMSpotifySongSearchViewModelType, themeManager: ThemeManager) {
-        self.viewModel = viewModel
+    init(withViewModel viewModel: AnyResultsViewModel<Representable>,
+         loadingTriggersViewModel: TriggerConsumingViewModelType,
+         loadingStateViewModel: LoadingStateObservingViewModelType,
+         themeManager: ThemeManager) {
+        self.resultsViewModel = viewModel
+        self.loadingTriggersViewModel = loadingTriggersViewModel
+        self.loadingStateViewModel = loadingStateViewModel
         self.themeManager = themeManager
         self.tableViewLoadingFooter = DMKoelLoadingView(themeManager: themeManager)
         super.init(nibName: nil, bundle: nil)
@@ -97,9 +105,6 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType, Themeab
         super.viewDidLoad()
         bindThemeManager()
         title = UIConstants.strings.searchSongs
-        let searchController = UISearchController(searchResultsController: nil)
-        navigationItem.searchController = searchController
-        navigationItem.hidesSearchBarWhenScrolling = false
         
         view.addSubview(tableView)
         tableView.refreshControl = refreshControl
@@ -112,11 +117,7 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType, Themeab
         ]
         NSLayoutConstraint.activate(tableViewConstraints)
         
-        view.addSubview(addSongsButton)
-        addSongsButton.setTitle(UIConstants.strings.addSelectedSongs, for: .normal)
-        addSongsButton.addConstraints(inSuperview: view)
         self.tableView.tableFooterView = tableViewLoadingFooter
-
     }
     
     func bindThemeManager() {
@@ -131,37 +132,25 @@ class DMSpotifySongSearchViewController: UIViewController, BindableType, Themeab
     
 }
 
-extension DMSpotifySongSearchViewController {
+extension DMSpotifySearchResultsViewController {
     
     func bindViewModel() {
-        addSongsButton.rx.action = viewModel.queueSelectedSongs
-        
-        let dataSource = DMSpotifySongSearchViewController.spotifySongDataSource(withViewModel: self.viewModel)
-        
-        viewModel.songResults
+
+        let dataSource = DMSpotifySearchResultsViewController.spotifySongDataSource(withViewModel: resultsViewModel)
+
+        resultsViewModel.songResults
             .drive(tableView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
-        
-        viewModel.queueSelectedSongs.executing
-            .filter { $0 }
-            .debounce(0.3, scheduler: MainScheduler.instance)
-            .do(onNext: { _ in
-                self.tableView.indexPathsForSelectedRows?.forEach {
-                    self.tableView.deselectRow(at: $0, animated: false)
-                }
-            })
-            .subscribe()
-            .disposed(by: disposeBag)
-        
-        tableView.rx
-            .modelSelected(SectionItem.self)
-            .subscribe(viewModel.sectionItemSelected.inputs)
-            .disposed(by: disposeBag)
-        
-        tableView.rx
-            .modelDeselected(SectionItem.self)
-            .subscribe(viewModel.sectionItemDeselected.inputs)
-            .disposed(by: disposeBag)
+
+//        tableView.rx
+//            .modelSelected(SectionItem.self)
+//            .subscribe(viewModel.sectionItemSelected.inputs)
+//            .disposed(by: disposeBag)
+//
+//        tableView.rx
+//            .modelDeselected(SectionItem.self)
+//            .subscribe(viewModel.sectionItemDeselected.inputs)
+//            .disposed(by: disposeBag)
         
         bindLoadingTrigger()
         bindLoadingFooterView()
@@ -175,7 +164,7 @@ extension DMSpotifySongSearchViewController {
                 self.prefetchTrigger
                     .map { _ in }
                     .debounce(0.1, scheduler: MainScheduler.instance)
-                    .bind(to: self.viewModel.offsetTriggerRelay)
+                    .bind(to: self.loadingTriggersViewModel.offsetTriggerObserver)
                     .disposed(by: self.disposeBag)
             }
             .subscribe()
@@ -183,14 +172,14 @@ extension DMSpotifySongSearchViewController {
     }
     
     private func bindLoadingFooterView() {
-        viewModel.isLoading
+        loadingStateViewModel.isLoading
             .do(onNext: { loading in self.adjustFooter(toVisible: loading) })
-            .drive(tableViewLoadingFooter.isAnimating)
+            .bind(to: tableViewLoadingFooter.isAnimating)
             .disposed(by: self.disposeBag)
     }
     
     private func bindRefreshView() {
-        viewModel.isLoading
+        loadingStateViewModel.isLoading
             .do(onNext: { isLoading in
                 // Disable UIRefreshControl if loading
                 if isLoading {
@@ -199,22 +188,22 @@ extension DMSpotifySongSearchViewController {
                     self.tableView.refreshControl = self.refreshControl
                 }
             })
-            .drive()
+            .subscribe()
             .disposed(by: disposeBag)
         
-        viewModel.isRefreshing
+        loadingStateViewModel.isRefreshing
             .filter { !$0 }
-            .drive(refreshControl.rx.isRefreshing)
+            .bind(to: refreshControl.rx.isRefreshing)
             .disposed(by: disposeBag)
         
         refreshControl.rx.controlEvent(.valueChanged).asObservable()
             .debug("what", trimOutput: true)
-            .bind(to: viewModel.refreshTriggerRelay)
+            .bind(to: loadingTriggersViewModel.refreshTriggerObserver)
             .disposed(by: disposeBag)
     }
 }
 
-extension DMSpotifySongSearchViewController {
+extension DMSpotifySearchResultsViewController {
     
     //MARK: - Helpers
     
@@ -243,28 +232,40 @@ extension DMSpotifySongSearchViewController {
     
 }
 
-extension DMSpotifySongSearchViewController {
+extension DMSpotifySearchResultsViewController {
     
-    static func spotifySongDataSource(withViewModel viewModel: DMSpotifySongSearchViewModelType) -> RxTableViewSectionedAnimatedDataSource<SongSearchResultSectionModel> {
+    static func spotifySongDataSource(withViewModel viewModel: AnyResultsViewModel<Representable>) -> RxTableViewSectionedAnimatedDataSource<SongSearchResultSectionModel<Representable>> {
         
-        return RxTableViewSectionedAnimatedDataSource<SongSearchResultSectionModel>(
-            animationConfiguration: AnimationConfiguration(insertAnimation: .automatic,
+        return RxTableViewSectionedAnimatedDataSource<SongSearchResultSectionModel<Representable>>(
+            animationConfiguration: AnimationConfiguration(insertAnimation: .none,
                                                            reloadAnimation: .none,
                                                            deleteAnimation: .none),
             configureCell: { (dataSource, tableView, indexPath, element) -> UITableViewCell in
-                let cell = tableView.dequeueReusableCell(withIdentifier: DMSpotifySongTableViewCell.reuseIdentifier,
-                                                         for: indexPath)
                 switch dataSource[indexPath] {
-                case let .songSectionItem(song: item):
-                    (cell as? DMSpotifySongTableViewCell)?.configure(withSong: item)
+                case let .representable(representable: item):
+                    let cell = tableView.dequeueReusableCell(withIdentifier: ResultReusableView.reuseIdentifier,
+                                                             for: indexPath) as! ResultReusableView
+                    cell.configure(withRepresentable: item)
                     return cell
-                case .emptySectionItem:
+                case .empty:
                     let cell = tableView.dequeueReusableCell(withIdentifier: DMKoelEmptyPlaceholderTableViewCell.reuseIdentifier,
-                                                             for: indexPath)
+                                                             for: indexPath) as! DMKoelEmptyPlaceholderTableViewCell
+                    cell.placeholderImage = #imageLiteral(resourceName: "empty song screen placeholder")
+                    cell.placeholderText = UIConstants.strings.noSearchResults
                     return cell
-                default:
+                case .initial:
+                    let cell = tableView.dequeueReusableCell(withIdentifier: DMKoelEmptyPlaceholderTableViewCell.reuseIdentifier,
+                                                             for: indexPath) as! DMKoelEmptyPlaceholderTableViewCell
+                    cell.placeholderImage = #imageLiteral(resourceName: "empty song screen placeholder")
+                    cell.placeholderText = UIConstants.strings.enterToSearch
                     return cell
                 }
+            },
+            titleForHeaderInSection: { dataSource, index in
+                if dataSource.sectionModels[index].identity == SectionType.representables.rawValue {
+                    return UIConstants.strings.userSavedTracks
+                }
+                return nil
             }
         )
     }

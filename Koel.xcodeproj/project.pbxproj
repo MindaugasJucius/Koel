@@ -9,10 +9,12 @@
 /* Begin PBXBuildFile section */
 		031D904420566AE4007D1156 /* ReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 031D904320566AE4007D1156 /* ReusableView.swift */; };
 		031D904620566EB3007D1156 /* SongSharingViewModelType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 031D904520566EB3007D1156 /* SongSharingViewModelType.swift */; };
+		032EA64220FBAAE90038F310 /* DMSpotifySearchContainerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 032EA64120FBAAE90038F310 /* DMSpotifySearchContainerViewController.swift */; };
+		032EA64420FBBD810038F310 /* DMSpotifySearchContainerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 032EA64320FBBD810038F310 /* DMSpotifySearchContainerViewModel.swift */; };
 		035596DA2066B4D20067A737 /* Bindable+PersistedSongs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035596D92066B4D20067A737 /* Bindable+PersistedSongs.swift */; };
 		035596DC2067FA020067A737 /* DMSpotifySearchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035596DB2067FA020067A737 /* DMSpotifySearchService.swift */; };
-		035596DF206804330067A737 /* DMSpotifySongSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035596DE206804330067A737 /* DMSpotifySongSearchViewController.swift */; };
-		035596E1206804460067A737 /* DMSpotifySongSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035596E0206804460067A737 /* DMSpotifySongSearchViewModel.swift */; };
+		035596DF206804330067A737 /* DMSpotifySearchResultsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035596DE206804330067A737 /* DMSpotifySearchResultsViewController.swift */; };
+		035596E1206804460067A737 /* DMSpotifySearchResultsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035596E0206804460067A737 /* DMSpotifySearchResultsViewModel.swift */; };
 		037A47E3205923990030D25F /* DMEntitySharingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 037A47E1205923980030D25F /* DMEntitySharingService.swift */; };
 		039A2C6C2078AAE100C58BE5 /* DMEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 039A2C6B2078AAE100C58BE5 /* DMEntity.swift */; };
 		039A2C6E207A438A00C58BE5 /* Array+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 039A2C6D207A438A00C58BE5 /* Array+Extensions.swift */; };
@@ -25,6 +27,8 @@
 		03BC359320E8274B0099E647 /* String+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03BC359220E8274B0099E647 /* String+Extensions.swift */; };
 		03BC359520E8C9470099E647 /* DMImageDownloadService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03BC359420E8C9470099E647 /* DMImageDownloadService.swift */; };
 		03E47D4420E0C88D0000F480 /* DMSearchResultSong.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03E47D4320E0C88D0000F480 /* DMSearchResultSong.swift */; };
+		03F1E9AB210626130086C765 /* ResultViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03F1E9AA210626130086C765 /* ResultViewModel.swift */; };
+		03F1E9B12108C5200086C765 /* SearchInteractionViewModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03F1E9B02108C5200086C765 /* SearchInteractionViewModels.swift */; };
 		33CD43033F2349BABFA21363 /* Pods_Koel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 859C054680781DDB43D6FFC3 /* Pods_Koel.framework */; };
 		47ADB8775C90C90A34CB0B4E /* Pods_KoelTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C68936EB8AF29A19F4BC4C74 /* Pods_KoelTests.framework */; };
 		5F014BD41FB9E20000079009 /* WaveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F014BD31FB9E20000079009 /* WaveView.swift */; };
@@ -93,10 +97,12 @@
 /* Begin PBXFileReference section */
 		031D904320566AE4007D1156 /* ReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReusableView.swift; sourceTree = "<group>"; };
 		031D904520566EB3007D1156 /* SongSharingViewModelType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongSharingViewModelType.swift; sourceTree = "<group>"; };
+		032EA64120FBAAE90038F310 /* DMSpotifySearchContainerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMSpotifySearchContainerViewController.swift; sourceTree = "<group>"; };
+		032EA64320FBBD810038F310 /* DMSpotifySearchContainerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMSpotifySearchContainerViewModel.swift; sourceTree = "<group>"; };
 		035596D92066B4D20067A737 /* Bindable+PersistedSongs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bindable+PersistedSongs.swift"; sourceTree = "<group>"; };
 		035596DB2067FA020067A737 /* DMSpotifySearchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMSpotifySearchService.swift; sourceTree = "<group>"; };
-		035596DE206804330067A737 /* DMSpotifySongSearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMSpotifySongSearchViewController.swift; sourceTree = "<group>"; };
-		035596E0206804460067A737 /* DMSpotifySongSearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMSpotifySongSearchViewModel.swift; sourceTree = "<group>"; };
+		035596DE206804330067A737 /* DMSpotifySearchResultsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMSpotifySearchResultsViewController.swift; sourceTree = "<group>"; };
+		035596E0206804460067A737 /* DMSpotifySearchResultsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMSpotifySearchResultsViewModel.swift; sourceTree = "<group>"; };
 		037A47E1205923980030D25F /* DMEntitySharingService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DMEntitySharingService.swift; path = Koel/Services/DMEntitySharingService.swift; sourceTree = SOURCE_ROOT; };
 		039A2C6B2078AAE100C58BE5 /* DMEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEntity.swift; sourceTree = "<group>"; };
 		039A2C6D207A438A00C58BE5 /* Array+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Extensions.swift"; sourceTree = "<group>"; };
@@ -109,6 +115,8 @@
 		03BC359220E8274B0099E647 /* String+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extensions.swift"; sourceTree = "<group>"; };
 		03BC359420E8C9470099E647 /* DMImageDownloadService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMImageDownloadService.swift; sourceTree = "<group>"; };
 		03E47D4320E0C88D0000F480 /* DMSearchResultSong.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMSearchResultSong.swift; sourceTree = "<group>"; };
+		03F1E9AA210626130086C765 /* ResultViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultViewModel.swift; sourceTree = "<group>"; };
+		03F1E9B02108C5200086C765 /* SearchInteractionViewModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchInteractionViewModels.swift; sourceTree = "<group>"; };
 		1EEEA22101255BEC78867464 /* Pods-Koel.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Koel.release.xcconfig"; path = "Pods/Target Support Files/Pods-Koel/Pods-Koel.release.xcconfig"; sourceTree = "<group>"; };
 		2F9833A4A17A19528964480E /* Pods-Koel.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Koel.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Koel/Pods-Koel.debug.xcconfig"; sourceTree = "<group>"; };
 		4BFB7D7E45702A7F3768CF64 /* Pods-KoelTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KoelTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-KoelTests/Pods-KoelTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -197,14 +205,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		035596DD206802BA0067A737 /* Song Search */ = {
+		035596DD206802BA0067A737 /* Spotify Search */ = {
 			isa = PBXGroup;
 			children = (
-				035596DE206804330067A737 /* DMSpotifySongSearchViewController.swift */,
-				035596E0206804460067A737 /* DMSpotifySongSearchViewModel.swift */,
+				035596DE206804330067A737 /* DMSpotifySearchResultsViewController.swift */,
+				035596E0206804460067A737 /* DMSpotifySearchResultsViewModel.swift */,
 				5FAFD145206FF5BE00077E39 /* DMSpotifySongTableViewCell.swift */,
+				032EA64120FBAAE90038F310 /* DMSpotifySearchContainerViewController.swift */,
+				032EA64320FBBD810038F310 /* DMSpotifySearchContainerViewModel.swift */,
+				03F1E9AA210626130086C765 /* ResultViewModel.swift */,
+				03F1E9B02108C5200086C765 /* SearchInteractionViewModels.swift */,
 			);
-			path = "Song Search";
+			path = "Spotify Search";
 			sourceTree = "<group>";
 		};
 		4ED69C3232FD6FE416E4C8DB /* Pods */ = {
@@ -247,7 +259,7 @@
 				5F84FF9D1FD98429003332B4 /* Protocols */,
 				5FB665DA1FA346C5005C5165 /* Coordinators */,
 				5F58F0321F9CB7AE006B9B47 /* Extensions */,
-				035596DD206802BA0067A737 /* Song Search */,
+				035596DD206802BA0067A737 /* Spotify Search */,
 				5F47B8321FD4034B0053A0A5 /* Event Search */,
 				5F5445931FD590470059A975 /* Event Participation */,
 				5FDEB6B11F97C02C00070930 /* Event Creation */,
@@ -664,6 +676,7 @@
 				5FD30C471FEE8ED100861353 /* DMEventSongSharingViewModel.swift in Sources */,
 				5F84FFA11FD98531003332B4 /* MultipeerViewModelType.swift in Sources */,
 				5F5445971FD594570059A975 /* DMEventParticipationViewController.swift in Sources */,
+				03F1E9B12108C5200086C765 /* SearchInteractionViewModels.swift in Sources */,
 				03BC359520E8C9470099E647 /* DMImageDownloadService.swift in Sources */,
 				031D904620566EB3007D1156 /* SongSharingViewModelType.swift in Sources */,
 				5F37D88A1FF3D0A6002E0ACD /* DMSpotifyAuthService.swift in Sources */,
@@ -672,10 +685,12 @@
 				5F014BD61FB9E29700079009 /* UIColor+Extensions.swift in Sources */,
 				5F81861C1FD3FAB000477C71 /* SceneCoordinator.swift in Sources */,
 				03BC359120E7DB100099E647 /* KoelPageViewController.swift in Sources */,
-				035596E1206804460067A737 /* DMSpotifySongSearchViewModel.swift in Sources */,
+				035596E1206804460067A737 /* DMSpotifySearchResultsViewModel.swift in Sources */,
 				5F8186181FD3F7F200477C71 /* BindableType.swift in Sources */,
 				5F81861A1FD3FA6800477C71 /* SceneCoordinatorType.swift in Sources */,
 				03BC359320E8274B0099E647 /* String+Extensions.swift in Sources */,
+				032EA64220FBAAE90038F310 /* DMSpotifySearchContainerViewController.swift in Sources */,
+				032EA64420FBBD810038F310 /* DMSpotifySearchContainerViewModel.swift in Sources */,
 				5FDEB6BA1F99235500070930 /* DMInitialLoadingViewController.swift in Sources */,
 				5F84FFB01FDC3AB0003332B4 /* DMEventPeerPersistenceService.swift in Sources */,
 				5FB2C93E1FE8073B001D532F /* Style.swift in Sources */,
@@ -691,9 +706,10 @@
 				5FB2C9401FE8075F001D532F /* Stylesheet.swift in Sources */,
 				5F47B83B1FD4073F0053A0A5 /* ViewModelType.swift in Sources */,
 				037A47E3205923990030D25F /* DMEntitySharingService.swift in Sources */,
+				03F1E9AB210626130086C765 /* ResultViewModel.swift in Sources */,
 				03BC358B20E6C2580099E647 /* ThemeManager.swift in Sources */,
 				035596DA2066B4D20067A737 /* Bindable+PersistedSongs.swift in Sources */,
-				035596DF206804330067A737 /* DMSpotifySongSearchViewController.swift in Sources */,
+				035596DF206804330067A737 /* DMSpotifySearchResultsViewController.swift in Sources */,
 				5F84FF9C1FD86367003332B4 /* DMEventManagementViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
